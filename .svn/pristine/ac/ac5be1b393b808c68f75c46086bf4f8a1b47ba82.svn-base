@@ -1,0 +1,1546 @@
+/**
+ * Created by demo on 2017/7/3.
+ */
+"use strict";
+
+var SystemKeyHandler = require("./SystemKeyHandler.js");
+var Util = require("./util.js");
+module.exports = {
+  querybyckfn:function (keywordid,usrid,itemid){
+      return new Promise(function (resolve,reject) {
+        Complexkeyword.findOne({
+          id: keywordid
+        }).exec(function (err, ck) {
+          if (!ck) {
+            reject(null,'');
+          } else {
+            var _para = {"usrid": usrid};
+            //思路：先根据条件取所有数据，然后进行行内操作，再进行纵向操作
+            getallskinfo(ck, _para,itemid)//lyd 找到所有的sk的信息，主要使用sk的id，理解为便于拿数据具体值，找出sk的id，在下边拿
+              .then(SystemKeyHandler.startprocess)// 这是系统关键字
+              .then(geteachrowconditionflowid) // 获取每一行条件的flowid
+              .then(getrangevaluebyitemid) // 根据每一行条件的flowid和传入的itemid找rangevalue的值
+              .then(replacerangevalbyitiemid) // 如果输入的是para.itemid，根据传入的itemid找出需要替换给rangeval的值
+              .then(queryalldatabycondidtion) //lyd这里是根据ck下找出的所有的sk的id，去对应的flow下找所有的sk具体数据
+              .then(quaryusersinfo)//找ck中用到的人员信息
+              .then(groupforcalculate)//groupby
+              .then(calculate)// 计算
+              .then(calcrrowandbuildreply)//计算多行的数据并整理返回的数据结构
+              .then(function (reply) {
+                  resolve(reply)
+              })
+          }
+        });
+      })
+  }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+// 取出每一行条件的flowid，组成数组，去重
+function geteachrowconditionflowid(data) {
+  return  new Promise(function (resolve,reject) {
+    if(data.itemid){
+      var _operations = data.cks.operations;
+      var ret = [];
+      for(var i = 0 ; i < _operations.length;i++){
+        ret.push(_operations[i].flowid)
+      }
+      data.flowidarr = uniqueArr(ret);
+      resolve(data)
+    }else{
+      resolve(data)
+    }
+  })
+}
+
+// 根据传入的itemid和每一行的flowid，取出数据
+function getrangevaluebyitemid(data) {
+  return new Promise(function (resolve,reject) {
+    if(data.flowidarr && data.flowidarr.length > 0) {
+      var _flowidarr = data.flowidarr;
+      var _itemid = data.itemid;
+      async.series(
+        buildqueryrangevaluefn(_flowidarr,_itemid),
+        function (err,result) {
+          if(result){
+            data.rangevaldata = result;
+            resolve(data)
+          }
+        }
+      )
+    }else{
+      resolve(data)
+    }
+  })
+}
+
+// 跟据flowid和itemid，组件查询函数
+function buildqueryrangevaluefn(flowidarr ,itemid) {
+  var ret = [];
+  for(var i = 0 ; i < flowidarr.length;i++){
+    (function (i) {
+    var queryrangevaluefn = function (callback) {
+      var flowid = flowidarr[i];
+      var  flowdb = eval("n"+flowid);
+      flowdb.findOne(
+        {id:itemid}
+      ).exec(function (err,val) {
+        if(!val){
+          callback(null,"")
+        }else {
+          callback(null,val)
+        }
+      })
+    };
+      ret.push(queryrangevaluefn)
+    }(i))
+
+  }
+  return ret;
+}
+
+// 将ck中的para.itemid替换为相对应的值
+function replacerangevalbyitiemid(data) {
+    return new Promise(function (resolve,reject) {
+        var _operations = data.cks.operations;
+        for(var i = 0;i < _operations.length;i++){
+            if(_operations[i].condition.range.value == "para.itemid"){
+                var _rangeskid = _operations[i].condition.range.skid;
+                var rangekeyname = getskkey(_operations[i].condition.range.skid,data.sks);
+                var rangekeyval = getrangekeyval(_operations[i].flowid,rangekeyname,data.rangevaldata);
+                data.cks.operations[i].condition.range.value = rangekeyval;
+            }
+        }
+        resolve(data)
+    })
+}
+
+// 根据flowid和keyname找出相对应的值
+function getrangekeyval(flowid,keyname,arr) {
+    for(var i = 0 ; i < arr.length;i++){
+        if(arr[i].flowid == flowid){
+           return arr[i][keyname]
+        }
+    }
+}
+
+//for compelx key
+//根据条件来对每一项进行搜索。
+function getallskinfo(ck,_para,itemid){
+  return new Promise(function (resolve, reject) {
+    Simplekeyword.find({
+      or : getkeylike(ck,"skid")
+    }).exec(function (err, sks) {
+      if (sks) {
+        var data = {};
+        data.cks = ck;
+        data.sks = sks;
+        data._para = _para;
+        data.itemid = itemid;
+        resolve(data);
+        //lyd   这里是返回找出的sk的信息，同时返回传入的ck，理解为sks是个[{},...]  log确定
+      } else {
+        reject(err);
+      }
+    })
+  });
+}
+
+function queryalldatabycondidtion(data){
+  //这里的cks也就是ck所有数据
+  var cks = data.cks; // 原始的complex key
+  var sks = data.sks; // 取出的simple key类型。
+  return new Promise(function (resolve, reject) {
+    //异步调用所有的
+    async.series(
+      //lyd 这里是准备一个队列，是一组XXX.find(){}...
+      buildckqueryfunctions(cks, sks)
+      ,function(err, results) {//lyd   log一下看找到的数据的结果！
+        if (results) {
+          data.results = results;
+          resolve(data);
+        } else {
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+function quaryusersinfo(data) {
+  return new Promise(function (resolve,reject) {
+    var _search_condition = [];
+    for(var j = 0 ; j < data.cks.operations.length;j++){
+      var temp = {};
+      if(data.cks.operations[j].condition.persons.who){
+        temp.id = data.cks.operations[j].condition.persons.who;
+        _search_condition.push(temp);
+      }
+    }
+    Users.find({
+      or:_search_condition
+    }).exec(function (err,users) {
+      if(users){
+        data.usersinfo = users;
+        resolve(data)
+      }else{
+        reject('quaryusersinfo error')
+      }
+    })
+  })
+}
+
+function calculate(data) {
+  return new Promise(function (resolve,reject) {
+    if(data.groupforcalc){
+      var _forCalc = data.groupforcalc;
+      // 对多行查出的数据进行循环，得到每行groupby过的数据
+      for(var i = 0;i < _forCalc.length;i++){
+        // 这是第一层判断 --start
+        var _rowOperation = "";
+        for(var keyLevel1 in  _forCalc[i]){
+          // 定义一个层数在多行计算时候使用
+          if(typeof _forCalc[i][keyLevel1] == "string" && keyLevel1 == "rowOperation"){
+            _rowOperation = _forCalc[i][keyLevel1];
+          }
+          // 判断有没有operation,这个字段和left/right是同一级的，判断left/right可能会触发两次，
+          // 所以改为判断operation，operation可能为空，但有这个字段
+          if(keyLevel1 == 'operation'){
+            console.log('di 1 ceng');
+            var re = calculateNode(_forCalc[i],data.usersinfo);
+            _forCalc[i] = re;
+            _forCalc[i]['level'] = 1;
+            _forCalc[i]['rowOperation'] = _rowOperation;
+            break;
+          }
+          // 判断是不是对象格式的
+          if(Object.prototype.toString.call(_forCalc[i][keyLevel1]) == "[object Object]"){
+            // 这是第二层判断 --Start
+            for(var keyLevel2 in _forCalc[i][keyLevel1]){
+              if(keyLevel2 == "operation"){
+                console.log('di 2 ceng ')
+                var re = calculateNode(_forCalc[i][keyLevel1],data.usersinfo);
+                _forCalc[i][keyLevel1] = re;
+                _forCalc[i]['level'] = 2;
+                break;
+              }
+              if(Object.prototype.toString.call(_forCalc[i][keyLevel1][keyLevel2]) == "[object Object]"){
+                // 这是判断第三层
+                for(var keyLevel3 in _forCalc[i][keyLevel1][keyLevel2]){
+                  if(keyLevel3 == "operation"){
+                    console.log('di 3 ceng ')
+                   var re = calculateNode(_forCalc[i][keyLevel1][keyLevel2],data.usersinfo);
+                     _forCalc[i][keyLevel1] = re;
+                    _forCalc[i]['level'] = 3;
+                    break;
+                  }
+                  if(Object.prototype.toString.call(_forCalc[i][keyLevel1][keyLevel2][keyLevel3]) == "[object Object]"){
+                    // 这是判断第四层
+                    for(var keyLevel4 in _forCalc[i][keyLevel1][keyLevel2][keyLevel3]){
+                      if(keyLevel4 == "operation"){
+                        console.log('di 4 ceng')
+                        var re = calculateNode(_forCalc[i][keyLevel1][keyLevel2][keyLevel3],data.usersinfo);
+                        _forCalc[i][keyLevel1][keyLevel2][keyLevel3] = re;
+                        _forCalc[i]['level'] = 4;
+                        break;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            // 这是第二层判断--end
+          }
+        }
+        // 这是第一层判断 --end
+      }
+      data.groupforcalc = _forCalc;
+      resolve(data)
+    }else{
+      resolve(data)
+    }
+  })
+}
+
+// 对多行数据进行计算并整理返回值
+function calcrrowandbuildreply(data) {
+ return new Promise(function (resolve,reject) {
+   if(data.groupforcalc && data.groupforcalc.length > 0){
+     var ret = {};
+     // console.log('-groupforcalc------------')
+     // console.log(data.groupforcalc)
+      var _forCalc = data.groupforcalc;
+      // 临时变量，保存每次循环出来的level的值
+      var _tempLevel = _forCalc[0].level;
+      // level的值是否相同
+      var _isLevelEqual = false;
+      for(var i = 0 ; i < _forCalc.length;i++){
+        if(_tempLevel == _forCalc[i].level){
+          _tempLevel = _forCalc[i].level;
+          _isLevelEqual = true;
+        }else{
+          _isLevelEqual = false;
+        }
+      }
+      console.log('_isLevelEqual:'+_isLevelEqual);
+      // 判断层数相同的时候，可进行多行计算
+     if(_isLevelEqual == true){
+       for(var keylev1 in _forCalc[0]){
+         if(keylev1 == "data" || keylev1 == "valL" || keylev1 == "valR"){
+           if(keylev1 == "data"){
+             _resultArr = _forCalc[0][keylev1];
+           }
+           if(keylev1 == "valL"){
+             _resultArr = _forCalc[0][keylev1];
+           }
+           if(keylev1 == "valR"){
+             _resultArr = _forCalc[0][keylev1];
+           }
+           console.log('--------------1');
+           calceachrownode(_forCalc,1)
+
+         }
+         if(Object.prototype.toString.call(_forCalc[0][keylev1]) == "[object Object]"){
+           for(var keylev2 in _forCalc[0][keylev1]){
+             var _resultArr = [];
+             console.log('----------------------')
+             console.log(_forCalc[0][keylev1][keylev2])
+             if(Object.prototype.toString.call(_forCalc[0][keylev1][keylev2]) == "[object Array]"){
+
+               if(_forCalc[0][keylev1][keylev2]["valL"]){
+                 _resultArr = _forCalc[0][keylev1][keylev2]["valL"];
+               }
+               if(_forCalc[0][keylev1][keylev2]["valR"]){
+                 _resultArr = _forCalc[0][keylev1][keylev2]["valR"];
+               }
+               if(_forCalc[0][keylev1][keylev2]["data"]){
+                 if(Object.prototype.toString.call(_forCalc[0][keylev1][keylev2]["data"]) == "[object Array]"){
+                   _resultArr = _forCalc[0][keylev1][keylev2]["data"];
+                 }else if(typeof _forCalc[0][keylev1][keylev2]["data"] == "number"){
+                   _resultSingal = _forCalc[0][keylev1][keylev2]["data"];
+                 }
+               }
+               console.log('------------112')
+               console.log(keylev1)
+               console.log(keylev2)
+               console.log('_resultArr')
+               console.log(_resultArr)
+               console.log('_resultSingal')
+               console.log(_resultSingal)
+               console.log('------------872')
+             }
+             if(Object.prototype.toString.call(_forCalc[0][keylev1][keylev2]) == "[object Object]"){
+               for(var keylev3 in _forCalc[0][keylev1][keylev2]){
+                 var _resultArr = []
+                 if(_forCalc[0][keylev1][keylev2][keylev3]["valL"]){
+                   _resultArr = _forCalc[0][keylev1][keylev2][keylev3]["valL"];
+                 }
+                 if(_forCalc[0][keylev1][keylev2][keylev3]["valR"]){
+                   _resultArr = _forCalc[0][keylev1][keylev2][keylev3]["valR"];
+                 }
+                 if(_forCalc[0][keylev1][keylev2][keylev3]["data"]){
+                   if(Object.prototype.toString.call(_forCalc[0][keylev1][keylev2][keylev3]["data"]) == "[object Array]"){
+                     _resultArr = _forCalc[0][keylev1][keylev2][keylev3]["data"];
+                   }else if(typeof _forCalc[0][keylev1][keylev2][keylev3]["data"] == "number"){
+                     _resultSingal = _forCalc[0][keylev1][keylev2][keylev3]["data"];
+                   }
+                 }
+                 console.log('------------113')
+                 console.log(keylev1)
+                 console.log(keylev2)
+                 console.log(keylev3)
+                 console.log('_resultArr')
+                 console.log(_resultArr)
+                 console.log('_resultSingal')
+                 console.log(_resultSingal)
+                 console.log('------------873')
+               }
+             }
+           }
+         }
+       }
+
+
+       resolve(_forCalc)
+     }else{
+       // 这里是层数不相同的情况，返回第一行的结果
+        var _cksName = data.cks.name;
+        var _cksDesc = data.cks.desc;
+        ret["name"] = _cksName;
+        ret["desc"] = _cksDesc;
+        delete data.groupforcalc[0].rowOperation;
+        delete data.groupforcalc[0].level;
+        var _firstDataRet = data.groupforcalc[0];
+        ret['data'] = _firstDataRet;
+     }
+   }
+   resolve(ret)
+ })
+}
+
+function calceachrownode(arr,lev) {
+  var ret = [];
+  if(lev == 1){
+    for(var i = 0 ; i < arr.length;i++){
+      if(arr[i].rowOperation == ""){
+        if(arr[i]['data']){
+          ret = arr[i]['data'];
+        }else if(arr[i]["valL"]){
+          ret = arr[i]['valL'];
+        }else if(arr[i]['valR']){
+          ret = arr[i]['valR']
+        }
+
+      }else if(arr[i].rowOperation == "+"){
+
+      }
+    }
+  }
+}
+// 对左右节点选出的数据进行整理
+function calculateNode(obj,usrinfo) {
+  // 这是要返回的值
+  var ret = {};
+  // 这是左右之间的计算条件,可为空
+  var _operation = '';
+  if(obj.operation){
+    _operation = obj.operation;
+  }
+  // 左边的前置条件
+  var _leftOperation = "";
+  if(obj.leftOperation){
+    _leftOperation = obj.leftOperation;
+  }
+  // 右边的前置条件
+  var _rightOperation = "";
+  if(obj.rightOperation){
+    _rightOperation = obj.rightOperation;
+  }
+  // 左节点选出的值
+  var _left = [];
+  if(obj.left){
+    _left = obj.left;
+  }
+  // 右节点选出的值
+  var _right = [];
+  if(obj.right){
+    _right = obj.right;
+  }
+  // 是否可用于计算
+  // 两边的值是不是都可计算的
+  var _isCalcAble = true;
+  // 左边的值是不是可计算的
+  var _isCalcAbleL = true;
+  // 右边的值是不是可计算的
+  var _isCalcAbleR = true;
+  // 左边返回的值是个数组
+  var _tempLeftValArr = [];
+  // 右边返回的值是个数组
+  var _tempRightValArr = [];
+  // 左边的值是个单值
+  var _tempLeftSingleVal = 0;
+  // 右边的值是个单值
+  var _tempRightSingleVal = 0;
+
+  // 判断值是不是可计算
+  if(_left && _left.length > 0){
+    for(var ii = 0 ; ii < _left.length;ii++){
+      if(isNaN(Number(_left[ii]["val"])) || (typeof _left[ii]["val"] == "number" && String(parseInt(_left[ii]["val"])).length == 13)){
+        _isCalcAble = false;
+        _isCalcAbleL = false;
+        break;
+      }
+    }
+  }
+
+  if(_right && _right.length > 0){
+    for(var nn = 0 ; nn < _right.length;nn++){
+      if(isNaN(Number(_right[nn]["val"])) || (typeof _right[nn]["val"] == "number" && String(parseInt(_right[nn]["val"])).length == 13)){
+        _isCalcAbleR = false;
+        break;
+      }
+    }
+  }
+
+  if(_isCalcAble == true){
+    if(_right && _right.length > 0){
+      for(var nn = 0 ; nn < _right.length;nn++){
+        if(isNaN(Number(_right[nn]["val"])) || (typeof _right[nn]["val"] == "number" && String(parseInt(_right[nn]["val"])).length == 13)){
+          _isCalcAble = false;
+          break;
+        }
+      }
+    }
+  }
+  // 如果左侧有数据
+  if(_left && _left.length > 0){
+    // 将左侧选出的值中的id和时间戳转为时间
+    for(var jj = 0 ;jj < _left.length;jj++){
+      var regid = /^[a-zA-Z0-9]{24}/;
+      // 如果是id,替换为人
+      if(regid.test(_left[jj]["val"])) {
+        var _temp = _left[jj]["val"];
+        var usrname = getusername(_temp, usrinfo);
+        _left[jj]["val"] = usrname;
+      }
+      if( typeof _left[jj]["val"] == "number" && String(parseInt(_left[jj]["val"])).length == 13){
+        var tempTime = formatTime(_left[jj]["val"],"yyyy-MM-dd hh:mm");
+        _left[jj]["val"] = tempTime
+      }
+    }
+
+    var _tempLeftArr = [];
+    var  _leftKey = _left[0]["key"];
+    // 不可计算的
+    if(_isCalcAbleL == false){
+      // 左边的
+      // 不可计算的，没有前置条件则列出所有的
+      if(_leftOperation == ""){
+        for(var i = 0;i < _left.length;i++){
+          if(!ret[_left[i]["key"]]){
+            ret[_left[i]["key"]] = [];
+          };
+          ret[_left[i]["key"]].push(_left[i]["val"]);
+        }
+      }else{ // 不可计算的，有前置条件的返回计算结果统计个数
+        var _tempArrL = [];
+        for(var i = 0 ; i < _left.length;i++){
+          _tempArrL.push(_left[i]["val"]);
+        }
+        var resuL = arrRepeatEle(_tempArrL);
+        ret = resuL;
+      }
+    }else{
+      // 左边的可计算
+      for(var i = 0 ; i < _left.length;i++){
+        _tempLeftArr.push(_left[i]["val"]);
+      }
+      if(_leftOperation == "sum"){
+        var sumVal = Util.arraysum(_tempLeftArr);
+        ret['keyL'] = _leftKey;
+        ret['valL'] = sumVal;
+        _tempLeftSingleVal = sumVal;
+      }else if(_leftOperation == "avg"){
+        var avgVal = Util.arrayaveg(_tempLeftArr);
+        ret['keyL'] = _leftKey;
+        ret['valL'] = avgVal;
+        _tempLeftSingleVal = avgVal;
+      }else if(_leftOperation == ''){
+        ret['keyL'] = _leftKey;
+        ret['valL'] = _tempLeftArr;
+        _tempLeftValArr = _tempLeftArr;
+      }
+    }
+  }
+
+  // 如果右侧有数据
+  if(_right && _right.length > 0){
+    // 将右侧选出的值中的id和时间戳做替换
+    for(var mm = 0 ; mm < _right.length;mm++){
+      var regid = /^[a-zA-Z0-9]{24}/;
+      if(regid.test(_right[mm]["val"])){
+        var _temp = _right[mm]["val"];
+        var usrname = getusername(_temp, usrinfo);
+        _right[mm]["val"] = usrname;
+      }
+      if(typeof _right[mm]["val"] == "number" && String(parseInt(_right[mm]["val"])).length == 13){
+        var tempTime = formatTime(_right[mm]["val"],"yyyy-MM-dd hh:mm");
+        _right[mm]["val"] = tempTime;
+      }
+    }
+    var _tempRightArr = [];
+    var _rightKey = _right[0]["key"];
+    // 这里是不可计算的
+    if(_isCalcAbleR == false){
+      // 右边的前置条件为空，不计算
+      if(_rightOperation == ""){
+        for(var j = 0;j < _right.length;j++){
+          if(!ret[_right[j]["key"]]){
+            ret[_right[j]["key"]] = [];
+          }
+          ret[_right[j]["key"]].push(_right[j]["val"]);
+        }
+      }else{
+        // 右侧的前置条件不为空，则列出每一项及个数
+        var _tempArrR = [];
+        for(var j = 0 ; j < _right.length;j++){
+          _tempArrR.push(_right[j]["val"]);
+        }
+        var resuR = arrRepeatEle(_tempArrR);
+        ret = Object.assign(ret,resuR);
+      }
+    }else{
+      // 可计算的，则进行计算
+      for(var j = 0 ; j < _right.length;j++){
+        _tempRightArr.push(_right[j]["val"]);
+      }
+      if(_rightOperation == "sum"){
+        var sumVal = Util.arraysum(_tempRightArr);
+        ret['keyR'] = _rightKey;
+        ret['valR'] = sumVal;
+        _tempRightSingleVal = sumVal;
+      }else if(_rightOperation == "avg"){
+        var avgVal = Util.arrayaveg(_tempRightArr);
+        ret['keyR'] = _rightKey;
+        ret['valR'] = _rightKey;
+        _tempRightSingleVal = avgVal;
+      }else if(_rightOperation == ""){
+        ret['keyR'] = _rightKey;
+        ret['valR'] = _tempRightArr;
+        _tempRightValArr = _tempRightArr;
+      }
+    }
+  }
+
+  // 如果有中间条件，做出计算
+  if(_operation){
+    if(_isCalcAble == true){
+      // 判断数组对数据计算
+
+      if(_tempLeftValArr && _tempLeftValArr.length > 0 && _tempRightValArr && _tempRightValArr.length > 0){
+        var _rempRowRsuArr = [];
+        for(var h = 0 ; h < _tempLeftValArr.length;h++){
+          var _tempRsu = 0;
+          if(_operation == "+"){
+            _tempRsu = _tempLeftValArr[h] + _tempRightValArr[h];
+          }else if(_operation == "-"){
+            _tempRsu = _tempLeftValArr[h] - _tempRightValArr[h];
+          }else if(_operation == "*"){
+            _tempRsu = _tempLeftValArr[h] * _tempRightValArr[h];
+          }else if(_operation == "/"){
+            _tempRsu = _tempLeftValArr[h] / _tempRightValArr[h];
+          }
+          _rempRowRsuArr.push(_tempRsu)
+        }
+        ret = {};
+        ret['data'] = _rempRowRsuArr;
+      }else if(_tempLeftValArr && _tempLeftValArr.length > 0){
+        ret = {};
+        ret['data'] = _tempLeftValArr;
+      }else if(_tempRightValArr && _tempRightValArr.length > 0){
+        ret = {};
+        ret['data'] = _tempRightValArr;
+      }
+
+      if(_tempLeftSingleVal && _tempRightSingleVal){
+        // 判断单值对单值计算
+        var _tempRsuSingle = 0;
+        if(_operation == "+"){
+          _tempRsuSingle = _tempLeftSingleVal + _tempRightSingleVal;
+        }else if(_operation == "-"){
+          _tempRsuSingle = _tempLeftSingleVal - _tempRightSingleVal;
+        }else if(_operation == "*"){
+          _tempRsuSingle = _tempLeftSingleVal * _tempRightSingleVal;
+        }else if(_operation == "/"){
+          _tempRsuSingle = _tempLeftSingleVal / _tempRightSingleVal;
+        }
+        ret = {};
+        ret['data'] = _tempRsuSingle;
+      }
+    }
+  }
+  return ret;
+}
+
+function groupforcalculate(data){
+  // console.log('-------calcdata');
+  // console.log(data);
+  // console.log('------operation----')
+  // console.log(data.cks.operations[0]);
+  // console.log('---end-----')
+  return new Promise(function (resolve, reject) {
+    if(data.results && data.results.length > 0) {
+      var _ckOperations = data.cks.operations;
+      // 这是按照条件保存的数据的格式,多行的数据
+      var _formatDataBeforeCalculateAllRows = [];
+      // 对cks的operations进行循环，得出每一行的条件
+      for(var i = 0 ; i < _ckOperations.length;i++){
+        // 这是按照条件保存的数据的格式，这是每一行的数据
+        var _formatDataBeforeCalculate = {};
+        // 是否有范围  有&& !all  为true
+        var _isRange = false;
+        // 是否有时间
+        var _isWhen = false;
+        // 是否有人员范围  有 && !all 为true
+        var _isWho = false;
+        // 范围是否需要groupBy
+        var _isRangeGroupBy = false;
+        // interval 返回值的频率
+        var _isInterval = false;
+        // 人员是否需要groupBy
+        var _isPersonGroupBy = false;
+        // 判断有没有范围
+        if(_ckOperations[i].condition.range.value && _ckOperations[i].condition.range.value != "all"){
+          _isRange = true;
+        }
+        // 判断有没有时间
+        if(_ckOperations[i].condition.duration.skid){
+          _isWhen = true;
+        }
+        // 判断有没有人
+        if(_ckOperations[i].condition.persons.who && _ckOperations[i].condition.persons.who != "all"){
+          _isWho = true;
+        }
+        // // 判断范围需要不需要groupby
+        // if(_ckOperations[i].condition.range.value && _ckOperations[i].condition.range.value == "all"){
+        //   _isRangeGroupBy = true;
+        // }
+        // 判断有没有interval
+        if(_ckOperations[i].condition.duration.interval){
+          _isInterval = true;
+        }
+        // // 判断人需要不需要groupBy
+        // if(_ckOperations[i].condition.persons.who && _ckOperations[i].condition.persons.who == "all"){
+        //   _isPersonGroupBy = true;
+        // }
+        // 先按照条件整理数据，没计算之前的数据，先按照条件生成返回数据的壳子，再处理数据
+
+        // var _durationStart = _ckOperations[i].condition.duration.start;
+        // var _durationEnd = _ckOperations[i].condition.duration.end;
+        var _durationSkid = _ckOperations[i].condition.duration.skid;
+        var _durationKey = getskkey(_durationSkid,data.sks);
+        //
+        // if(_durationStart && typeof _durationStart == "string"){
+        //   _durationStart = new Date(_durationStart).getTime();
+        // }
+        // if(_durationEnd && typeof _durationEnd == "string"){
+        //   _durationEnd = new Date(_durationEnd).getTime();
+        // }
+
+        // // 如果没有定义起始时间，找每行条件中查出的数据中最早提交的时间，作为起始时间
+        // // 在查询数据时候，已经给数据规定为按照createdAt ASC排序，最早的时间放在数组头部，最晚的时间在数组最后
+        // if(!_durationStart){
+        //   if(data.results[i] && data.results[i].length > 0){
+        //     _durationStart = data.results[i][0][_durationKey];
+        //   }
+        // }
+        // // 如果没有定义结束时间，找每行条件中查出的数据中最晚提交的时间，作为结束时间
+        // if(!_durationEnd){
+        //   if(data.results[i] && data.results[i].length > 0){
+        //     var _arrLen = data.results[i].length;
+        //     _durationEnd = data.results[i][_arrLen - 1][_durationKey];
+        //   }
+        // }
+
+        // 这里对时间戳做个比较，小的作为起始时间，大的为结束时间
+        // var _tempStr = 0;
+        // if(_durationStart > _durationEnd){
+        //   _tempStr = _durationStart;
+        //   _durationStart = _durationEnd;
+        //   _durationEnd = _tempStr;
+        // }
+        // var _dateStart = new Date(_durationStart);
+        // var _yearStart = _dateStart.getFullYear();
+        // var _monthStart = _dateStart.getMonth() + 1;
+        // var _dayStart = _dateStart.getDate();
+        //
+        // var _dateEnd = new Date(_durationEnd);
+        // var _yearEnd = _dateEnd.getFullYear();
+        // var _monthEnd = _dateEnd.getMonth() + 1;
+        // var _dayEnd = _dateEnd.getDate();
+
+        var _intervalVal = _ckOperations[i].condition.duration.interval;
+
+        var _rangeSkid = _ckOperations[i].condition.range.skid;
+        var _rangeKey = getskkey(_rangeSkid,data.sks);
+        var _leftSkid = _ckOperations[i].func.leftnodeskid;
+        var _rightSkid = _ckOperations[i].func.rightnodeskid;
+        var _personsSkid = _ckOperations[i].condition.persons.skid;
+        var _personsKey = getskkey(_personsSkid,data.sks);
+        var _leftOperation = _ckOperations[i].func.leftnodeskoperation;
+        var _rightOperation = _ckOperations[i].func.rightnodeskoperation;
+        var _operation = _ckOperations[i].func.operation;
+        var _rowOperation = _ckOperations[i].operation;
+        // 这是每一行的前置条件
+        _formatDataBeforeCalculate['rowOperation'] = _rowOperation;
+        // if(_isRange &&_isWhen && _isWho)  -- Start
+        if(_isRange &&_isWhen && _isWho){
+          console.log('_isRange &&_isWhen && _isWho');
+          // 这是有interval的
+          if(_isInterval){
+            console.log('_isInterval');
+            // 这里是以月为单位返回数据
+            // if(_intervalVal == "month"){
+              // 判断跨年的数据，使用_monthStart作为开始时间，12作为前一年结束时间，1作为下一年开始时间，_monthEnd作为下一年的结束时间
+            //   for(var n = _yearStart;n <= _yearEnd;n++){
+            //   //   // 判断跨年数据按月分类的头一年以指定月开始
+            //     if(n == _yearStart){
+            //       for(var x = _monthStart;x <= 12;x++){
+            //         _formatDataBeforeCalculate[n + '-' + x] = {};
+            //       }
+            //     }else if(n == _yearEnd){
+            //       // 判断跨年数据按月分类的最后一年以指定月结束
+            //       for(var y = 1;y <= _monthEnd;y++){
+            //         _formatDataBeforeCalculate[n + '-' + y] = {};
+            //       }
+            //     }else{
+            //       // 判断跨年数据按月分类的中间年，1-12月
+            //       for(var z = 1;z <= 12;z++){
+            //         _formatDataBeforeCalculate[n + '-' + z] = {};
+            //       }
+            //     }
+            //   }
+            // }
+            //
+            // // 这里是以年为单位返回数据
+            // if(_intervalVal == "year"){
+            //   for(var m = _yearStart;m <= _yearEnd;m++){
+            //     _formatDataBeforeCalculate[m] = {};
+            //   }
+            // }
+
+            // 插入数据
+            for(var xi = 0;xi <data.results[i].length;xi++){
+              var _intervalKeyForData = "";
+              var _rangekeyInData = data.results[i][xi][_rangeKey];
+              var _dataTime = data.results[i][xi][_durationKey];
+              var _dataTimeStamp = new Date(_dataTime);
+              var _dataYear = _dataTimeStamp.getFullYear();
+              var _dataMonth = _dataTimeStamp.getMonth() + 1;
+              var _dataDay = _dataTimeStamp.getDate();
+              if(_intervalVal == "year"){
+                _intervalKeyForData = _dataYear;
+              }
+              if(_intervalVal == "month"){
+                _intervalKeyForData = _dataYear +padzero(_dataMonth);
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData]){
+                _formatDataBeforeCalculate[_intervalKeyForData] = {};
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]){
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData] = {};
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["operation"] = _operation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["left"] = [];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["right"] = [];
+              }
+
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][xi][_leftSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][xi][_rightSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["right"].push(_tempObjR);
+              }
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData])
+              // console.log('-------')
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData])
+            }
+          }else{
+              // 这是没有interval的
+              // 每一行条件查一次数据，多行条件下查出的数据是二维数组，数组的索引和条件的一致
+
+             for(var j = 0 ; j < data.results[i].length;j++){
+               var _rangekeyInData = data.results[i][j][_rangeKey];
+               if(_formatDataBeforeCalculate[_rangekeyInData]){
+                 _formatDataBeforeCalculate[_rangekeyInData]["operation"] = _operation;
+                 if(_leftSkid){
+                    var _leftSkKey = getskkey(_leftSkid,data.sks);
+                    var _leftSkName = getskname(_leftSkid,data.sks);
+                    var _tempObjL = {};
+                   _tempObjL["key"] = _leftSkName;
+                   _tempObjL["val"] = data.results[i][j][_leftSkKey];
+                   _formatDataBeforeCalculate[_rangekeyInData]["leftOperation"] = _leftOperation;
+                   _formatDataBeforeCalculate[_rangekeyInData]["left"].push(_tempObjL);
+                 }
+                 if(_rightSkid){
+                   var _rightSkKey = getskkey(_rightSkid,data.sks);
+                   var _rightSkName = getskname(_rightSkid,data.sks);
+                   var _tempObjR = {};
+                   _tempObjR["key"] = _rightSkName;
+                   _tempObjR["val"] = data.results[i][j][_rightSkKey];
+                   _formatDataBeforeCalculate[_rangekeyInData]["rightOperation"] = _rightOperation;
+                   _formatDataBeforeCalculate[_rangekeyInData]["right"].push(_tempObjR);
+                 }
+               }else{
+                 _formatDataBeforeCalculate[_rangekeyInData] = {};
+                 _formatDataBeforeCalculate[_rangekeyInData]["operation"] = _operation;
+                 if(_leftSkid){
+                   var _leftSkKey = getskkey(_leftSkid,data.sks);
+                   var _leftSkName = getskname(_leftSkid,data.sks);
+                   var _tempObjL = {};
+                   _tempObjL["key"] = _leftSkName;
+                   _tempObjL["val"] = data.results[i][j][_leftSkKey];
+                   _formatDataBeforeCalculate[_rangekeyInData]["leftOperation"] = _leftOperation;
+                   _formatDataBeforeCalculate[_rangekeyInData]["left"] = [_tempObjL];
+                 }
+                 if(_rightSkid){
+                   var _rightSkKey = getskkey(_rightSkid,data.sks);
+                   var _rightSkName = getskname(_rightSkid,data.sks);
+                   var _tempObjR = {};
+                   _tempObjR["key"] = _rightSkName;
+                   _tempObjR["val"] = data.results[i][j][_rightSkKey];
+                   _formatDataBeforeCalculate[_rangekeyInData]["rightOperation"] = _rightOperation;
+                   _formatDataBeforeCalculate[_rangekeyInData]["right"] = [_tempObjR];
+                 }
+               }
+             }
+          }
+          _formatDataBeforeCalculateAllRows.push(_formatDataBeforeCalculate);
+          continue;
+        }
+        // if(_isRange &&_isWhen && _isWho)  --end
+
+        // if(iswho & iswhen) -- Start
+        else if(_isWho && _isWhen){
+          console.log('_isWho && _isWhen')
+          if(_isInterval){
+            console.log('_isInterval')
+            // 这里是以月为单位返回数据
+            // if(_intervalVal == "month"){
+            //   //判断跨年的数据，使用_monthStart作为开始时间，12作为前一年结束时间，1作为下一年开始时间，_monthEnd作为下一年的结束时间
+            //   for(var n = _yearStart;n <= _yearEnd;n++){
+            //     //   // 判断跨年数据按月分类的头一年以指定月开始
+            //     if(n == _yearStart){
+            //       for(var x = _monthStart;x <= 12;x++){
+            //         _formatDataBeforeCalculate[n + '-' + x] = {};
+            //       }
+            //     }else if(n == _yearEnd){
+            //       // 判断跨年数据按月分类的最后一年以指定月结束
+            //       for(var y = 1;y <= _monthEnd;y++){
+            //         _formatDataBeforeCalculate[n + '-' + y] = {};
+            //       }
+            //     }else{
+            //       // 判断跨年数据按月分类的中间年，1-12月
+            //       for(var z = 1;z <= 12;z++){
+            //         _formatDataBeforeCalculate[n + '-' + z] = {};
+            //       }
+            //     }
+            //   }
+            // }
+            //
+            // // 这里是以年为单位返回数据
+            // if(_intervalVal == "year"){
+            //   for(var m = _yearStart;m <= _yearEnd;m++){
+            //     _formatDataBeforeCalculate[m] = {};
+            //   }
+            // }
+
+            // 插入数据
+            for(var xi = 0;xi <data.results[i].length;xi++){
+              var _intervalKeyForData = "";
+              var _rangekeyInData = data.results[i][xi][_rangeKey];
+              var _dataTime = data.results[i][xi][_durationKey];
+              var _dataTimeStamp = new Date(_dataTime);
+              var _dataYear = _dataTimeStamp.getFullYear();
+              var _dataMonth = _dataTimeStamp.getMonth() + 1;
+              var _dataDay = _dataTimeStamp.getDate();
+              if(_intervalVal == "year"){
+                _intervalKeyForData = _dataYear;
+              }
+              if(_intervalVal == "month"){
+                _intervalKeyForData = _dataYear + padzero(_dataMonth);
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData]){
+                _formatDataBeforeCalculate[_intervalKeyForData] = {}
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]){
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData] = {};
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["operation"] = _operation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["left"] = [];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["right"] = [];
+              }
+
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][xi][_leftSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][xi][_rightSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData]["right"].push(_tempObjR);
+              }
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData])
+              // console.log('----')
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData][_rangekeyInData])
+            }
+          }else{
+            for(var j = 0 ; j < data.results[i].length;j++){
+              var _rangekeyInData = data.results[i][j][_rangeKey];
+              if(_formatDataBeforeCalculate[_rangekeyInData]){
+                _formatDataBeforeCalculate[_rangekeyInData]["operation"] = _operation;
+                if(_leftSkid){
+                  var _leftSkKey = getskkey(_leftSkid,data.sks);
+                  var _leftSkName = getskname(_leftSkid,data.sks);
+                  var _tempObjL = {};
+                  _tempObjL["key"] = _leftSkName;
+                  _tempObjL["val"] = data.results[i][j][_leftSkKey];
+                  _formatDataBeforeCalculate[_rangekeyInData]["leftOperation"] = _leftOperation;
+                  _formatDataBeforeCalculate[_rangekeyInData]["left"].push(_tempObjL);
+                }
+                if(_rightSkid){
+                  var _rightSkKey = getskkey(_rightSkid,data.sks);
+                  var _rightSkName = getskname(_rightSkid,data.sks);
+                  var _tempObjR = {};
+                  _tempObjR["key"] = _rightSkName;
+                  _tempObjR["val"] = data.results[i][j][_rightSkKey];
+                  _formatDataBeforeCalculate[_rangekeyInData]["rightOperation"] = _rightOperation;
+                  _formatDataBeforeCalculate[_rangekeyInData]["right"].push(_tempObjR);
+                }
+              }else{
+                _formatDataBeforeCalculate[_rangekeyInData] = {};
+                _formatDataBeforeCalculate[_rangekeyInData]["operation"] = _operation;
+                if(_leftSkid){
+                  var _leftSkKey = getskkey(_leftSkid,data.sks);
+                  var _leftSkName = getskname(_leftSkid,data.sks);
+                  var _tempObjL = {};
+                  _tempObjL["key"] = _leftSkName;
+                  _tempObjL["val"] = data.results[i][j][_leftSkKey];
+                  _formatDataBeforeCalculate[_rangekeyInData]["leftOperation"] = _leftOperation;
+                  _formatDataBeforeCalculate[_rangekeyInData]["left"] = [_tempObjL];
+                }
+                if(_rightSkid){
+                  var _rightSkKey = getskkey(_rightSkid,data.sks);
+                  var _rightSkName = getskname(_rightSkid,data.sks);
+                  var _tempObjR = {};
+                  _tempObjR["key"] = _rightSkName;
+                  _tempObjR["val"] = data.results[i][j][_rightSkKey];
+                  _formatDataBeforeCalculate[_rangekeyInData]["rightOperation"] = _rightOperation;
+                  _formatDataBeforeCalculate[_rangekeyInData]["right"] = [_tempObjR];
+                }
+              }
+            }
+          }
+          _formatDataBeforeCalculateAllRows.push(_formatDataBeforeCalculate);
+          continue;
+        }
+        // if(iswho & iswhen) -- end
+        else if(_isRange && _isWhen){
+          console.log('_isRange && _isWhen')
+          if(_isInterval){
+            console.log('_isInterval')
+            for(var xi = 0;xi <data.results[i].length;xi++){
+              var _intervalKeyForData = "";
+              var _personsValInData = data.results[i][xi][_personsKey];
+              var _personValForData = getusername(_personsValInData,data.usersinfo);
+              var _dataTime = data.results[i][xi][_durationKey];
+              var _dataTimeStamp = new Date(_dataTime);
+              var _dataYear = _dataTimeStamp.getFullYear();
+              var _dataMonth = _dataTimeStamp.getMonth() + 1;
+              var _dataDay = _dataTimeStamp.getDate();
+              if(_intervalVal == "year"){
+                _intervalKeyForData = _dataYear;
+              }
+              if(_intervalVal == "month"){
+                _intervalKeyForData = _dataYear + padzero(_dataMonth);
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData]){
+                _formatDataBeforeCalculate[_intervalKeyForData] = {}
+              }
+              if(!_formatDataBeforeCalculate[_intervalKeyForData][_personValForData]){
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData] = {};
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["operation"] = _operation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["left"] = [];
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["right"] = [];
+              }
+
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][xi][_leftSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][xi][_rightSkKey];
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_intervalKeyForData][_personValForData]["right"].push(_tempObjR);
+              }
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData])
+              // console.log('----')
+              // console.log(_formatDataBeforeCalculate[_intervalKeyForData][_personValForData])
+            }
+          }else{
+            for(var mi = 0;mi <data.results[i].length;mi++){
+              var _personsValInData = data.results[i][mi][_personsKey];
+              var _personValForData = getusername(_personsValInData,data.usersinfo);
+              if(!_formatDataBeforeCalculate[_personValForData]){
+                _formatDataBeforeCalculate[_personValForData] = {};
+                _formatDataBeforeCalculate[_personValForData]["operation"] = _operation;
+                _formatDataBeforeCalculate[_personValForData]['left'] = [];
+                _formatDataBeforeCalculate[_personValForData]['right'] = [];
+              }
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][mi][_leftSkKey];
+                _formatDataBeforeCalculate[_personValForData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_personValForData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][mi][_rightSkKey];
+                _formatDataBeforeCalculate[_personValForData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_personValForData]["right"].push(_tempObjR);
+              }
+              // console.log(_formatDataBeforeCalculate[_personValForData])
+            }
+          }
+          _formatDataBeforeCalculateAllRows.push(_formatDataBeforeCalculate);
+          continue;
+        }
+
+        else if(_isWhen){
+          console.log("_isWhen")
+          if(_isInterval){
+            console.log("_isInterval")
+            // 先循环一次数据，打出返回值的架子
+            for(var ji = 0;ji <data.results[i].length;ji++){
+              var _personsValInData = data.results[i][ji][_personsKey];
+              var _personValForData = getusername(_personsValInData,data.usersinfo);
+              var _intervalKeyForData = "";
+              var _rangekeyInData = data.results[i][ji][_rangeKey];
+              var _dataTime = data.results[i][ji][_durationKey];
+              var _dataTimeStamp = new Date(_dataTime);
+              var _dataYear = _dataTimeStamp.getFullYear();
+              var _dataMonth = _dataTimeStamp.getMonth() + 1;
+              var _dataDay = _dataTimeStamp.getDate();
+
+              if(_intervalVal == "year"){
+                _intervalKeyForData = _dataYear;
+              }
+              if(_intervalVal == "month"){
+                _intervalKeyForData = _dataYear + padzero(_dataMonth);
+              }
+              if(!_formatDataBeforeCalculate[_personValForData]) {
+                _formatDataBeforeCalculate[_personValForData] = {};
+              }
+              if(!_formatDataBeforeCalculate[_personValForData][_intervalKeyForData]){
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData] = {};
+              }
+              if(!_formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]){
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData] = {};
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["operation"] = _operation;
+              }
+              _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["left"] = [];
+              _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["right"] = [];
+
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][ji][_leftSkKey];
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][ji][_rightSkKey];
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_personValForData][_intervalKeyForData][_rangekeyInData]["right"].push(_tempObjR);
+              }
+              // console.log(_formatDataBeforeCalculate[_personValForData][_intervalKeyForData])
+              // console.log('-------')
+              // console.log(_formatDataBeforeCalculate[_personValForData])
+              // console.log('---------')
+              // console.log(_formatDataBeforeCalculate)
+
+              // 再循环数据，向架子中插入数据
+
+            }
+          }else {
+            for(var j = 0 ; j < data.results[i].length;j++){
+              var _personsValInData = data.results[i][j][_personsKey];
+              var _personValForData = getusername(_personsValInData,data.usersinfo);
+              var _rangeValInData = data.results[i][j][_rangeKey];
+              if(!_formatDataBeforeCalculate[_personValForData]){
+                _formatDataBeforeCalculate[_personValForData] = {}
+              }
+              if(!_formatDataBeforeCalculate[_personValForData][_rangeValInData]){
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData] = {};
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["operation"] = _operation;
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["left"] = [];
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["right"] = [];
+              }
+              if(_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][j][_leftSkKey];
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["leftOperation"] = _leftOperation;
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["left"].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][j][_rightSkKey];
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["rightOperation"] = _rightOperation;
+                _formatDataBeforeCalculate[_personValForData][_rangeValInData]["right"].push(_tempObjR);
+              }
+            }
+          }
+          _formatDataBeforeCalculateAllRows.push(_formatDataBeforeCalculate);
+          continue;
+        }
+
+        else if(!_isWhen && !_isWho && !_isRange){
+          console.log('!iswhen && !who && !Range');
+          // 没有指定_isWhen的字段，也就没办法按照时间进行groupBy
+            for(var zi = 0;zi < data.results[i].length;zi++){
+              _formatDataBeforeCalculate['operation'] = _operation;
+              if (_leftSkid){
+                var _leftSkKey = getskkey(_leftSkid,data.sks);
+                var _leftSkName = getskname(_leftSkid,data.sks);
+                var _tempObjL = {};
+                _tempObjL["key"] = _leftSkName;
+                _tempObjL["val"] = data.results[i][zi][_leftSkKey];
+                _formatDataBeforeCalculate["leftOperation"] = _leftOperation;
+                if(!_formatDataBeforeCalculate['left']){
+                  _formatDataBeforeCalculate['left'] = [];
+                }
+                _formatDataBeforeCalculate['left'].push(_tempObjL);
+              }
+              if(_rightSkid){
+                var _rightSkKey = getskkey(_rightSkid,data.sks);
+                var _rightSkName = getskname(_rightSkid,data.sks);
+                var _tempObjR = {};
+                _tempObjR["key"] = _rightSkName;
+                _tempObjR["val"] = data.results[i][zi][_rightSkKey];
+                _formatDataBeforeCalculate["rightOperation"] = _rightOperation;
+                if(!_formatDataBeforeCalculate['right']){
+                  _formatDataBeforeCalculate['right'] = [];
+                }
+                _formatDataBeforeCalculate['right'].push(_tempObjR);
+              }
+            }
+          _formatDataBeforeCalculateAllRows.push(_formatDataBeforeCalculate);
+          continue;
+        }
+      }
+      data.groupforcalc = _formatDataBeforeCalculateAllRows;
+      resolve(data)
+    }else{
+      reject("error")
+    }
+  })
+}
+
+function quaryusersinfo(data) {
+  return new Promise(function (resolve,reject) {
+    //这里返回data.cks中的id
+    var _search_condition = [];
+    for(var j = 0 ; j < data.cks.operations.length;j++){
+      var tempByid = {};
+      var tempByRealName = {};
+      var tempByLoginName = {};
+      if(data.cks.operations[j].condition.persons.who && data.cks.operations[j].condition.persons.who != "all"){
+        tempByid.id = data.cks.operations[j].condition.persons.who;
+
+        tempByLoginName.loginname = data.cks.operations[j].condition.persons.who;
+
+        tempByRealName.realname = data.cks.operations[j].condition.persons.who;
+        _search_condition.push(tempByid,tempByLoginName,tempByRealName);
+        Users.find({
+          or:_search_condition
+        }).exec(function (err,users) {
+          if(users){
+            data.usersinfo = users;
+            resolve(data)
+          }else{
+            reject('quaryusersinfo error')
+          }
+        })
+      }else{
+        Users.find({
+
+        }).exec(function (err,users) {
+          if(users){
+            data.usersinfo = users;
+            resolve(data)
+          }else{
+            reject('quaryusersinfo error')
+          }
+        })
+      }
+    }
+  })
+}
+
+//整理返回的数据结构
+
+//lyd  这里key可能会有错，需要log    找包含skid  这里得细看一下if中keylike，理解为if中的keylike需写成’skid‘,具体log一下
+function getkeylike(ck ,keylike) {
+  var ret = [];
+  return _getkeylike(ck ,keylike);
+  function _getkeylike(ck ,keylike) {
+    for(var key in ck){
+      if(ck[key] && typeof ck[key] == 'object'){
+        ret.concat(_getkeylike(ck[key], keylike));
+      }else{
+        if(key.indexOf(keylike) != -1){
+          if(ck[key]){
+            var temp = {};//此处只是给对象的id赋值用，需要放for里
+            temp.id = ck[key];
+            ret.push(temp);
+          }
+          //lyd 这里得log出temp，确定具体格式及信息
+        }
+      }
+    }
+
+    //这里是sql里or后的条件，必须是个数组
+    return ret;
+  }
+}
+
+function buildckqueryfunctions(cks, sks) { //根据ck中的operations中的condition，做循环拼出sql，这里一个condition是一行，
+  var ret = [];
+  for(var key in cks){
+    if(cks[key] && typeof cks[key] == "object"){ //这里找到的是operations
+      for(var i = 0;i < cks[key].length;i++){
+        //这里不适用闭包，会在创建查询函数时候，取不到查询的条件
+        (function(){
+          var con={};
+          if(cks[key][i] && cks[key][i].condition){
+            if(cks[key][i].condition.range){
+              var rangeKeyname = getskkey(cks[key][i].condition.range.skid, sks);
+              var rangeK, rangeV;
+              rangeK = cks[key][i].condition.range.operation;
+              rangeV = cks[key][i].condition.range.value;
+              // 这里拼出是这样的
+              //{xiangmu:xiangmuA}
+              if(rangeV != 'all'){
+                if(rangeKeyname && rangeK && rangeV){
+                  if(rangeK == "="){
+                    con[rangeKeyname] = rangeV;
+                  }
+                }
+              }else{
+                //  为all的时候，不写入任何条件
+              }
+            }
+
+            if(cks[key][i].condition.duration){
+              var durationKeyname = getskkey(cks[key][i].condition.duration.skid, sks);
+
+              var durationS, durationE;
+              durationS = cks[key][i].condition.duration.start;
+              durationE = cks[key][i].condition.duration.end;
+
+              var stampDurationS,stampDurationE;
+
+              // 这里将时间转换为时间戳
+              // 在系统关键字中，已将系统关键字时间替换为数字格式的时间戳
+              if(durationS){
+                if(typeof durationS == 'number' && String(durationS).length == 13){
+                  stampDurationS = durationS;
+                }else{
+                  stampDurationS = new Date(durationS).getTime();
+                }
+              }
+              if(durationE){
+                if(typeof durationE == 'number' && String(durationE).length == 13){
+                  stampDurationE = durationE;
+                }else{
+                  stampDurationE = new Date(durationE).getTime();
+                }
+              }
+
+              // 开始拼sql语句
+              // 这里拼出是这样的
+              // {shijian:{'>=':1485907200000,'<':1488326400000}}
+              if(durationKeyname && stampDurationS && !stampDurationE){
+                con[durationKeyname] = {'>=':stampDurationS};
+              }
+              if(durationKeyname && !stampDurationS && stampDurationE){
+                con[durationKeyname] = {'<=':stampDurationE};
+              }
+
+              if(durationKeyname && durationS && durationE){
+                con[durationKeyname] = {'>=':stampDurationS,'<=':stampDurationE};
+              }
+            }
+            if(cks[key][i].condition.persons){
+              var personsKeyname = getskkey(cks[key][i].condition.persons.skid, sks);
+              var personsK, personsV;
+              personsK = cks[key][i].condition.persons.operation;
+              personsV = cks[key][i].condition.persons.who;
+              // 这里拼出是这样的
+              //{xiangmu:xiangmuA}
+              if(personsKeyname && personsK && personsV){
+                if(personsV != "all"){
+                  if(personsK == "="){
+                      con[personsKeyname] = personsV;
+                  }
+                }else{
+                  // 等于all的时候，不写任何条件
+                }
+              }
+            }
+          }
+          if(cks[key][i].flowid){
+            var _flowdb = eval("n" + cks[key][i].flowid);
+            var _con = con;
+            // 根据传入的时间，正序排列，便于后边计算的时候需要取数据的起止时间的时候，好取值
+            var _conditionquuerybyconditionFn = function (callback) {
+              _flowdb.find({
+                where: _con,
+               // sort: 'createdAt ASC'
+              }).exec(function(err,val){
+                if(val){
+                  callback(null,val)
+                }else{
+                  callback(null,'')
+                }
+              })
+            }
+            ret.push(_conditionquuerybyconditionFn);
+          }
+        }())
+      }
+    }
+  }
+  return ret;
+}
+
+function getskname(skid,sks) {
+  for(var i= 0;i < sks.length;i++){
+    if(skid == sks[i].id){
+      return sks[i].name;
+    }
+  }
+}
+function getskkey(skid, sks){
+  for(var i = 0;i < sks.length;i++){
+    if(skid == sks[i].id){
+      return sks[i].key;
+    }
+  }
+}
+
+function getusername(id,usersinfo) {
+  for(var i = 0; i < usersinfo.length;i++){
+    if(id == usersinfo[i].id || id == usersinfo[i].loginname){
+      if(usersinfo[i].realname){
+        return usersinfo[i].realname;
+      }else{
+        return usersinfo[i].loginname;
+      }
+    }
+  }
+}
+
+
+function formatTime(time,fmt) {
+  var date = new Date(time);
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
+  };
+  for (let k in o) {
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + '';
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : _padLeftZero(str));
+    }
+  }
+  return fmt;
+
+  function _padLeftZero(str) {
+    return ('00' + str).substr(str.length);
+  }
+}
+
+function uniqueArrbykey(arr,key) {
+  var newArr=[];
+  for(var i=0;i<arr.length;i++){
+    if(_objIsInArray(arr[i],newArr,key) ==-1){
+      newArr.push(arr[i]);
+    }
+  }
+  return newArr
+
+  function _objIsInArray(obj,arr,key){
+    var tmpStatus=false;
+    for(var j=0;j<arr.length;j++){
+      if(obj[key]==arr[j][key]){
+        return j;
+        break;
+      }else{
+        tmpStatus=false;
+      }
+    }
+    if(!tmpStatus){
+      return -1;
+    }
+  }
+}
+
+function arrRepeatEle(arr) {
+  var i = 0, maxI,
+    item = {};
+  arr.sort(function(x,y){return x - y;});
+  for(i = 0; maxI = arr.length, i < maxI; i +=1){
+    var key = arr[i], obj = {};
+
+    if(item[key]){
+      item[key]++;
+    }else{
+      obj = arr[i] == arr[i+1]? 2: 1;
+      item[key] = obj;
+    }
+    if(arr[i] == arr[i+1]){
+      arr.splice(i+1,1);
+    }
+  }
+  return item
+}
+
+function uniqueArr(ar) {
+  var ret = [];
+  for (var i = 0, j = ar.length; i < j; i++) {
+    if (ret.indexOf(ar[i]) === -1) {
+      ret.push(ar[i]);
+    }
+  }
+  return ret;
+}
+
+function padzero(s){
+  if(String(s).length == 1){
+    return "0"+s;
+  }
+  return String(s);
+}

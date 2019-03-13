@@ -1,0 +1,88 @@
+
+条件
+	人。	-- who
+	时间。	-- when
+	范围。	-- range
+
+	//进行计算。。。。
+
+	buildreply(data){
+
+		iswho = who & who!all.
+		iswhen = when & when!all.
+		isrange = range & range!all.
+
+		if(iswho & iswhen & isrange){ ，，，，  ，，
+			if(when interview存在)｛
+				//按interview返回。
+				[
+				"1月"：｛。。。｝
+				]
+
+			｝else {
+				｛。。。｝
+			}
+			/*
+				举个例子：我去年某个项目的支出情况。
+				who：项目的owner字段指向  我(system-myself)。
+				when：去年(system-thisyear -1 )，interview： 1月。
+				range：项目的item = ‘某个’。
+			*/
+
+		}
+
+		if(iswho & iswhen) {
+			if(when interview存在){
+				//按interview返回。
+				[
+				"1月"：[range1:｛。。。｝,range1:｛。。。｝]
+				]
+
+			}else {
+				[range1:｛。。。｝,range1:｛。。。｝]
+			}
+			/*
+				举个例子：我去年所有项目的支出情况。
+				who：项目的owner字段指向  我(system-myself)。
+				when：去年(system-thisyear -1 )，interview： 1月。
+				range：项目的item = all。
+				[项目1:｛1000｝,项目2:｛2000｝]
+				[｛项目1:[12, 22, 222, 222, 222] ｝,｛项目2:[2000]｝]
+			*/
+
+		}
+
+		if(iswhen) {
+			if(when interview存在){
+				//按interview返回。
+				"who": [
+				"1月"：[range1:｛。。。｝,range1:｛。。。｝]
+				]
+
+			}else {
+				"who": [｛range1:[。。。]｝,｛range1:[。。。]｝]
+			}
+			/*
+				举个例子：所有人去年所有项目的支出情况。
+				who：项目的owner字段指向  我(system-myself)。
+				when：去年(system-thisyear -1 )，interview： 1月。
+				range：项目的item = all。
+				[项目1:｛1000｝,项目2:｛2000｝]
+				[项目1:｛12, 22, 222, 222, 222 ｝,项目2:｛2000｝]
+			*/
+
+		}
+
+		if(!iswhen & !who & !Range) {
+				｛。。。｝
+			/*
+				举个例子：所有项目的支出情况。
+				who：所有
+				when：所有。
+				range：所有。
+				[。。。。]
+			*/
+
+		}
+
+	}

@@ -1,0 +1,18 @@
+
+Dist目录是存放部署到其它服务器上的数据的地方，其中包括
+
+	DB.tar				：数据库信息
+	FrontFramework.tar		：前端框架对应的代码
+	FrontEngine.tar		：前端引擎对应的代码
+	ServiceFramework.tar	：后端框架服务对应的代码
+	ServiceEngine.tar		：后端引擎服务对应的代码。
+
+这些文件是由build.sh生成，在使用build.sh命令前，需要确保对应的build.ini中的配置信息是正确的。
+
+当需要将这些拖拽生成的系统部署到新服务器上时
+	1. 将整个目录copy到新服务器上
+	2. 配置好deploy.ini对应的内容，特别注意数据库中对应的库要删除掉，否则数据无法全部导入。
+	3. 调用depoly.sh。
+	4. 调用BPMStart.sh启动服务(注BPMStart.sh会放到/中，可以在任何位置调用，也可以配置成自启动。)
+
+注，同一电脑只能部署同一个项目，因为端口号和BPMStart命令会重复。

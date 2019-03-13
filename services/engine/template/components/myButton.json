@@ -1,0 +1,62 @@
+{
+    "newlayout": {
+        
+    },
+    "setting": {
+        
+    },
+    "importpages": {
+    	
+    },
+    "action": [
+        {
+            "type": "replace",
+            "from": {
+                "start": "openid=\"",
+                "end": "\"",
+                "Trannsfer": "PAGEIDTOROUTER"
+            },
+            "to": {
+                "start": "{ path:'",
+                "end": "'}"
+            },
+            "totype": "json"
+        },
+        {
+            "type": "replace",
+            "from": {
+                "start": "openname=\"",
+                "end": "\""
+            },
+            "to": {
+            	"start": "<span>",
+                "end": "</span>"
+            },
+            "totype": "json"
+        },
+        {
+            "type": "replace",
+            "from": {
+                "start": "showinmodal=\"",
+                "end": "\""
+            },
+            "to": {
+            	"start": "showatmodal = \"",
+                "end": "\""
+            },
+            "totype": "json"
+        },
+        {
+            "type": "replace",
+            "from": {
+                "start": "showmodaltitle=\"",
+                "end": "\""
+            },
+            "to": {
+            	"start": "let showmodaltitle = \"",
+                "end": "\""
+            },
+            "totype": "json"
+        }
+    ]
+}

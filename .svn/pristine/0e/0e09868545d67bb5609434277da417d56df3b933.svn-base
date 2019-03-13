@@ -1,0 +1,195 @@
+angular.module('starter.controllers', [])
+.controller('myCtrls', function($scope,$rootScope,$state,$q) {
+  // $state.go("login");
+  $state.go("tab.dash");
+  $scope.startLogin = function (userName,password) {
+    var deferred = $q.defer();
+    var promise = deferred.promise;
+    promise
+      .then(function(val) {
+        console.log(val);
+        return 'B';
+      })
+      .then(function(val) {
+        console.log(val);
+        return 'C'
+      })
+      .then(function(val) {
+        console.log(val);
+      });
+    deferred.resolve('A');
+  };
+  $scope.startLogin()
+  $scope.initUrl = true;
+  $scope.login_data = {
+    "usrid":"591a71fc8c9082580984cee8",
+    "username":"小明",
+    "companyname":"北京盛达康网络科技有限公司",
+    "avartar":"",
+    "applications":{
+    "needtoshow":[
+      {
+        "name":"测试流程",
+        "icon":"",
+        "url":"/591a72e88c9082580984cee9|0|form"
+      },
+      {
+        "name":"流程及页面测试",
+        "icon":"",
+        "url":"/592d361676028b1c192252f0|tijiao|ceshitijiao"
+      },
+      {
+        "name":"展示",
+        "icon":"fa-trash-o",
+        "url":"/592e1c7d79faf98820c7a067|tijiao|shenpi1"
+      },
+      {
+        "name":"展示2",
+        "icon":"",
+        "url":"/592e1ee5997a731828c3b945|tijiaoshenqing|tijiaoshenqing"
+      },
+      {
+        "name":"展示流程",
+        "icon":"",
+        "url":"/592e5534997a731828c3b953|tijiaoshenqing|undefined"
+      },
+      {
+        "name":"用于测试关键字的流程",
+        "icon":"",
+        "url":"/5934d02203fa63fc070b30bc|kaishi|zhanshidekeshan"
+      },
+      {
+        "name":"计算总数",
+        "icon":"",
+        "url":"/5937cab1310ddbcc1b86d3e9|jisuan1|jisuan1"
+      }
+    ],
+      "moretoshow":[
+      {
+        "name":"张秀灿测试1",
+        "icon":"",
+        "url":"/593e61757de1eb6032fe0dd3|kaishi|ceshitiaozhuan"
+      },
+      {
+        "name":"返回指定JSON",
+        "icon":"",
+        "childs":[
+          {
+            "icon":"fa-trash-o",
+            "name":"一号",
+            "url":"/5940d09706f4279c2c8afc6c|yihao|undefined"
+          },
+          {
+            "icon":"",
+            "name":"五号",
+            "url":"/5940d09706f4279c2c8afc6c|wuhao|tijiaoE"
+          }
+        ]
+      },
+      {
+        "name":"一步步提交",
+        "icon":"fa-trash-o",
+        "url":"/5949eb13a476b33c34e0cfce|tijiao|tijiao2"
+      },
+      {
+        "name":"测试稳定性",
+        "icon":"",
+        "url":"/594b412f26ac2eb03ec9a2e0|kaishi|undefined"
+      },
+      {
+        "name":"报销管理",
+        "icon":"",
+        "url":"/594b7050b70d78bc21133a36||undefined"
+      },
+      {
+        "name":"用于测试条件",
+        "icon":"",
+        "url":"/5951b4fbe87545a44e34db4c|tijiao|undefined"
+      },
+      {
+        "name":"参数传递",
+        "icon":"",
+        "url":"/5951f5539335f7480f400d1d|kaishi|undefined"
+      },
+      {
+        "name":"测试路由显示",
+        "icon":"",
+        "url":"/595230a8e8e77f482fdb8d76|1111|喀shen"
+      }
+    ]
+  }
+  }
+})
+.controller('loginCtrl', function($scope,$state,$http) {
+  $http({
+    url: 'http://localhost:1337/login/login',
+    method: "GET",
+    headers: {
+      'Content-Type': 'application/x-www-form-urlencoded'
+    },
+    params:{
+      loginname:'',
+      password:'',
+      ismobile:true
+    }
+  }).success(function (data) {
+    console.log(data)
+  }).error(function (data) {
+    console.log(data)
+  })
+  })
+  .controller('DashCtrl', function($scope,$state,$rootScope) {
+    if($scope.initUrl){
+      $scope.initDash = $scope.login_data;
+    }else{
+      $state.go("login");
+    }
+    $scope.goSecond = function (url,child) {
+      console.log(url)
+      console.log(child)
+      $rootScope.appliListData = child;
+      url?$state.go("tab.appliDetail",{data:url}):$state.go("tab.appliList")
+
+    }
+
+  })
+  .controller('applicationCtrl', function($scope,$state,$rootScope) {
+    $scope.initDash = $scope.login_data.applications.moretoshow;
+
+    $scope.goSecond = function (url,child) {
+      console.log(url)
+      console.log(child)
+      $rootScope.appliListData = child;
+      url?$state.go("tab.appliDetail",{data:url}):$state.go("tab.appliList")
+    }
+  })
+  .controller('appliListCtrl', function($scope,$state,$rootScope) {
+    console.log($rootScope.appliListData)
+
+  })
+  .controller('appliDetailCtrl', function($scope,$state,$stateParams) {
+    console.log($stateParams.data)
+    $scope.url = './dist/index.html#/login'
+
+  })
+.controller('ChatsCtrl', function($scope) {
+  var dataBase = openDatabase("group", "1.0", "消息类型表", 1024 * 1024, function () { });
+  if (!dataBase) {
+    alert("数据库创建失败！");
+  } else {
+    alert("数据库创建成功！");
+  }
+})
+.controller('AccountCtrl', function($scope) {
+  //获取手机通讯录
+  var options = [navigator.contacts.fieldType.displayName, navigator.contacts.fieldType.name]
+  navigator.contacts.find(options,function (contacts) {
+    $scope.contactsList = contacts;
+  },function (e) {
+    alert(e)
+  })
+
+})
+.controller('MainCtrl', function($scope) {
+
+});

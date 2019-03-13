@@ -1,0 +1,7 @@
+用Firefox进行开发
+
+安装Firefox 57与Python3.5，配置python3.5进path.
+在python 3.5中安装 selenium 
+
+调用python test.py来查看Firefox是否启动，如果启动，则证明成功。
+

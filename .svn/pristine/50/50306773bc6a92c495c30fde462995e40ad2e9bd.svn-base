@@ -1,0 +1,19 @@
+<ion-view id="login_bg">
+
+  <ion-slide-box>
+    <ion-slide class="calm-bg">
+    <div >1111</div>
+    </ion-slide>
+
+    <ion-slide class="assertive-bg">
+    <div >222</div>
+    </ion-slide>
+
+    <ion-slide class="positive-bg">
+      <div>
+        <button ng-click="gologin()" class="button button-block">立即体验</button>
+      </div>
+    </ion-slide>
+  </ion-slide-box>
+
+</ion-view>

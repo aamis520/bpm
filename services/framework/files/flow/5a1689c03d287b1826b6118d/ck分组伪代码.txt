@@ -1,0 +1,45 @@
+
+var needgroupbywhen = false
+var needgroupbywho = false
+var needgroupbyrange = false
+
+[
+{abc, , name1, 1978}
+{abd, name2, 1979}
+{abf, name3, 1980}
+]
+
+[
+{abc, name1, 1978}
+{abf, name2, 1980}
+]
+
+////////////////////////////////////////////////////////////////////////////////
+
+{
+needgoupbywhen= 。。。
+needgoupbywho= 。。。
+needgoupbyrange = 。。。
+
+
+		{
+		if (needgoupbywhen & !needgoupbywho & !needgoupbyrange)
+		//只有when的。
+		} else
+		if (!needgoupbywhen & needgoupbywho & !needgoupbyrange)
+		//只有who的。
+		} else
+		if (!needgoupbywhen & !needgoupbywho & needgoupbyrange)
+		//只有range的
+		} else
+		{
+		//有人有时间的
+		} else
+		{
+		//有人有范围的的
+		} else
+		{
+		//有范围有时间的的
+		}
+
+}

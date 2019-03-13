@@ -1,0 +1,16 @@
+{
+  "action":[
+    {
+      "type":"replace",
+      "from":{
+        "start":"msgsetting=\"{",
+        "end":"}\""
+      },
+      "to":{
+        "start":"let msgset = {",
+        "end":"}"
+      },
+      "totype":"json"
+    }
+  ]
+}

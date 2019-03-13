@@ -1,0 +1,160 @@
+<template>
+    <section>
+    	<Button type="info" opentype="page"  @click="onclick"><span>信息按钮</span></Button>
+    	<Modal
+    		width = "1200"
+	        v-model="showpage"
+			:transfer=false
+	        @on-cancel="cancel">
+          	<p slot="header">
+    			<span>{{showmodaltitle}}</span>
+          	</p>
+			        
+	        <div id="pagetobeadd"></div>
+			<div slot="footer"></div>
+        </Modal>
+    </section>
+</template>
+
+<script>
+	let importstart;
+	
+	let ownflowid = ""
+	let ownnodeid = ""
+	let ownpageid = ""
+	
+	let showatmodal = ""
+	let showmodaltitle = ""
+    export default {
+    	components:{},
+    	data (){
+    		return {
+    			querydata:{},
+    			showpage:false,
+    			dialogindex: -1,
+    			showmodaltitle:'模态框设置',
+				modalwatch:this.globalconfig
+    		}
+    	},
+    	watch:{
+			"modalwatch.showingpagedlgqueue":function(){   //这个监听只负责在提交后关闭模态框
+				let me = this;
+				let data = me.globalconfig.showingpagedlgqueue;
+				let modalisshow  = false;
+				if(data.length>0){
+					for(let i=0;i<data.length;i++){
+						if(data[i][ownpageid] !== undefined){
+							modalisshow = data[i][ownpageid];
+						}
+					}
+				} else {
+					modalisshow = false;
+				}
+				if(modalisshow === false){
+					me.showpage = modalisshow;
+				}
+			},
+			showpage(){
+				if(this.dialogindex == -1){
+					return false;
+				}else if(!this.globalconfig.showingpagedlgqueue[this.dialogindex-1]){
+					return false;
+				}else{
+					return this.globalconfig.showingpagedlgqueue[this.dialogindex-1][ownpageid]
+				}
+			}
+		},
+        methods:{
+            onclick(){
+            	//将当前的itemid取出来
+            	var itemid = ""
+				//拿到itemid（如果没有，表明是主数据的新建）
+				//1---从this.querydata中拿
+				//2---从this.globalconfig.showingpagedlgqueue中拿--编辑的时候会存
+				//3---没有的时候就自己生成一个id--主数据的新建(因为生成id是异步的，所以逻辑稍微改一下)
+				//liuguochao --- 如果是修改，从路由参数或者是全局中拿--如果是编辑，如果是子数据的新建，---肯定是有的
+            	if(this.querydata.itemid){   //路由的参数中有这个
+            		itemid = this.querydata.itemid ;
+            	}else if(this.globalconfig.showingpagedlgqueue.length > 0){  //全局中有'
+					var tempdata = this.globalconfig.showingpagedlgqueue;
+					for(var i=0;i<tempdata.length;i++){
+						if(tempdata[i].itemid){
+							itemid = tempdata[i].itemid;
+						}
+					}
+            	}
+				//liuguochao --- 如果是修改，从路由参数或者是全局中拿
+				//liuguchao --- this.globalconfig.parentid是个数组
+				//一个值，主数据的新建
+				//两个值，第一个是主数据的id，第二个是子数据的id
+				if(itemid != ""){
+					this.globalconfig.parentid.push(itemid);
+				}
+				this.$http.get(this.globalconfig.generatedataidapi,
+				{
+					params: {
+						flowid:ownflowid
+					}
+				}, {emulateJSON: true})
+				.then((response) => {
+					this.globalconfig.parentid.push(response.body.id);
+				}, () => {
+					this.$Message.success('这是一条失败的提示');
+				});
+				//liuguchao --- this.globalconfig.parentid是个数组
+                if(showatmodal == "" || showatmodal == "false"){
+                	//path是需要被转成新值的。
+					var queryPatams = {};
+					if(JSON.parse(getCookie("parent")) && JSON.parse(getCookie("parent")).dataid){
+						queryPatams.parentid = JSON.parse(getCookie("parent")).dataid
+					}
+					var pathobj = { path:'./5a1390fdd818b768265cd6e1|yusuanjine|zhushujudetijiao'};
+					pathobj.query = queryPatams;
+					this.$router.push(pathobj);
+                }else if(showatmodal == "true"){
+                	//显示modal
+                	this.showmodaltitle = showmodaltitle
+                	this.showpage = true
+                	var newObj = {}
+                	newObj[ownpageid] = true
+                	newObj.flowid = ownflowid
+                	newObj.nodeid = ownnodeid
+					newObj.showatmodal = true;
+                	this.dialogindex = this.globalconfig.showingpagedlgqueue.push(newObj)
+                }
+            },
+            cancel(){
+            	this.globalconfig.showingpagedlgqueue[this.dialogindex-1][ownpageid] = false
+            	this.globalconfig.showingpagedlgqueue.pop()
+            	this.dialogindex--
+            }
+        },
+        mounted:function(){
+        	if(this.$router.currentRoute.query){
+    			this.querydata = this.$router.currentRoute.query
+    		}
+        }
+    }
+	function delCookie(name){
+		var exp = new Date();
+		exp.setTime(exp.getTime() - 1);
+		var cval=getCookie(name);
+		if(cval!=null)
+		document.cookie= name + "="+cval+";expires="+exp.toGMTString();
+	}
+	//获取cookie
+	function getCookie(name){
+		var arr,reg=new RegExp("(^| )"+name+"=([^;]*)(;|$)");
+		if(arr=document.cookie.match(reg)){
+			return unescape(arr[2]);
+		}else{
+			return null;
+		}
+	}
+	function setCookie(name,value){
+		var Days = 1;  //过期时间设置为一天
+		var exp = new Date();
+		exp.setTime(exp.getTime() + Days*24*60*60*1000);
+		document.cookie = name + "="+ escape (value) + ";expires=" + exp.toGMTString();
+	}
+</script>

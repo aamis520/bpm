@@ -1,0 +1,341 @@
+<template>
+  <div>
+      <Modal
+          v-model="isReverseConditionModalShow"
+          title="设置通知人员及内容"
+          @on-ok="ReverseConditionModalOk"
+          @on-cancel="ReverseConditionModalCancel">
+              <Form ref="reverseConditionModalForm">
+                  <Form-item label="请选择人员" :label-width="100">
+                      <Input :placeholder="personIptPlaceHolder" @on-click="showPersonSelect" icon="edit"></Input>
+                  </Form-item>
+                  <Form-item label="设置优先级" :label-width="100">
+                      <Select v-model="priority" placeholder="请选择优先级">
+                          <Option v-for="item in 5" :value="item" :key="item">
+                              {{ item }}
+                          </Option>
+                      </Select>
+                  </Form-item>
+                  <Form-item label="请选择消息详情页面" :label-width="100">
+                    <Select v-model="detailPage" placeholder="请选择消息详情页面">
+                      <Option v-for="(item,index) in ajaxPageList" :value="item.value" :key="index">
+                        {{ item.label }}
+                      </Option>
+                    </Select>
+                  </Form-item>
+                  <Form-item label="请选择重点字段1" :label-width="100">
+                      <Select v-model="keyword1" placeholder="请选择重点字段1" clearable>
+                        <Option v-for="(item,index) in curFlowSksList" :value="item.value" :key="index">
+                            {{ item.label }}
+                        </Option>
+                      </Select>
+                  </Form-item>
+                  <Form-item label="请选择重点字段2" :label-width="100">
+                      <Select v-model="keyword2" placeholder="请选择重点字段2" clearable>
+                          <Option v-for="(item,index) in curFlowSksList" :value="item.value" :key="index">
+                              {{ item.label }}
+                          </Option>
+                      </Select>
+                  </Form-item>
+                  <Form-item label="请选择重点字段3" :label-width="100">
+                      <Select v-model="keyword3" placeholder="请选择重点字段3" clearable>
+                          <Option v-for="(item,index) in curFlowSksList" :value="item.value" :key="index">
+                              {{ item.label }}
+                          </Option>
+                      </Select>
+                  </Form-item>
+                  <Form-item label="请选择重点字段4" :label-width="100">
+                      <Select v-model="keyword4" placeholder="请选择重点字段4" clearable>
+                          <Option v-for="(item,index) in curFlowSksList" :value="item.value" :key="index">
+                              {{ item.label }}
+                          </Option>
+                      </Select>
+                  </Form-item>
+              </Form>
+      </Modal>
+
+      <!--选择人员弹出框-->
+      <SelectPerson @fromselectperson="getSelectPersonMsg" :toSelectPersonMsg="toSelectPersonMsg" ref="SelectPerson"></SelectPerson>
+  </div>
+</template>
+
+<script>
+    import SelectPerson from "./selectpersonModal"
+    export default {
+        components:{
+            SelectPerson
+        },
+        props:[
+            'toReverseConditionMsg'
+        ],
+        computed:{
+            isReverseConditionModalShow(){
+                return this.toReverseConditionMsg.isReverseConditionModalShow;
+            },
+            flowid(){
+                return this.toReverseConditionMsg.flowid;
+            },
+            conditionid(){
+                return this.toReverseConditionMsg.conditionid;
+            },
+            nextnodeid(){
+                return this.toReverseConditionMsg.nextnodeid;
+            }
+        },
+        watch:{
+            nextnodeid(){
+                if(this.nextnodeid !=""){
+                    this.$http.get(this.globalconfig.getpagesapi,{
+                      params:{
+                          flowid:this.flowid,
+                          nodeid:this.nextnodeid
+                      }
+                    },{emulateJSON:true})
+                    .then((response)=>{
+                        if(response.data.finn){
+                            var _tempArr = [{
+                                value:'',
+                                label:'空'
+                            }];
+                            for(var i = 0 ;i < response.data.finn.length;i++){
+                                var _tempObj = {};
+                                _tempObj.label = response.data.finn[i].pagename;
+                                _tempObj.value = response.data.finn[i].filename;
+                                _tempArr.push(_tempObj)
+                            }
+                            if(response.data.finn.length == 0){
+                                _tempArr = [
+                                    {
+                                        label:'此节点暂无页面',
+                                        value:''
+                                    }
+                                ]
+                            }
+                            this.ajaxPageList = _tempArr;
+                        }
+                    },(response)=>{
+                        this.$Message.error("读取page失败")
+                    })
+                }
+            },
+            conditionid(){
+                this.curFlowSksList = this.getSksByFlowid();
+                if(this.conditionid == "empty"){
+                    this.priority = 0;
+                    this.keyword1 = '';
+                    this.keyword2 = '';
+                    this.keyword3 = '';
+                    this.keyword4 = '';
+                    this.detailPage = '';
+                    this.persons = [];
+                    this.groups = [];
+                    this.departments = [];
+                }else{
+                    console.log('conditionid:'+this.conditionid)
+                    if(!this.conditionid){
+                        return
+                    }
+                    var _conditionInfo = this.getMessageConditionById(this.conditionid);
+                    this.priority = Number(_conditionInfo.priority);
+                    this.keyword1 = _conditionInfo.keyword1;
+                    this.keyword2 = _conditionInfo.keyword2;
+                    this.keyword3 = _conditionInfo.keyword3;
+                    this.keyword4 = _conditionInfo.keyword4;
+                    if(_conditionInfo.page){
+                        this.detailPage = _conditionInfo.page;
+                    }
+                    if(_conditionInfo.toIDs && _conditionInfo.toIDs.length > 0){
+                        this.persons = _conditionInfo.toIDs
+                    }else{
+                        this.persons = []
+                    }
+                    if(_conditionInfo.groupIDs && _conditionInfo.groupIDs.length > 0){
+                        this.groups = _conditionInfo.groupIDs;
+                    }else{
+                        this.groups = [];
+                    }
+                    if(_conditionInfo.departmentIDs && _conditionInfo.departmentIDs.length > 0){
+                        this.departments = _conditionInfo.departmentIDs;
+                    }else{
+                        this.departments = [];
+                    }
+                    if( _conditionInfo.departmentIDs && _conditionInfo.departmentIDs.length > 0 ||
+                        _conditionInfo.groupIDs && _conditionInfo.groupIDs.length > 0 ||
+                        _conditionInfo.toIDs && _conditionInfo.toIDs.length > 0
+                    ){
+                        this.personIptPlaceHolder = "已选择";
+                    }
+                }
+            }
+        },
+
+        data(){
+            return {
+                // 所有的sk
+                ajaxAllSkList:[],
+                // 当前流程下的sk
+                curFlowSksList:[],
+
+                // 此节点下的页面
+                ajaxPageList:[],
+                personIptPlaceHolder:'请选择人员',
+                priority:0,
+                keyword1:'',
+                keyword2:'',
+                keyword3:'',
+                keyword4:'',
+                detailPage:'',
+
+                persons:[],
+                groups:[],
+                departments:[],
+                // 向选择人员的子组件你传递的数据
+                toSelectPersonMsg:{
+                    isSelectPersonModalShow:false,
+                    isReshow:"empty",
+                    persons:"",
+                    groups:"",
+                    apartments:"",
+                    isAdmin:"empty"
+                },
+            }
+        },
+        methods:{
+            // 列出的sk
+            handleListAllSks(){
+                this.$http.get(this.globalconfig.listsksapi,{
+                    params:{}
+                },{emulateJSON:true})
+                .then((response)=>{
+                    if(response.data){
+                        if(response.data.sks){
+                            this.ajaxAllSkList = response.data.sks;
+                        }
+                    }
+                },
+                (response)=>{
+                    this.$Message.error("读取sks失败")
+                })
+            },
+
+            // 列出所有消息的条件
+            hangleQueryMessageConditions(){
+                this.$http.get(this.globalconfig.listmessageconditionsapi,{
+                    params:{
+
+                    },
+                },{emulateJSON:true})
+                .then((response)=>{
+                     if(response.data){
+                        if(response.data.conditions){
+                            this.ajaxAllMessageConditions = response.data.conditions;
+                        }
+                     }
+                },(response)=>{
+                    this.$Message.error("读取messageconditions失败")
+                })
+            },
+
+            // 根据当前的messageconditionid找到对应的messageCondition信息
+            getMessageConditionById(id){
+                for(var i = 0 ; i < this.ajaxAllMessageConditions.length;i++){
+                    if(this.ajaxAllMessageConditions[i].id == id){
+                        return this.ajaxAllMessageConditions[i];
+                    }
+                }
+            },
+
+            // 列出当前流程下的sk
+            getSksByFlowid(){
+                var _tempArr = [];
+                for(var i = 0 ; i < this.ajaxAllSkList.length;i++){
+                    if(this.ajaxAllSkList[i].flowid == this.flowid){
+                        var _tempObj = {};
+                        _tempObj.label = this.ajaxAllSkList[i].name;
+                        _tempObj.value = this.ajaxAllSkList[i].id;
+                        _tempArr.push(_tempObj);
+                    }
+                }
+                if(_tempArr.length == 0){
+                     _tempArr = [
+                        {
+                            label:'此流程下无sk',
+                            value:''
+                        }
+                     ]
+                }
+                return _tempArr;
+            },
+
+            // 展开人员弹出框
+            showPersonSelect(){
+                this.toSelectPersonMsg.isSelectPersonModalShow = true;
+                if(this.messageconditionid == "empty"){
+                    this.toSelectPersonMsg.isReshow = "false";
+                }else{
+                    this.toSelectPersonMsg.isReshow = "true";
+                    this.toSelectPersonMsg.persons = this.persons;
+                    this.toSelectPersonMsg.groups = this.groups;
+                    this.toSelectPersonMsg.apartments = this.departments;
+                }
+            },
+
+            // 获取人员选择框选中的结果
+            getSelectPersonMsg(data){
+                this.toSelectPersonMsg.isSelectPersonModalShow = false;
+                this.toSelectPersonMsg.isReshow = "empty";
+                this.toSelectPersonMsg.isAdmin = "empty";
+                if(data.isClickOk == true){
+                    this.persons = data.persons;
+                    this.groups = data.groups;
+                    this.departments = data.apartments;
+                }
+
+                if(data.persons && data.persons.length > 0 || data.groups && data.groups.length > 0 || data.apartments && data.apartments.length > 0){
+                    this.personIptPlaceHolder = "已选择";
+                }
+            },
+
+            ReverseConditionModalOk(){
+                this.$http.get(this.globalconfig.updateorcreatemessageconditionapi,{
+                    params:{
+                        id:this.conditionid,
+                        toIDs:this.persons,
+                        groupIDs:this.groups,
+                        priority:this.priority,
+                        departments:this.departments,
+                        keyword1:this.keyword1,
+                        keyword2:this.keyword2,
+                        keyword3:this.keyword3,
+                        keyword4:this.keyword4,
+                        flowid:this.flowid,
+                        nodeid:this.nextnodeid,
+                        page:this.detailPage
+                    }
+                },{emulateJSON:true})
+                .then((response)=>{
+                    if(response.data.id){
+                        var data = {};
+                        data.isReverseConditionModalShow = false;
+                        data.reversemessageconditionid = response.data.id;
+                        this.$emit("fromReverseCondition",data);
+                        this.$Message.info('提交成功');
+                    }
+                },(response)=>{
+                    this.$Message.error("提交失败");
+                })
+            },
+            ReverseConditionModalCancel(){
+                var data = {};
+                data.reversemessageconditionid = "";
+                data.isReverseConditionModalShow = false;
+                this.$emit("fromReverseCondition",data)
+            },
+        },
+
+        created(){
+            this.hangleQueryMessageConditions();
+            this.handleListAllSks();
+        }
+    }
+</script>

@@ -1,0 +1,207 @@
+/**
+ * Created by yanglf on 2017/5/24.
+ */
+"use strict";
+
+
+module.exports = {
+  add:function (a,b){
+      if(isArray(a) || isArray(b)){
+          return _arrayadd(a,b)
+      }
+      var suma=Number(a)+Number(b);
+      return suma;
+  },
+  sub:function (a,b){
+      if(isArray(a) || isArray(b)){
+          return _arraysub(a,b)
+      }
+      var sub=Number(a)-Number(b);
+      return sub;
+  },
+
+  app:function (a,b){
+      if(isArray(a) || isArray(b)){
+          return _arrayapp(a,b)
+      }
+      var sumc=Number(a)*Number(b);
+      return sumc;
+  },
+
+  divs:function (a,b){
+      if(isArray(a) || isArray(b)){
+        return _arraydivs(a,b)
+      }
+      var sumd=Number(a)/Number(b);
+      return sumd;
+  },
+  //总值
+  arraysum:function (a){
+    var ret = 0;
+    for(let i=0;i<a.length;i++){
+      a[i] = Number(a[i]);
+      ret = ret + a[i];
+    }
+    return ret;
+  },
+//数组加法
+  arrayadd:function (a,b){
+      if(a.length != b.length){
+        return "Invalid value:arrayadd";
+      }
+
+      var ret = [];
+      for(var i=0;i<a.length;i++){
+          ret.push(Number(a[i]) + Number(b[i]))
+      }
+      return ret;
+},
+
+//数组减法
+  arraysub:function (a,b){
+      if(a.length != b.length){
+        return "Invalid value:arraysub";
+      }
+
+      var ret = [];
+      for(var i=0;i<a.length;i++){
+          ret.push(Number(a[i]) - Number(b[i]))
+      }
+      return ret;
+
+  },
+
+//数组乘法
+  arrayapp:function (a,b){
+      if(a.length != b.length){
+        return "Invalid value:arrayapp";
+      }
+      var ret = [];
+      for(var i=0;i<a.length;i++){
+          ret.push(Number(a[i]) * Number(b[i]))
+      }
+      return ret;
+},
+
+//数组除法
+  arraydivs:function (a,b){
+    if(a.length != b.length){
+      return "Invalid value:arraydivs"
+    }
+
+    var ret = [];
+    for(var i=0;i<a.length;i++){
+        ret.push(Number(a[i]) / Number(b[i]))
+    }
+    return ret;
+  },
+
+  //平均值
+  arrayaveg:function (a){
+      var ret = 0;
+      for(var i=0;i<a.length;i++){
+          ret =ret + Number(a[i]);
+      }
+        ret = ret/a.length;
+      return ret;
+  },
+   isArray:function (a) {
+      return Object.prototype.toString.call(a) === "[object Array]";
+  },
+  isObject:function (a) {
+      return Object.prototype.toString.call(a) === "[object Object]";
+  }
+};
+
+//数组加法
+function _arrayadd(a,b){
+  if(a.length != b.length){
+      return "Invalid value:_arrayadd"
+  }
+
+  var ret = [];
+  for(var i=0;i<a.length;i++){
+    ret.push(Number(a[i]) + Number(b[i]))
+  }
+  return ret;
+}
+
+//数组减法
+function _arraysub(a,b){
+  if(a.length != b.length){
+     return "Invalid value:_arraysub"
+  }
+
+  var ret = [];
+  for(var i=0;i<a.length;i++){
+    ret.push(Number(a[i]) - Number(b[i]))
+  }
+  return ret;
+
+}
+
+//数组乘法
+function _arrayapp(a,b){
+  if(a.length != b.length){
+      return "Invalid value:_arrayapp"
+  }
+  var ret = [];
+  for(var i=0;i<a.length;i++){
+    ret.push(Number(a[i]) * Number(b[i]))
+  }
+  return ret;
+}
+
+//数组除法
+function _arraydivs(a,b){
+  if(a.length != b.length){
+     return "Invalid value:_arraydivs"
+  }
+
+  var ret = [];
+  for(var i=0;i<a.length;i++){
+    ret.push(Number(a[i]) / Number(b[i]))
+  }
+  return ret;
+}
+
+
+function isSametype(a, b){
+    return Object.prototype.toString.call(a) === Object.prototype.toString.call(b);
+}
+
+function isArray (a) {
+    return Object.prototype.toString.call(a) === "[object Array]";
+}
+
+function isString(s) {
+    return typeof s === "string";
+}
+
+function isNumber(value) {
+    var patrn = /^(-)?\d+(\.\d+)?$/;
+    if (patrn.exec(value) == null || value == "") {
+        return false
+    } else {
+        return true
+    }
+}
+
+function isBoolean(s) {
+  return typeof s === "boolean";
+}
+
+function isObject(o) {
+  return Object.prototype.toString.call(o) === "[object Object]";
+}
+
+function isDate(o) {
+  return Object.prototype.toString.call(o) === "[object Date]";
+}
+
+function isFunction(o) {
+  return Object.prototype.toString.call(o) === "[object Function]";
+}
+
+
+

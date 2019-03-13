@@ -1,0 +1,4 @@
+ // todo delete
+    // 列出当前节点下的数据历史记录
+    listcurnodehostories:'http://localhost:1337/approvalhistory/listcurnodehistories',
+    getexceptedflow:'http://localhost:1337/flow/getexceptedflow',

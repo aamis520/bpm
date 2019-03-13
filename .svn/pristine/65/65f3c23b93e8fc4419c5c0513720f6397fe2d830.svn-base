@@ -1,0 +1,13 @@
+.login{
+    margin: 100rpx 110rpx;
+    color: #00b30c;
+}
+.login input{
+    height: 80rpx;
+    margin-bottom: 80rpx;
+    border-bottom: 1px solid #00b30c;
+}
+.btn_login{
+    background: #00b30c;
+    color: #fff;
+}

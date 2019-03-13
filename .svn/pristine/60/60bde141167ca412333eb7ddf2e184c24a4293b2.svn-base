@@ -1,0 +1,61 @@
+{
+	"newlayout": {
+		"start":"<div id = \"layouttobeadd\">",
+	    "end":"</div>"
+	},
+	"setting": {
+		"colunms":{
+			"start": "var keytoshow = \\[",
+			"end": "]"
+		},
+		"editpage":{
+			"start": "let editpageid = \\[",
+			"end": "]"
+		},
+		"viewpage":{
+			"start": "let viewpageid = \\[",
+			"end": "]"
+		},
+		"showviewinmodal":{
+			"start": "let isshowviewinmodal = \\[",
+			"end": "]"
+		},
+		"showeditinmodal":{
+			"start": "let isshoweditinmodal = \\[",
+			"end": "]"
+		},
+		"count":{
+			"start":"let countData = \\[",
+			"end":"]"	
+		}
+	},
+	"importpages": "",
+	"action":[
+		{
+		    "type": "replace",
+		    "from": {
+			"start": "let editpage = \\[\\[",
+			"end": "]]",
+			"Trannsfer": "PAGEIDTOROUTER"
+		    },
+		    "to": {
+			"start": "{ path:'",
+			"end": "'}"
+		    },
+		    "totype": "json"
+		},
+		{
+		    "type": "replace",
+		    "from": {
+			"start": "let viewpage = \\[\\[",
+			"end": "]]",
+			"Trannsfer": "PAGEIDTOROUTER"
+		    },
+		    "to": {
+			"start": "{ path:'",
+			"end": "'}"
+		    },
+		    "totype": "json"
+		}
+  ]
+}

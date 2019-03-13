@@ -1,0 +1,962 @@
+/**
+ * Created by demo on 2017/7/3.
+ */
+"use strict";
+
+var SystemKeyHandler = require("./SystemKeyHandler.js");
+var Util = require("./util.js");
+module.exports = {
+  querybyckfn:function (keywordid,usrid){
+      return new Promise(function (resolve,reject) {
+        Complexkeyword.findOne({
+          id: keywordid
+        }).exec(function (err, ck) {
+          if (!ck) {
+            reject(null,'');
+          } else {
+            var _para = {"usrid": usrid};
+            //思路：先根据条件取所有数据，然后进行行内操作，再进行纵向操作
+            getallskinfo(ck, _para)//lyd 找到所有的sk的信息，主要使用sk的id，理解为便于拿数据具体值，找出sk的id，在下边拿
+              .then(SystemKeyHandler.startprocess)// 这是系统关键字
+              .then(queryalldatabycondidtion) //lyd这里是根据ck下找出的所有的sk的id，去对应的flow下找所有的sk具体数据
+              .then(quaryusersinfo)//找ck中用到的人员信息
+              .then(calculate)//计算，有个util.js,
+              .then(buildreply)//整理返回的数据结构
+              .then(function (reply) {
+                  resolve(reply)
+              })
+          }
+        });
+      })
+  }
+};
+
+///////////////////////////////////////////////////////////////////////////////
+//for compelx key
+//根据条件来对每一项进行搜索。
+function getallskinfo(ck,_para){
+  return new Promise(function (resolve, reject) {
+    Simplekeyword.find({
+      or : getkeylike(ck,"skid")
+    }).exec(function (err, sks) {
+      if (sks) {
+        resolve({cks:ck, sks:sks,_para:_para});
+        //lyd   这里是返回找出的sk的信息，同时返回传入的ck，理解为sks是个[{},...]  log确定
+      } else {
+        reject(err);
+      }
+    })
+  });
+}
+
+function queryalldatabycondidtion(data){
+  //这里的cks也就是ck所有数据
+  var cks = data.cks; // 原始的complex key
+  var sks = data.sks; // 取出的simple key类型。
+  return new Promise(function (resolve, reject) {
+    //异步调用所有的
+    async.series(
+      //lyd 这里是准备一个队列，是一组XXX.find(){}...
+      buildckqueryfunctions(cks, sks)
+      ,function(err, results) {//lyd   log一下看找到的数据的结果！
+        if (results) {
+          data.results = results;
+           // console.log('打出calc中需用的数据：')
+           // console.log(results)
+           // console.log('---------')
+          resolve(data);
+        } else {
+          reject(err);
+        }
+      }
+    );
+  });
+}
+
+function quaryusersinfo(data) {
+  return new Promise(function (resolve,reject) {
+    // console.log('-----quaryusersinfo----');
+    // console.log(data.cks.operations[0].condition);
+    // console.log(data)
+    // console.log('-------------');
+    //这里返回data.cks中的id
+    var _search_condition = [];
+    // for(var j = 0; j < data.results[0].length;j++){
+    //     var temp = {};
+    //     //TODO, 为什么有"fuzeren"
+    //     temp.id = data.results[0][j].fuzeren;
+    //     _search_condition.push(temp);
+    // }
+    for(var j = 0 ; j < data.cks.operations.length;j++){
+      var temp = {};
+      if(data.cks.operations[j].condition.persons.who){
+        temp.id = data.cks.operations[j].condition.persons.who;
+        _search_condition.push(temp);
+      }
+    }
+    Users.find({
+      or:_search_condition
+    }).exec(function (err,users) {
+      if(users){
+        data.usersinfo = users;
+        resolve(data)
+      }else{
+        reject('quaryusersinfo error')
+      }
+    })
+  })
+}
+
+function calculate(data){
+  // console.log('-------calc');
+  // console.log(data.results);
+  // console.log('-----------');
+  // console.log(data.cks.operations[0]);
+  // console.log('--------')
+  return new Promise(function (resolve, reject) {
+    if(data.results) {
+      if (data.cks.operations[0].func.leftnodeskid || data.cks.operations[0].func.rightnodeskid) {
+        //进到这个api的时候，data的results中存的是根据条件搜索出来的数据，下一步是按要求进行行内和行间的计算。
+
+        // ret是最终的返回结果
+        var ret = [];
+        // 这是每一行计算出来的结果
+        var eachRowResuarr = [];
+        // 不管多少行数据，是否可进行数学运算,所有的数据中，只要有一项不能转为数学值，就是不能运算
+        var isCalcAble = true;
+        // 不管多少行数据，是否返回一个单值，不是对象
+        var isReturnSingalVal = false;
+        // 是否需要groupby，以第一行的条件为准
+        var _rangeValue = data.cks.operations[0].condition.range.value;
+        var _whoValue = data.cks.operations[0].condition.persons.who;
+        // 这是不可计算的值
+        var cannotCalcArr = [];
+        var isGroupByNeeded = false;
+        var groupByWhichOne = "";
+        var groupByRange = '';
+        var groupByWho = "";
+        var groupByDataarr = [];//这里是groupby的值[{k:v},...]
+        var groupByDataKeyarr = [];//这里是groupby的k[k,...]
+
+
+        //计算每一行的数据--start
+        for (var i = 0; i < data.cks.operations.length; i++) {
+          var _idx = i;
+          //找左侧skid的具体数据
+          var _func = data.cks.operations[i].func;
+          var dataRowLarr = [], dataRowRarr = [];//保存的是左右节点的数据
+          var resuLarr = [], resuRarr = [];//保存左右节点计算的结果
+          var operationRowL = '', operationRowR = '';//左右前置条件
+
+          // 这里是取出左边的值，是时间戳，转为时间，是id，转为名字，可计算，转为数字
+          if (_func.leftnodeskid) {
+            dataRowLarr = getdatabycolum(_idx, _func.leftnodeskid, data.sks, data.results);
+            var tempdataRowLarr = [];
+            for (var r = 0; r < dataRowLarr.length; r++) {
+              // 可以转为数字运算的，进行数学运算，不能的话，不转
+              if(Number(dataRowLarr[r]) && typeof dataRowLarr[r] == "string"){
+                tempdataRowLarr[r] = Number(dataRowLarr[r]);
+              }else{
+                var regid = /^[a-zA-Z0-9]{24}/;
+                if(regid.test(dataRowLarr[r])){
+                  var _temp = dataRowLarr[r];
+                  dataRowLarr[r] = getusername(_temp,data.usersinfo)
+                }
+                if(typeof dataRowLarr[r] == "number"){
+                  var _num = parseInt(dataRowLarr[r]);
+                  if(String(_num).length == 13){
+                    dataRowLarr[r] = formatTime(dataRowLarr[r],"yyyy-MM-dd hh:mm")
+                  }
+                }
+                tempdataRowLarr[r] = dataRowLarr[r];
+              }
+            }
+            dataRowLarr = tempdataRowLarr;
+
+            // 这里对左侧查出的值进行数学转化，只要有一个不能转化，就是不可运算的
+            if(isCalcAble == true){
+              for (var m = 0 ; m < dataRowLarr.length;m++ ){
+                if(isNaN(Number(dataRowLarr[m]))){
+                  isCalcAble = false;
+                  break;
+                }
+              }
+            }
+          }
+
+          // 这里是取出右边的值，是时间戳，转为时间，是id，转为名字，可计算，转为数字
+          if (_func.rightnodeskid) {
+            dataRowRarr = getdatabycolum(_idx, _func.rightnodeskid, data.sks, data.results);
+            var tempdataRowRarr = [];
+            for (var s = 0; s < dataRowRarr.length; s++) {
+              // 可以转为数字运算的，进行数学运算，不能的话，不转
+              if(Number(dataRowRarr[s]) && typeof dataRowRarr[s] == "string"){
+                tempdataRowRarr[s] = Number(dataRowRarr[s]);
+              }else{
+                var regid = /^[a-zA-Z0-9]{24}/;
+                if(regid.test(dataRowRarr[s])){
+                  var _temp = dataRowRarr[s];
+                  dataRowRarr[s] = getusername(_temp,data.usersinfo)
+                }
+                if(typeof dataRowRarr[s] == "number"){
+                  var _num = parseInt(dataRowRarr[s]);
+                  if(String(_num).length == 13){
+                    dataRowRarr[s] = formatTime(dataRowRarr[s],"yyyy-MM-dd hh:mm")
+                  }
+                }
+                tempdataRowRarr[s] = dataRowRarr[s];
+              }
+            }
+
+            // 这里对右侧的值进行数字转化，在左侧已经是可计算值的情况下进行判断
+            dataRowRarr = tempdataRowRarr;
+            if(isCalcAble == true){
+              for (var n = 0 ; n < dataRowRarr.length;n++ ){
+                if(isNaN(Number(dataRowRarr[n]))){
+                  isCalcAble = false;
+                  break;
+                }
+              }
+            }
+          }
+
+          // 如果是可执行计算的 --start
+          // 只要左右数据前置条件有sum/avg,返回值就是个单值
+          if(isCalcAble){
+            if (dataRowLarr && dataRowLarr.length > 0) {
+              for(var s = 0;s <data.cks.operations.length;s++) {
+                if(data.cks.operations[s].func){
+                  if (data.cks.operations[s].func.leftnodeskoperation == "sum") {
+                    isReturnSingalVal = true;
+                    break;
+                  } else if (data.cks.operations[s].func.leftnodeskoperation == "avg") {
+                    isReturnSingalVal = true;
+                    break;
+                  }
+                }
+              }
+            }else if (dataRowRarr && dataRowRarr.length > 0) {
+              for(var s = 0;s <data.cks.operations.length;s++) {
+                if(data.cks.operations.func[s]) {
+                  if (data.cks.operations.func[s].rightnodeskoperation == "sum") {
+                    isReturnSingalVal = true;
+                    break;
+                  } else if (data.cks.operations[s].func.rightnodeskoperation == "avg") {
+                    isReturnSingalVal = true;
+                    break;
+                  }
+                }
+              }
+            }
+
+
+
+            // 找左侧skid的前置条件
+            if (_func.leftnodeskoperation) {
+              operationRowL = _func.leftnodeskoperation
+            }
+            //找右侧skid的前置条件
+            if (_func.rightnodeskoperation) {
+              operationRowR = _func.rightnodeskoperation;
+            }
+
+            //对左侧数据进行计算
+            if (dataRowLarr) {
+              if (_func.leftnodeskoperation == "sum") {
+                isReturnSingalVal = true;
+                resuLarr[0] = Util.arraysum(dataRowLarr);
+                iscalcvaluseable(resuLarr);
+              } else if (_func.leftnodeskoperation == "avg") {
+                isReturnSingalVal = true;
+                resuLarr[0] = Util.arrayaveg(dataRowLarr);
+                iscalcvaluseable(resuLarr);
+              } else if (_func.leftnodeskoperation == "") {
+                resuLarr = dataRowLarr;
+                iscalcvaluseable(resuLarr);
+              }
+            }
+            // 对右侧数据进行计算
+            if (dataRowRarr) {
+              if (_func.rightnodeskoperation == "sum") {
+                isReturnSingalVal = true;
+                resuRarr[0] = Util.arraysum(dataRowRarr);
+                iscalcvaluseable(resuRarr);
+              } else if (_func.rightnodeskoperation == "avg") {
+                isReturnSingalVal = true;
+                resuRarr[0] = Util.arrayaveg(dataRowRarr);
+                iscalcvaluseable(resuRarr);
+              } else if (_func.rightnodeskoperation == "") {
+                resuRarr = dataRowRarr;
+                iscalcvaluseable(resuRarr);
+              }
+            }
+
+            var resuRowarr = [];
+
+            // 只有左侧的数据，本行的结果就是左侧的数据
+            if ((resuLarr && resuLarr.length > 0) && !(resuRarr && resuRarr.length > 0)) {
+              resuRowarr = resuLarr;
+
+            // 只有右侧的数据，本行的结果就是右侧的数据
+            } else if ((resuRarr && resuRarr.length > 0) && !(resuLarr && resuLarr.length > 0)) {
+              resuRowarr = resuRarr;
+
+            // 两侧的数据都有的时候，进行计算
+            } else if ((resuLarr && resuLarr.length > 0) && (resuRarr && resuRarr.length > 0)) {
+              if (_func.operation == "+") {
+                resuRowarr = Util.add(resuLarr, resuRarr);
+                iscalcvaluseable(resuRowarr);
+              } else if (_func.operation == "-") {
+                resuRowarr = Util.sub(resuLarr, resuRarr);
+                iscalcvaluseable(resuRowarr);
+              } else if (_func.operation == "*") {
+                resuRowarr = Util.app(resuLarr, resuRarr);
+                iscalcvaluseable(resuRowarr);
+              } else if (_func.operation == "/") {
+                resuRowarr = Util.divs(resuLarr, resuRarr);
+                iscalcvaluseable(resuRowarr);
+              } else if (_func.operation == "") {
+                resuRowarr = resuLarr;
+                iscalcvaluseable(resuRowarr);
+              }
+            }
+            // 不管每一行是不是执行sum或者avg，返回值都是个数组
+            eachRowResuarr.push(resuRowarr);
+
+            // 是否可计算 --end
+          }
+          // 这里是不可计算的结果,这里用groupby,直接返回结果
+          if(isCalcAble == false){
+            cannotCalcArr = cannotCalcArr.concat(dataRowLarr,dataRowRarr)
+          }
+        }
+
+        // 不可计算的走这里返回
+        if(isCalcAble == false){
+          var countObj = arrRepeatEle(cannotCalcArr);
+          var countFinalArr = [];
+          for(var countKey in countObj){
+            var tempObj = {};
+            tempObj[countKey] = countObj[countKey]["count"];
+            countFinalArr.push(tempObj)
+          }
+          data.calcval = countFinalArr;
+          data.isCalcAble = false;
+          data.isReturnSingalVal = isReturnSingalVal;
+          resolve(data)
+        }
+
+        // 如果是可执行计算的 --end
+        if(isCalcAble){
+          // 计算只有一行的情况
+          if (data.cks.operations.length == '1') {
+            ret = eachRowResuarr;
+          }
+          //计算有多行的情况
+          if (data.cks.operations.length > 1) {
+            var totalNum = 0; //声明一个变量，判断每行的行首条件，往totalNum中操作，为空，赋值给totalNum，
+            for (var j = 0; j < data.cks.operations.length; j++) {
+              if (data.cks.operations[j].operation == '') {
+                totalNum = eachRowResuarr[j];
+              } else if (data.cks.operations[j].operation == '+') {
+                totalNum = Util.add(totalNum, eachRowResuarr[j]);
+                iscalcvaluseable(totalNum);
+              } else if (data.cks.operations[j].operation == '-') {
+                totalNum = Util.sub(totalNum, eachRowResuarr[j]);
+                iscalcvaluseable(totalNum);
+              } else if (data.cks.operations[j].operation == '*') {
+                totalNum = Util.app(totalNum, eachRowResuarr[j]);
+                iscalcvaluseable(totalNum);
+              } else if (data.cks.operations[j].operation == '/') {
+                totalNum = Util.divs(totalNum, eachRowResuarr[j]);
+                iscalcvaluseable(totalNum);
+              }
+            }
+            ret.push(totalNum)
+          }
+          // 这里返回的是不需要groupby的，可计算的,有who就用who当key，有range就用range当key
+           data.calcval = ret[0];
+          if(_rangeValue && _rangeValue != "all" &&  _whoValue && _whoValue == "all"){
+            if(isReturnSingalVal == true){
+              data.calcval = ret[0];
+            }else {
+              var _tempArr = [];
+              for (var y = 0; y < ret[0].length; y++) {
+                var _tempObj = {};
+                _tempObj[_rangeValue] = ret[0][y];
+                _tempArr.push(_tempObj);
+              }
+              data.calcval = _tempArr;
+            }
+          }else if(_rangeValue && _rangeValue == "all" &&  _whoValue && _whoValue != "all"){
+            if(isReturnSingalVal == true){
+              data.calcval = ret[0];
+            }else {
+              var _tempArr = [];
+              var _name = getusername(_whoValue,data.usersinfo);
+              for (var y = 0; y < ret[0].length; y++) {
+                var _tempObj = {};
+                _tempObj[_name] = ret[0][y];
+                _tempArr.push(_tempObj);
+              }
+              data.calcval = _tempArr;
+            }
+          }
+
+          // 判断需要groupBy
+          // 这里根据第一行条件来判断
+          if(_rangeValue && _rangeValue == "all" && !_whoValue){
+            groupByRange = data.cks.operations[0].condition.range.skid;
+            groupByWhichOne = "range";
+            isGroupByNeeded = true;
+          }else{
+            groupByRange = data.cks.operations[0].condition.range.skid;
+          }
+
+          if(_whoValue && _whoValue == "all" && !_rangeValue){
+            isGroupByNeeded = true;
+            groupByWhichOne = "who";
+            groupByWho = data.cks.operations[0].condition.persons.skid;
+          }else{
+            groupByWho = data.cks.operations[0].condition.persons.skid;
+          }
+
+
+
+          if(isGroupByNeeded){
+            if(groupByWhichOne == "range"){
+              groupByDataKeyarr = getdatabycolum(_idx, groupByRange, data.sks, data.results);
+              var groupByDataarr = [];
+              for(var n = 0 ; n < ret[0].length;n++){
+                var _tempObj = {};
+                _tempObj[groupByDataKeyarr[n]] = ret[0][n];
+                groupByDataarr.push(_tempObj);
+              }
+            }
+
+            if(groupByWhichOne == "who"){
+              groupByDataKeyarr = getnamebycolum(0, groupByWho, data.sks, data.results,data.usersinfo);
+
+              var groupByDataarr = [];
+              for(var m = 0;m < ret[0].length;m++){
+                var _tempObj = {};
+                _tempObj[groupByDataKeyarr[m]] = ret[0][m];
+                groupByDataarr.push(_tempObj);
+              }
+            }
+            data.calcval = groupByDataarr;
+          }
+
+          data.isCalcAble = isCalcAble;
+          data.isReturnSingalVal = isReturnSingalVal;
+          resolve(data);
+        }
+      }else{
+        // 这是只有条件，没有选择左右数据的情况
+        data.calcval = data.results;
+        resolve(data);
+      }
+    } else {
+      reject("error")
+    }
+  })
+}
+
+function quaryusersinfo(data) {
+  return new Promise(function (resolve,reject) {
+    //这里返回data.cks中的id
+    var _search_condition = [];
+    // for(var j = 0; j < data.results[0].length;j++){
+    //     var temp = {};
+    //     //TODO, 为什么有"fuzeren"
+    //     temp.id = data.results[0][j].fuzeren;
+    //     _search_condition.push(temp);
+    // }
+    for(var j = 0 ; j < data.cks.operations.length;j++){
+      var tempByid = {};
+      var tempByRealName = {};
+      var tempByLoginName = {};
+      if(data.cks.operations[j].condition.persons.who && data.cks.operations[j].condition.persons.who != "all"){
+        tempByid.id = data.cks.operations[j].condition.persons.who;
+
+        tempByLoginName.loginname = data.cks.operations[j].condition.persons.who;
+
+        tempByRealName.realname = data.cks.operations[j].condition.persons.who;
+        _search_condition.push(tempByid,tempByLoginName,tempByRealName);
+        Users.find({
+          or:_search_condition
+        }).exec(function (err,users) {
+          if(users){
+            data.usersinfo = users;
+            resolve(data)
+          }else{
+            reject('quaryusersinfo error')
+          }
+        })
+      }else{
+        Users.find({
+
+        }).exec(function (err,users) {
+          if(users){
+            data.usersinfo = users;
+            resolve(data)
+          }else{
+            reject('quaryusersinfo error')
+          }
+        })
+      }
+    }
+  })
+}
+
+//整理返回的数据结构
+function buildreply(data) {
+  // console.log('------buildreply_data----------');
+  // console.log(data);
+  // console.log('----------');
+  return new Promise(function (resolve,reject) {
+    var _cks = data.cks;
+    var _isReturnSingalVal = data.isReturnSingalVal;
+    if(_isReturnSingalVal == true) {
+      resolve(data.calcval[0])
+    }else{
+      var _sks = data.sks;
+      var _results = data.results;
+      var _calcval = data.calcval;
+      var _usersinfo = data.usersinfo;
+
+      var isRange = false;//是否设定了范围
+      var isInterVal = false;//是否设定了返回频率
+      var isDuration = false;//是否设定了时间范围
+      var isWho = false;//是否设定了person
+
+      var _returnVal = {};
+
+      if (_cks.operations[0].condition.range.value
+          && _cks.operations[0].condition.range.skid
+          && _cks.operations[0].condition.range.operation
+          && _cks.operations[0].condition.range.value !="all") {
+        isRange = true;
+      }
+      if (_cks.operations[0].condition.duration.interval) {
+        isInterVal = true;
+      }
+      if (_cks.operations[0].condition.duration.start
+          && _cks.operations[0].condition.duration.end
+          && _cks.operations[0].condition.duration.skid) {
+        isDuration = true;
+      }
+      if (_cks.operations[0].condition.persons.who
+          && _cks.operations[0].condition.persons.skid
+          && _cks.operations[0].condition.persons.operation
+          && _cks.operations[0].condition.persons.who != "all"
+      ) {
+        isWho = true;
+      }
+      //判断节点的前置条件，两边都有前置条件，使用calc计算过的值   只有一边有前置条件，应报错  两边都没有前置条件，视为返回JSON结构的数据
+
+      if (!isRange && !isWho && !isDuration) {
+        console.log("!isRange && !isWho && !isDuration");
+        if (isInterVal) {
+          // resolve("暂时没加interval判断")
+        } else {
+          _returnVal["name"] = data.cks.name;
+          _returnVal["desc"] = data.cks.desc;
+          // 这里返回数据的长度也按照第一行查出的数据长度为准，不管左右节点有几个，如果无前置条件并进行计算的话，数组长度不一致，会报错，如果长度一致，
+          // 取第一行查出的数据长度也就合理了
+          _returnVal.value = data.calcval;
+          if (_returnVal) {
+            resolve(_returnVal)
+          }
+        }
+      } else if (isRange && isDuration && isWho) {
+        console.log("isRange && isDuration && isWho");
+        if (isInterVal) {
+          // resolve("暂时没加interval判断")
+        } else {
+          var _whoval = _cks.operations[0].condition.persons.who;
+          var _whoname = getusername(_whoval, _usersinfo);
+          var _rangeval = _cks.operations[0].condition.range.value;
+          _returnVal["name"] = data.cks.name;
+          _returnVal["desc"] = data.cks.desc;
+          _returnVal["value"] = [];
+          for (var i = 0; i < _calcval.length; i++) {
+            var _temp = {};
+            _temp[_whoname] = _calcval[i];
+            _returnVal.value.push(_temp)
+          }
+          if (_returnVal) {
+            resolve(_returnVal)
+          } else {
+            reject('isRange && isDuration && isWho  error')
+          }
+        }
+
+      } else if (isWho && isDuration && !isRange) {
+        if (isInterVal) {
+          resolve("暂时没加interval判断")
+        } else {
+          console.log("isWho && isDuration && !isRange");
+          var _whoval = _cks.operations[0].condition.persons.who;
+          var _whoname = getusername(_whoval, _usersinfo);
+
+          _returnVal["name"] = data.cks.name;
+          _returnVal["desc"] = data.cks.desc;
+          _returnVal["value"] = _calcval;
+
+          if (_returnVal) {
+            resolve(_returnVal)
+          } else {
+            reject('isWho && isDuration erorr')
+          }
+        }
+
+      } else if (isDuration && !isRange && !isWho) {
+        if (isInterVal) {
+          resolve("暂时没加interval判断")
+        } else {
+          console.log("isDuration && !isRange && !isWho");
+          _returnVal["name"] = data.cks.name;
+          _returnVal["desc"] = data.cks.desc;
+          _returnVal.value = _calcval;
+          // for(var i = 0 ; i < _calcval.length;i++){
+          //   for(var _key in _calcval[i]){
+          //     var _tempObj = {};
+          //     _tempObj["name"] = _key;
+          //     _tempObj["val"] = _calcval[i][_key];
+          //     _returnVal.value.push(_tempObj)
+          //   }
+          // }
+
+          // var _uniqueArr = uniqueArr(_tempArr,"name");
+          // var _returnArr = [];
+          // for(var j = 0;j < _uniqueArr.length;j++){
+          //   var _returnObj = {};
+          //   _returnObj[_uniqueArr[j]["name"]] = [];
+          //   _returnArr.push(_returnObj);
+          // }
+          //
+          // for(var k = 0 ; k < _tempArr.length;k++){
+          //   var _key = _tempArr[k]["name"];
+          //   for(var m = 0 ; m < _returnArr.length;m++){
+          //     if(_returnArr[m][_key]){
+          //        _returnArr[m][_key].push(_tempArr[k]["val"])
+          //     }
+          //   }
+          // }
+
+          // _returnVal.value = _returnArr;
+
+          if (_returnVal) {
+            resolve(_returnVal)
+          } else {
+            reject("isDuration error")
+          }
+        }
+      } else if(isRange && isDuration && !isWho){
+          if(isInterVal){
+            resolve("暂时没加interval判断")
+          }else{
+            console.log("isRange && isDuration && !isWho");
+            _returnVal["name"] = data.cks.name;
+            _returnVal["desc"] = data.cks.desc;
+            _returnVal.value = data.calcval;
+            resolve(_returnVal)
+          }
+      }else {
+        console.log("cks others");
+        _returnVal["name"] = data.cks.name;
+        _returnVal["desc"] = data.cks.desc;
+        _returnVal["value"] = data.calcval;
+        resolve(_returnVal);
+      }
+    }
+  })
+}
+
+//lyd  这里key可能会有错，需要log    找包含skid  这里得细看一下if中keylike，理解为if中的keylike需写成’skid‘,具体log一下
+function getkeylike(ck ,keylike) {
+  var ret = [];
+  return _getkeylike(ck ,keylike);
+  function _getkeylike(ck ,keylike) {
+    for(var key in ck){
+      if(ck[key] && typeof ck[key] == 'object'){
+        ret.concat(_getkeylike(ck[key], keylike));
+      }else{
+        if(key.indexOf(keylike) != -1){
+          if(ck[key]){
+            var temp = {};//此处只是给对象的id赋值用，需要放for里
+            temp.id = ck[key];
+            ret.push(temp);
+          }
+          //lyd 这里得log出temp，确定具体格式及信息
+        }
+      }
+    }
+
+    //这里是sql里or后的条件，必须是个数组
+    return ret;
+  }
+}
+
+function buildckqueryfunctions(cks, sks) { //根据ck中的operations中的condition，做循环拼出sql，这里一个condition是一行，
+  var ret = [];
+  var lefttemp,righttemp;
+
+  for(var key in cks){
+    if(cks[key] && typeof cks[key] == "object"){ //这里找到的是operations
+      for(var i = 0;i < cks[key].length;i++){
+        //这里不适用闭包，会在创建查询函数时候，取不到查询的条件
+        (function(){
+          var con={}, func =[];
+          if(cks[key][i] && cks[key][i].condition){
+            if(cks[key][i].condition.range){
+              var rangeKeyname = getskname(cks[key][i].condition.range.skid, sks);
+              var rangeK, rangeV;
+              rangeK = cks[key][i].condition.range.operation;
+              rangeV = cks[key][i].condition.range.value;
+              // 这里拼出是这样的
+              //{xiangmu:xiangmuA}
+              if(rangeV != 'all'){
+                if(rangeKeyname && rangeK && rangeV){
+                  if(rangeK == "="){
+                    con[rangeKeyname] = rangeV;
+                  }
+                }
+              }else{
+                //  为all的时候，不写入任何条件
+              }
+            }
+            if(cks[key][i].condition.duration){
+              var durationKeyname = getskname(cks[key][i].condition.duration.skid, sks);
+
+              //lyd.change
+              var durationS, durationE;
+              durationS = cks[key][i].condition.duration.start;
+              durationE = cks[key][i].condition.duration.end;
+
+              if(durationKeyname && durationS && durationE){
+                // 这里拼出是这样的，注意：符号之后只能用string
+                // {shijian:{'>=':'1485907200000','<':'1488326400000'}}
+                var _opera = {};
+                _opera[">="] = Number(durationS);
+                _opera["<"] = Number(durationE);
+                con[durationKeyname] = {'>=':_opera[">="],'<':_opera["<"]};
+              }
+            }
+
+            if(cks[key][i].condition.persons){
+              var personsKeyname = getskname(cks[key][i].condition.persons.skid, sks);
+              var personsK, personsV;
+              personsK = cks[key][i].condition.persons.operation;
+              personsV = cks[key][i].condition.persons.who;
+              // 这里拼出是这样的
+              //{xiangmu:xiangmuA}
+              if(personsKeyname && personsK && personsV){
+                  if(personsV != "all"){
+                    if(personsK == "="){
+                        con[personsKeyname] = personsV;
+                    }
+                  }else{
+                  }
+              }
+            }
+          }
+
+          if(cks[key][i] && cks[key][i].func){
+            if(cks[key][i].func.leftnodeskid){
+              var _leftgetskdb = getskdb(cks[key][i].func.leftnodeskid, sks);
+              var _conL = con;
+              var _leftquerybyconditionFn = function(callback){
+                var _flowdbL=eval("n"+ _leftgetskdb);
+                _flowdbL.find(
+                  _conL
+                ).exec(function(err,val){
+                  if(val){
+                    callback(null,val)
+                  }else{
+                    callback(null,'')
+                  }
+                })
+              };
+              ret.push(_leftquerybyconditionFn);
+            }else if(cks[key][i].func.rightnodeskid){
+              var _rightgetskdb = getskdb(cks[key][i].func.rightnodeskid, sks);
+              var _conR = con;
+              var _rightquerybyconditionFn = function(callback){
+                var _flowdbR=eval("n"+ _rightgetskdb);
+                _flowdbR.find(
+                  _conR
+                ).exec(function(err,val){
+                  if(val){
+                    callback(null,val)
+                  }else{
+                    callback(null,'')
+                  }
+                })
+              };
+              ret.push(_rightquerybyconditionFn);
+            }else{
+              //这里判断没有左右节点的情况,左右节点都有的情况不用判断，有左右节点，会进第一个if条件
+              //   找一个flowid
+                var _tempskid = '';
+                if(cks[key][i].condition.persons.skid){
+                    _tempskid = cks[key][i].condition.persons.skid;
+                }
+                if(cks[key][i].condition.range.skid){
+                    _tempskid = cks[key][i].condition.range.skid;
+                }
+                if(cks[key][i].condition.duration.skid){
+                    _tempskid = cks[key][i].condition.duration.skid;
+                }
+                var _conditiondb = getskdb(_tempskid,sks);
+                var _con = con;
+                var _conditionquuerybyconditionFn = function(callback){
+                    var _flowdbCondition = eval("n" + _conditiondb)
+                    _flowdbCondition.find(
+                        _con
+                    ).exec(function(err,val){
+                        if(val){
+                            callback(null,val)
+                        }else {
+                            callback(null,'')
+                        }
+                    })
+                }
+                ret.push(_conditionquuerybyconditionFn);
+            }
+          }
+        }())
+      }
+    }
+  }
+  return ret;
+}
+
+function getskname(skid, sks){
+  for(var i = 0;i < sks.length;i++){
+    if(skid == sks[i].id){
+      return sks[i].key;
+    }
+  }
+}
+
+function getskdb(skid, sks){
+  for(var i = 0;i < sks.length;i++){
+    if(skid == sks[i].id){
+      return sks[i].flowid;
+    }
+  }
+}
+
+function getdatabycolum(where, skid, sks, results){
+  var ret = [];
+  var name = getskname(skid, sks);
+  for(var i = 0 ; i < results[where].length;i++){
+    var _val = results[where][i][name];
+    ret.push(_val)
+  }
+  return ret;
+}
+
+function getnamebycolum(where,skid,sks,results,usrinfos) {
+  var ret = [];
+  var name = getskname(skid,sks);
+  for(var i = 0 ; i < results[where].length;i++){
+      var _val = results[where][i][name];
+      var _name = getusername(_val,usrinfos);
+      ret.push(_name)
+  }
+  return ret;
+}
+
+function getusername(id,usersinfo) {
+  for(var i = 0; i < usersinfo.length;i++){
+    if(id == usersinfo[i].id || id == usersinfo[i].loginname){
+      if(usersinfo[i].realname){
+        return usersinfo[i].realname;
+      }else{
+        return usersinfo[i].loginname;
+      }
+    }
+  }
+}
+
+function iscalcvaluseable(val) {
+  if(typeof val == 'string'){
+    return false;
+  }else {
+    return true;
+  }
+}
+
+function formatTime(time,fmt) {
+  var date = new Date(time);
+  if (/(y+)/.test(fmt)) {
+    fmt = fmt.replace(RegExp.$1, (date.getFullYear() + '').substr(4 - RegExp.$1.length));
+  }
+  let o = {
+    'M+': date.getMonth() + 1,
+    'd+': date.getDate(),
+    'h+': date.getHours(),
+    'm+': date.getMinutes(),
+    's+': date.getSeconds()
+  };
+  for (let k in o) {
+    if (new RegExp(`(${k})`).test(fmt)) {
+      let str = o[k] + '';
+      fmt = fmt.replace(RegExp.$1, (RegExp.$1.length === 1) ? str : _padLeftZero(str));
+    }
+  }
+  return fmt;
+
+  function _padLeftZero(str) {
+    return ('00' + str).substr(str.length);
+  }
+}
+
+function uniqueArr(arr,key) {
+  var newArr=[];
+  for(var i=0;i<arr.length;i++){
+    if(_objIsInArray(arr[i],newArr,key) ==-1){
+      newArr.push(arr[i]);
+    }
+  }
+  return newArr
+
+  function _objIsInArray(obj,arr,key){
+    var tmpStatus=false;
+    for(var j=0;j<arr.length;j++){
+      if(obj[key]==arr[j][key]){
+        return j;
+        break;
+      }else{
+        tmpStatus=false;
+      }
+    }
+    if(!tmpStatus){
+      return -1;
+    }
+  }
+}
+
+function arrRepeatEle(arr) {
+  var i = 0, maxI,
+    item = {};
+  arr.sort(function(x,y){return x - y;});
+  for(i = 0; maxI = arr.length, i < maxI; i +=1){
+    var key = arr[i], obj = {};
+
+    if(item[key]){
+      item[key].count++;
+    }else{
+      obj.value = arr[i];
+      obj.count = arr[i] == arr[i+1]? 2: 1;
+      item[key] = obj;
+    }
+    if(arr[i] == arr[i+1]){
+      arr.splice(i+1,1);
+    }
+  }
+  return item
+}

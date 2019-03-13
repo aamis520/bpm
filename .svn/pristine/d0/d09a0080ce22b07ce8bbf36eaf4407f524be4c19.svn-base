@@ -1,0 +1,1845 @@
+<style scoped>
+.form {
+    width: 85%;
+}
+hr {
+    height:1px;
+    width:100%;
+    text-align:center;
+}
+.mylabel{
+    text-align: right;
+    vertical-align: middle;
+    float: left;
+    font-size: 12px;
+    color: #657180;
+    line-height: 1;
+    padding: 10px 12px 0 0;
+    box-sizing: border-box;
+}
+.mgt10{
+    margin-top:10px;
+}
+.aligncenter{
+    text-align:center
+}
+
+
+
+</style>
+
+<template>
+  <div>
+    <Card>
+      <p slot="title">
+        <Icon type="ios-film-outline"></Icon>
+        关键字生成表单
+      </p>
+      <Form ref="ckForm" :model="ckForm" :label-width="50" class="form">
+        <Form-item label="名称">
+          <Input v-model.trim="ckForm.ckName" placeholder="请输入"></Input>
+        </Form-item>
+        <Form-item label="描述">
+          <Input v-model.trim="ckForm.ckDesc" type="textarea" placeholder="请输入" :autosize="{minRows: 2,maxRows: 4}"></Input>
+        </Form-item>
+        <Form-item
+          v-for="(eachOperation, index) in ckForm.operations"
+          :key="index">
+          <Row>
+            <!--行首条件-->
+            <Select v-model="eachOperation.preOperation" style="width:80px;" clearable>
+              <Option v-for="(option,index) in eachOperation.preOperationList" :value="option.value" :key="index" v-if="index == 0 && option.value == ''">
+                {{option.label}}
+              </Option>
+              <Option v-for="(option,index) in eachOperation.preOperationList" :value="option.value" :key="index" v-if="index != 0 && option.value != ''">
+                {{option.label}}
+              </Option>
+            </Select>
+            <!--条件设置-->
+            <Button type="primary" @click="showConditionModalFn(index)">
+              <p>条件</p>
+              <hr>
+              <p>{{eachOperation.conditionBtnStatus}}</p>
+            </Button>
+            <Button disabled> =>&emsp;{</Button>
+            <!--左侧节点前置条件-->
+            <Select v-model="eachOperation.leftNodeSkOperation" style="width:80px;" clearable>
+              <Option v-for="item in eachOperation.leftNodePreOperationList" :value="item.value" :key="item.label">
+                {{item.label}}
+              </Option>
+            </Select>
+            <!--左侧节点条件设置-->
+            <Button type="primary" @click="showLeftNodeModalFn(index)">
+              <p>节点</p>
+              <hr>
+              <p>{{eachOperation.leftNodeBtnStatus}}</p>
+            </Button>
+            <!--中间条件设置-->
+            <Select v-model="eachOperation.operation" style="width:80px;" clearable>
+              <Option v-for="item in eachOperation.operationList" :value="item.value" :key="item.label">
+                {{ item.label }}
+              </Option>
+            </Select>
+            <!--右侧节点前置条件-->
+            <Select v-model="eachOperation.rightNodeSkOpreation" style="width:80px;" clearable>
+              <Option v-for="item in eachOperation.rightNodePreOperationList" :value="item.value" :key="item.label">
+                {{item.label}}
+              </Option>
+            </Select>
+            <!--右侧节点设置-->
+            <Button type="primary" @click="showRightNodeModalFn(index)">
+              <p>节点</p>
+              <hr>
+              <p>{{eachOperation.rightNodeBtnStatus}}</p>
+            </Button>
+            <Button disabled> }</Button>
+            <Button type="error" @click="handleRemove(index)">
+              <Icon type="trash-a" size="20"></Icon>
+            </Button>
+          </Row>
+          <Row>
+            <hr style=" margin-top:5px;"/>
+          </Row>
+        </Form-item>
+        <Form-item>
+          <Row>
+            <Col span="24">
+            <Button type="dashed" long @click="handleAdd" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+        </Form-item>
+        <Form-item style="text-align:right;">
+          <Button type="primary" @click="handleSubmit('ckForm')">提交</Button>
+          <Button type="ghost" @click="handleReset('ckForm')" style="margin-left: 8px">重置</Button>
+        </Form-item>
+      </Form>
+    </Card>
+
+    <!--条件modal-->
+    <Modal
+      v-model="showConditionModal"
+      title="选择条件"
+      @on-ok="conditionModalOk"
+      @on-cancel="conditionModalCancel">
+      <Row >
+        <Col span="24" class="aligncenter">
+        <h6>选择本行条件的流程</h6>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>选择流程</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurFlowid"
+                @on-change="listCurFlowSk(eachOperationsModal.CurFlowid)" clearable>
+          <Option v-for="item in ajaxFlowList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <hr class="mgt10">
+
+      <!--range-->
+      <Row class="mgt10">
+        <Col span="24" class="aligncenter">
+        <h6>设置范围条件</h6>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>选择关键字</label>
+        </Col>
+
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurRangeSkid" clearable>
+          <Option v-for="item in eachOperationsModal.SkList" :value="item.value" :key="item.label">{{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>选择条件</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurRangeOption" clearable>
+          <Option v-for="item in eachOperationsModal.rangeOperationList" :value="item.value" :key="item.label">
+            {{ item.label}}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+          <label>输入信息</label>
+        </Col>
+        <Col span="19">
+          <Select v-model="eachOperationsModal.CurSelectRangeValue" clearable>
+            <Option value="">空</Option>
+            <Option value="all">全部</Option>
+            <Option value="para.itemid">itemid</Option>
+          </Select>
+        </Col>
+      </Row>
+
+      <Row class="mgt10">
+       <Col span="5" class="mylabel">
+       </Col>
+        <Col span="19">
+          <Input v-model.trim="eachOperationsModal.CurRangeValue" placeholder="请输入..."
+                 :disabled="eachOperationsModal.CurSelectRangeValue == 'para.itemid' || eachOperationsModal.CurSelectRangeValue == 'all'">
+          </Input>
+        </Col>
+      </Row>
+      <hr class="mgt10">
+
+      <!--duration-->
+
+      <Row class="mgt10">
+        <Col span="24" class="aligncenter">
+        <h6>设置时间范围条件</h6>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        选择关键字
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurDurationSkid" clearable>
+          <Option v-for="item in eachOperationsModal.SkList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>定义绝对开始日期</label>
+        </Col>
+        <Col span="7">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeStartYear" placeholder="请输入4位数年"></Input>
+        </Col>
+        <Col span="5" offset="1">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeStartMonth" placeholder="请输入2位数月"></Input>
+        </Col>
+        <Col span="5" offset="1">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeStartDay" placeholder="请输入2位数日"></Input>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>定义绝对结束日期</label>
+        </Col>
+        <Col span="7">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeEndYear" placeholder="请输入4位数年"></Input>
+        </Col>
+        <Col span="5" offset="1">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeEndMonth" placeholder="请输入2位数月"></Input>
+        </Col>
+        <Col span="5" offset="1">
+          <Input v-model.trim="eachOperationsModal.CurDurationTimeEndDay" placeholder="请输入2位数月"></Input>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>定义相对开始日期</label>
+        </Col>
+        <Col span="7">
+        <Select v-model="eachOperationsModal.CurDurationTimeStartByMyself" clearable>
+          <Option v-for="item in eachOperationsModal.durationTimeByMyselfList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+        <Col span="5" offset="1">
+        <Select v-model="eachOperationsModal.CurDurationTimeOptionStartByMyself" clearable>
+          <Option v-for="item in eachOperationsModal.durationTimeOptionByMyselfList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+        <Col span="5" offset="1">
+        <Input-number :min="0" v-model.trim="eachOperationsModal.CurDurationNumberOptionStartByMyself" style="width:100%" clearable></Input-number>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>定义相对结束日期</label>
+        </Col>
+        <Col span="7">
+        <Select v-model="eachOperationsModal.CurDurationTimeEndByMyself" clearable>
+          <Option v-for="item in eachOperationsModal.durationTimeByMyselfList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+        <Col span="5" offset="1">
+        <Select v-model="eachOperationsModal.CurDurationTimeOptionEndByMyself" clearable>
+          <Option v-for="item in eachOperationsModal.durationTimeOptionByMyselfList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+        <Col span="5" offset="1">
+        <Input-number :min="0" v-model.trim="eachOperationsModal.CurDurationNumberOptionEndByMyself" style="width:100%" clearable></Input-number>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        输入Interval
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurDurationInterval" clearable>
+          <Option v-for="item in eachOperationsModal.durationIntervalList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+
+      <hr class="mgt10">
+      <!--person-->
+      <Row class="mgt10">
+        <Col span="24" class="aligncenter">
+        <h6>设置人员条件</h6>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>选择关键字</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurPersonSkid" clearable>
+          <Option v-for="item in eachOperationsModal.SkList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        <label>选择条件</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurPersonOpreation" clearable>
+          <Option v-for="item in eachOperationsModal.personOperationList" :value="item.value" :key="item.label">
+            {{item.label}}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+      <Row class="mgt10">
+        <Col span="5" class="mylabel">
+        选择人员
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurPersonId" clearable placement="top">
+          <Option v-for="item in ajaxPersonUserList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+    </Modal>
+
+    <Modal
+      v-model="showLeftNodeModal"
+      title="选择节点条件"
+      @on-ok="leftNodeModalOk"
+      @on-cancel="leftNodeModalCancel">
+      <Row>
+        <Col span="5" class="mylabel">
+        <label>选择skid</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurLeftNodeSkid" clearable>
+          <Option v-for="item in eachOperationsModal.SkList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+    </Modal>
+
+    <Modal
+      v-model="showRightNodeModal"
+      title="选择节点条件"
+      @on-ok="rightNodeModalOk"
+      @on-cancel="rightNodeModalCancel">
+      <Row>
+        <Col span="5" class="mylabel">
+        <label>选择skid</label>
+        </Col>
+        <Col span="19">
+        <Select v-model="eachOperationsModal.CurRightNodeSkid" clearable>
+          <Option v-for="item in eachOperationsModal.SkList" :value="item.value" :key="item.label">
+            {{ item.label }}
+          </Option>
+        </Select>
+        </Col>
+      </Row>
+    </Modal>
+  </div>
+</template>
+<script>
+    export default {
+        data () {
+             return {
+                 ckid:' ',//当前ck的id，如果有的话，则视为修改，没有，则视为创建,这里是赋值为空
+
+                 //flowlist和pesonlist是加载页面时即取到，不会随条件变化有变化，定公共变量接收，在add一行时调用
+                 ajaxFlowList:[
+                    {
+                        label:'空',
+                        value:''
+                    }
+                 ],
+                 ajaxPersonUserList:[
+                      {
+                        label:'空',
+                        value:''
+                      },
+                      {
+                          value:'all',
+                          label:'所有人'
+                      },
+                      {
+                          value:'system-myself',
+                          label:'我自己'
+                      },{
+                          value:'system-myboss',
+                          label:'我的上级'
+                      }
+                 ],
+
+                 allSks:[
+                     {
+                        label:'空',
+                        value:''
+                    }
+                 ],//页面初始化取到的所有的sk,不是某个流程下的sks
+
+                 showConditionModal: false, // 显示条件modal
+                 showLeftNodeModal: false, //显示左侧节点的modal
+                 showRightNodeModal: false,//显示右侧的modal
+                 CurRowIndex:0,//当前这一行的index
+
+                  //所有需要提交的数据，都从ckForm中取
+                 ckForm: {
+                      ckName:'',
+                      ckDesc:'',
+                      operations: [
+                          {
+                              // 按钮的状态
+                              conditionBtnStatus:'还未设置',
+                              leftNodeBtnStatus:'还未设置',
+                              rightNodeBtnStatus:'还未设置',
+                              flowid:'',//一行条件共用一个flowid
+                              preOperation:'',//get from ckform
+
+                              rangeSkid:'',
+                              rangeOperation:'',
+                              rangeValue:'',
+
+                              durationSkid:'',
+                              durationStart:'',
+                              durationEnd:'',
+                              durationInterval:'',
+
+                              personSkid:'',
+                              personWho:'',
+                              personOperation:'',
+
+                              leftNodeSkOperation:'',//get from ckform
+                              leftNodeSkid:'',
+                              operation:'',//get from ckform
+                              rightNodeSkOpreation:'',//get from ckform
+                              rightNodeSkid:'',
+
+                              preOperationList:[
+                                  {
+                                      value: '',
+                                      label: '空'
+                                  },
+                                  {
+                                      value: '+',
+                                      label: '加'
+                                  },
+                                  {
+                                      value: '-',
+                                      label: '减'
+                                  },
+                                  {
+                                      value: '*',
+                                      label: '乘'
+                                  },
+                                  {
+                                      value: '/',
+                                      label: '除'
+                                  }
+                              ],
+
+                              leftNodePreOperationList:[
+                                  {
+                                      label:'空',
+                                      value:''
+                                  },
+                                  {
+                                      label:'求和',
+                                      value:'sum'
+                                  },
+                                  {
+                                      label:'求平均',
+                                      value:'avg'
+                                  }
+                              ],
+
+                              operationList:[
+                                  {
+                                      label:'空',
+                                      value:''
+                                  },
+                                  {
+                                    label:'加',
+                                    value:'+'
+                                  },
+                                  {
+                                      label:'减',
+                                      value:'-'
+                                  },
+                                  {
+                                      label:'乘',
+                                      value:'*'
+                                  },
+                                  {
+                                      label:'除',
+                                      value:'/'
+                                  }
+                              ],
+
+                              rightNodePreOperationList:[
+                                  {
+                                      label:'空',
+                                      value:''
+                                  },
+                                  {
+                                      label:'求和',
+                                      value:'sum'
+                                  },
+                                  {
+                                      label:'求平均',
+                                      value:'avg'
+                                  }
+                              ],
+                          }
+                      ]
+                 },
+
+                  //modal无法用form的index在v-modal中直接取操作行的数据，定中间{}
+                 eachOperationsModal:{}, //当前选中的modal对应行的值
+                 operationsModal:[
+                      {
+                          //按钮的状态
+                          conditionBtnStatus:'还未设置',
+                          leftNodeBtnStatus:'还未设置',
+                          rightNodeBtnStatus:'还未设置',
+                          //当前行中modal的值，点击确定需赋给对应的ckform，一行共用一个flowid
+                          CurFlowid:'',
+
+                          CurRangeSkid:'',
+                          CurRangeOption:'',
+                          CurRangeValue:'',
+                          CurSelectRangeValue:'',
+
+                          CurDurationSkid:'',
+                          CurDurationTimeStartYear:'',
+                          CurDurationTimeStartMonth:'',
+                          CurDurationTimeStartDay:'',
+
+                          CurDurationTimeEndYear:'',
+                          CurDurationTimeEndMonth	:'',
+                          CurDurationTimeEndDay:'',
+
+                          CurDurationTimeStartByMyself:'',
+                          CurDurationTimeOptionStartByMyself:'',
+                          CurDurationNumberOptionStartByMyself:0,
+                          CurDurationTimeEndByMyself:'',
+                          CurDurationTimeOptionEndByMyself:'',
+                          CurDurationNumberOptionEndByMyself:0,
+
+                          CurDurationInterval:'',
+                          CurPersonSkid:'',
+                          CurPersonId:'',
+                          CurPersonOpreation:'',
+
+                          // 一行中选择sk的列表
+                          SkList:[
+                              {
+                                  label:'此流程下无sk',
+                                  value:''
+                              }
+                          ],
+
+                          rangeOperationList:[
+                              {
+                                  label:'空',
+                                  value:''
+                              },
+                              {
+                                  label:'等于',
+                                  value:'='
+                              }
+                          ],
+                          durationTimeOptionByMyselfList:[
+                              {
+                                  label:'空',
+                                  value:''
+                              },
+                              {
+                                  label:'加',
+                                  value:'+'
+                              },
+                              {
+                                  label:'减',
+                                  value:'-'
+                              }
+                          ],
+                          durationTimeByMyselfList:[
+                              {
+                                  label:'空',
+                                  value:''
+                              },
+                              {
+                                   label:'今年',
+                                   value:'system-thisyear'
+                              },
+                              {
+                                  label:'去年',
+                                  value:'system-thisyear-1'
+                              },
+                              {
+                                  label:'明年',
+                                  value:'system-thisyear+1'
+                              },
+                              {
+                                   label:'今天',
+                                   value:'system-today'
+                              },
+                              {
+                                  label:'昨天',
+                                  value:'system-today-1'
+                              },
+                              {
+                                  label:'明天',
+                                  value:'system-today+1'
+                              },
+                              {
+                                  label:'本月',
+                                  value:'system-thismonth'
+                              },
+                              {
+                                  label:'上月',
+                                  value:'system-thismonth-1'
+                              },
+                              {
+                                  label:'下月',
+                                  value:'system-thismonth+1'
+                              },
+                              {
+                                  label:'本周',
+                                  value:'system-thisweek'
+                              },
+                              {
+                                  label:'上周',
+                                  value:'system-thisweek-1'
+                              },
+                              {
+                                  label:'下周',
+                                  value:'system-thisweek+1'
+                              }
+                          ],
+
+                          durationIntervalList:[
+                              {
+                                  label:'空',
+                                  value:''
+                              },
+                              /*
+                              {
+                                  label:'一天',
+                                  value:'day',
+                              },
+                              {
+                                  label:'一周',
+                                  value:'week',
+                              },
+                              */
+                              {
+                                  label:'一月',
+                                  value:'month',
+                              },
+                              {
+                                  label:'一年',
+                                  value:'year',
+                              }
+                          ],
+
+                          personOperationList:[
+                               {
+                                   label:'空',
+                                   value:''
+                               },
+                              {
+                                  label:'等于',
+                                  value:'='
+                              }
+                          ],
+                          // 左侧节点选中的skid
+                          CurLeftNodeSkid:'',
+                          // 右侧节点选中的skid
+                          CurRightNodeSkid:''
+                      }
+                 ],
+             }
+        },
+        methods: {
+
+            // 展开条件Modal弹出框
+            showConditionModalFn (index){
+                this.CurRowIndex = index;
+                this.showConditionModal = ! this.showConditionModal;
+                this.eachOperationsModal = this.operationsModal[index];
+            },
+
+            // 展开左侧节点Modal弹出框
+            showLeftNodeModalFn(index){
+                this.CurRowIndex = index;
+                this.showLeftNodeModal = ! this.showLeftNodeModal;
+                this.eachOperationsModal = this.operationsModal[index];
+                if(!this.operationsModal[index].CurFlowid){
+                    this.$Message.error("请先到条件选择中选取流程id")
+                }
+            },
+
+            // 展开右侧节点Modal弹出框
+            showRightNodeModalFn(index){
+                this.CurRowIndex = index;
+                this.showRightNodeModal = ! this.showRightNodeModal;
+                this.eachOperationsModal = this.operationsModal[index];
+                if(!this.operationsModal[index].CurFlowid){
+                    this.$Message.error("请先到条件选择中选取流程id")
+                }
+            },
+
+            // 每一行条件的OK
+            conditionModalOk () {
+                var reg = /^system-[a-z]*[+-][0-9]*/;
+                if(reg.test(this.operationsModal[this.CurRowIndex].CurDurationTimeStartByMyself)
+                    && (this.operationsModal[this.CurRowIndex].CurDurationTimeOptionStartByMyself
+                    || this.operationsModal[this.CurRowIndex].CurDurationNumberOptionStartByMyself)){
+                    this.$Message.error("请重新设置时间，时间只可在今天，今年，本月的基础上做加减或时间设置有错误")
+                }
+                if(reg.test(this.operationsModal[this.CurRowIndex].CurDurationTimeEndByMyself)
+                    && (this.operationsModal[this.CurRowIndex].CurDurationTimeOptionEndByMyself
+                    || this.operationsModal[this.CurRowIndex].CurDurationNumberOptionEndByMyself)){
+                    this.$Message.error("请重新设置时间，时间只可在今天，今年，本月的基础上做加减或时间设置有错误")
+                }
+
+                // 对输入的时间的值进行验证，只能是可转为数字的值
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear){
+                    if( this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear.length != 4 || isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear)) ){
+                        this.$Message.error("请输入可用的数字年")
+                    }
+                }
+
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear){
+                    if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear.length != 4 || isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear)) ){
+                        this.$Message.error("请输入可用的数字年")
+                    }
+                }
+
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth){
+                    if(  isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth)) ||
+                        ( Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth) > 12 || Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth) < 0 )){
+                        this.$Message.error("请输入可用的数字月")
+                    }
+                }
+
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth){
+                    if(  isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth)) ||
+                        ( Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth) > 12 || Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth) < 0 )){
+                        this.$Message.error("请输入可用的数字月")
+                    }
+                }
+
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay){
+                    if(  isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay)) ||
+                        ( Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay) > 31 || Number(this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay) < 0 )){
+                        this.$Message.error("请输入可用的数字日")
+                    }
+                }
+
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay){
+                    if(  isNaN(Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay)) ||
+                        ( Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay) > 31 || Number(this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay) < 0 )){
+                        this.$Message.error("请输入可用的数字日")
+                    }
+                }
+
+                this.ckForm.operations[this.CurRowIndex].flowid = this.operationsModal[this.CurRowIndex].CurFlowid;
+
+                this.ckForm.operations[this.CurRowIndex].rangeSkid = this.operationsModal[this.CurRowIndex].CurRangeSkid;
+                this.ckForm.operations[this.CurRowIndex].rangeOperation = this.operationsModal[this.CurRowIndex].CurRangeOption;
+                if(this.operationsModal[this.CurRowIndex].CurSelectRangeValue == ""){
+                    this.ckForm.operations[this.CurRowIndex].rangeValue = this.operationsModal[this.CurRowIndex].CurRangeValue;
+                }else{
+                    this.ckForm.operations[this.CurRowIndex].rangeValue = this.operationsModal[this.CurRowIndex].CurSelectRangeValue;
+                }
+
+                // 判断自定义相对时间 --Start
+                // 先对自定义绝对开始时间进行处理
+                var _TempDateStartStr = "";
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear){
+                    _TempDateStartStr += this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear;
+                }
+                // 有月需要有年
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear && this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth){
+                    _TempDateStartStr += "-";
+                    _TempDateStartStr += _padLeftZero(this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth);
+                }else if(!this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear && this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth){
+                    this.$Message.error("定义月需要先定义年~")
+                }
+                // 有日需要有年和月
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear && this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth
+                        && this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay){
+                    _TempDateStartStr += "-";
+                    _TempDateStartStr += _padLeftZero(this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay);
+                }else if((!this.operationsModal[this.CurRowIndex].CurDurationTimeStartYear || !this.operationsModal[this.CurRowIndex].CurDurationTimeStartMonth)
+                        && this.operationsModal[this.CurRowIndex].CurDurationTimeStartDay){
+                    this.$Message.error("定义日需要先定义年和月~")
+                }
+                this.ckForm.operations[this.CurRowIndex].durationStart = _TempDateStartStr;
+
+                // 对自定义绝对结束时间进行处理
+                var _TempDateEndStr = "";
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear){
+                    _TempDateEndStr += this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear;
+                }
+
+                // 有月需要年
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear && this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth){
+                    _TempDateEndStr += "-";
+                    _TempDateEndStr += _padLeftZero(this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth);
+                }else if(!this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear && this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth){
+                    this.$Message.error("定义月需要先定义年~")
+                }
+
+                // 有日需要有年和月
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear && this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth
+                        && this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay){
+                    _TempDateEndStr += "-";
+                    _TempDateEndStr += _padLeftZero(this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay);
+                }else if((!this.operationsModal[this.CurRowIndex].CurDurationTimeEndYear || !this.operationsModal[this.CurRowIndex].CurDurationTimeEndMonth)
+                        && this.operationsModal[this.CurRowIndex].CurDurationTimeEndDay){
+                    this.$Message.error("定义日需要先定义年和月~")
+                }
+                this.ckForm.operations[this.CurRowIndex].durationEnd = _TempDateEndStr;
+                // 判断自定义相对时间 --end
+
+                // 判断自定义绝对时间 --start
+
+                // 判断自定义绝对开始时间
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeStartByMyself){
+                    //再判断自定义时间的值是不是等于0，做出拼接条件的判断
+                    if(this.operationsModal[this.CurRowIndex].CurDurationNumberOptionStartByMyself == 0){
+                        //如果自定义时间范围的数值是0，则只取范围指定的system的关键字，值的范围只能>0;但初始值是0，否则报错
+                       this.ckForm.operations[this.CurRowIndex].durationStart = this.operationsModal[this.CurRowIndex].CurDurationTimeStartByMyself;
+                    }else{
+                        this.ckForm.operations[this.CurRowIndex].durationStart =
+                            this.operationsModal[this.CurRowIndex].CurDurationTimeStartByMyself
+                            + this.operationsModal[this.CurRowIndex].CurDurationTimeOptionStartByMyself
+                            + this.operationsModal[this.CurRowIndex].CurDurationNumberOptionStartByMyself;
+                    }
+                }
+
+                // 判断自定义绝对结束时间
+                if(this.operationsModal[this.CurRowIndex].CurDurationTimeEndByMyself){
+                    //再判断自定义时间的值是不是等于0，做出拼接条件的判断
+                    if(this.operationsModal[this.CurRowIndex].CurDurationNumberOptionEndByMyself == 0){
+                        this.ckForm.operations[this.CurRowIndex].durationEnd = this.operationsModal[this.CurRowIndex].CurDurationTimeEndByMyself;
+                    }else{
+                         this.ckForm.operations[this.CurRowIndex].durationEnd =
+                              this.operationsModal[this.CurRowIndex].CurDurationTimeEndByMyself
+                              + this.operationsModal[this.CurRowIndex].CurDurationTimeOptionEndByMyself
+                              + this.operationsModal[this.CurRowIndex].CurDurationNumberOptionEndByMyself;
+                    }
+                }
+
+                // 判断自定义绝对时间 --end
+
+                this.ckForm.operations[this.CurRowIndex].durationSkid = this.operationsModal[this.CurRowIndex].CurDurationSkid;
+                this.ckForm.operations[this.CurRowIndex].durationInterval = this.operationsModal[this.CurRowIndex].CurDurationInterval;
+
+                this.ckForm.operations[this.CurRowIndex].personSkid = this.operationsModal[this.CurRowIndex].CurPersonSkid;
+                this.ckForm.operations[this.CurRowIndex].personWho = this.operationsModal[this.CurRowIndex].CurPersonId;
+                this.ckForm.operations[this.CurRowIndex].personOperation = this.operationsModal[this.CurRowIndex].CurPersonOpreation;
+
+                // 日期补0，存两位的月/日,是个内部函数
+                function _padLeftZero(str) {
+                  str = String(str);
+                  return ('00' + str).substr(str.length);
+                }
+            },
+
+            conditionModalCancel(){
+
+            },
+
+            // 左侧节点弹出框OK
+            leftNodeModalOk(){
+                this.ckForm.operations[this.CurRowIndex].leftNodeSkid = this.operationsModal[this.CurRowIndex].CurLeftNodeSkid;
+                if(this.operationsModal[this.CurRowIndex].CurLeftNodeSkid){
+                    this.ckForm.operations[this.CurRowIndex].leftNodeBtnStatus = "已设置";
+                }else{
+                    this.ckForm.operations[this.CurRowIndex].leftNodeBtnStatus = "还未设置";
+                }
+            },
+
+             // 左侧节点弹出框Cancel
+            leftNodeModalCancel(){
+
+            },
+
+            // 右侧节点弹出框OK
+            rightNodeModalOk(){
+                this.ckForm.operations[this.CurRowIndex].rightNodeSkid = this.operationsModal[this.CurRowIndex].CurRightNodeSkid;
+                if(this.operationsModal[this.CurRowIndex].CurLeftNodeSkid){
+                    this.ckForm.operations[this.CurRowIndex].rightNodeBtnStatus = "已设置";
+                }else{
+                    this.ckForm.operations[this.CurRowIndex].rightNodeBtnStatus = "还未设置";
+                }
+            },
+
+            // 右侧节点弹出框Cancel
+            rightNodeModalCancel(){
+
+            },
+
+            //提交按钮
+            handleSubmit(name){
+                var _operations = [];
+                for(var i = 0;i < this.ckForm.operations.length; i++){
+                    var _eachOperation = {};
+                    _eachOperation.condition = {};
+                    _eachOperation.condition.range = {};
+                    _eachOperation.condition.duration = {};
+                    _eachOperation.condition.persons = {};
+                    _eachOperation.func = {};
+                    _eachOperation.operation = this.ckForm.operations[i].preOperation;
+                    _eachOperation.flowid = this.ckForm.operations[i].flowid;
+
+                    _eachOperation.condition.range.skid = this.ckForm.operations[i].rangeSkid;
+                    _eachOperation.condition.range.value = this.ckForm.operations[i].rangeValue;
+                    _eachOperation.condition.range.operation = this.ckForm.operations[i].rangeOperation;
+
+                    _eachOperation.condition.duration.skid = this.ckForm.operations[i].durationSkid;
+                    _eachOperation.condition.duration.start = this.ckForm.operations[i].durationStart;
+                    _eachOperation.condition.duration.end = this.ckForm.operations[i].durationEnd;
+                    _eachOperation.condition.duration.interval = this.ckForm.operations[i].durationInterval;
+
+                    _eachOperation.condition.persons.skid = this.ckForm.operations[i].personSkid;
+                    _eachOperation.condition.persons.who = this.ckForm.operations[i].personWho;
+                    _eachOperation.condition.persons.operation = this.ckForm.operations[i].personOperation;
+
+                    _eachOperation.func.leftnodeskoperation = this.ckForm.operations[i].leftNodeSkOperation;
+                    _eachOperation.func.leftnodeskid = this.ckForm.operations[i].leftNodeSkid;
+
+                    _eachOperation.func.operation = this.ckForm.operations[i].operation;
+
+                    _eachOperation.func.rightnodeskoperation = this.ckForm.operations[i].rightNodeSkOpreation;
+                    _eachOperation.func.rightnodeskid = this.ckForm.operations[i].rightNodeSkid;
+
+                    //这里是选择的start时间，判断如果是NaN的话，置为''
+                    if(!_eachOperation.condition.duration.start){
+                        _eachOperation.condition.duration.start = '';
+                    }
+                    //这里是选择的end时间，判断如果是NaN的话，置为''
+                    if(!_eachOperation.condition.duration.end){
+                        _eachOperation.condition.duration.end = '';
+                    }
+                    _operations.push(_eachOperation);
+                }
+
+                this.$http.get(this.globalconfig.updateckapi,{
+                    params:{
+                        ckid:this.ckid,
+                        name:this.ckForm.ckName,
+                        desc:this.ckForm.ckDesc,
+                        operations:_operations,
+                    }
+                },{emulateJSON:true})
+                .then((response) => {
+                    if(response.data.id){
+                        this.$Message.info('提交成功');
+                        this.$router.push({
+                            path:'listallcks'
+                        })
+                    }
+                },(response) => {
+                    this.$Message.error('提交失败');
+                })
+            },
+
+            // 点击增加一行
+            handleAdd(){
+                var _tempCkFormOperations = {
+                    conditionBtnStatus:'还未设置',
+                    leftNodeBtnStatus:'还未设置',
+                    rightNodeBtnStatus:'还未设置',
+
+                    flowid:'',
+
+                    preOperation:'',//get from ckform
+
+                    rangeSkid:'',
+                    rangeOperation:'',
+                    rangeValue:'',
+
+                    durationSkid:'',
+                    durationStart:'',
+                    durationEnd:'',
+                    durationInterval:'',
+
+                    personSkid:'',
+                    personWho:'',
+                    personOperation:'',
+
+                    leftNodeSkOperation:'',//get from ckform
+                    leftNodeSkid:'',
+                    operation:'',//get from ckform
+                    rightNodeSkOpreation:'',//get from ckform
+                    rightNodeSkid:'',
+
+                    preOperationList:[
+                        {
+                            value: '',
+                            label: '空'
+                        },
+                        {
+                            value: '+',
+                            label: '加'
+                        },
+                        {
+                            value: '-',
+                            label: '减'
+                        },
+                        {
+                            value: '*',
+                            label: '乘'
+                        },
+                        {
+                            value: '/',
+                            label: '除'
+                        }
+                    ],
+
+                    leftNodePreOperationList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                            label:'求和',
+                            value:'sum'
+                        },
+                        {
+                            label:'求平均',
+                            value:'avg'
+                        }
+                    ],
+
+                    operationList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                          label:'加',
+                          value:'+'
+                        },
+                        {
+                            label:'减',
+                            value:'-'
+                        },
+                        {
+                            label:'乘',
+                            value:'*'
+                        },
+                        {
+                            label:'除',
+                            value:'/'
+                        }
+                    ],
+
+                    rightNodePreOperationList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                            label:'求和',
+                            value:'sum'
+                        },
+                        {
+                            label:'求平均',
+                            value:'avg'
+                        }
+                    ],
+                };
+                this.ckForm.operations.push(_tempCkFormOperations);
+
+                var _tempOperationsModal = {
+
+                    //按钮的状态
+                    conditionBtnStatus:'还未设置',
+                    leftNodeBtnStatus:'还未设置',
+                    rightNodeBtnStatus:'还未设置',
+                    CurFlowid:'',
+
+                    CurRangeSkid:'',
+                    CurRangeOption:'',
+                    CurRangeValue:'',
+                    CurSelectRangeValue:'',
+
+                    CurDurationSkid:'',
+
+                    CurDurationSkid:'',
+                    CurDurationTimeStartYear:'',
+                    CurDurationTimeStartMonth:'',
+                    CurDurationTimeStartDay:'',
+
+                    CurDurationTimeEndYear:'',
+                    CurDurationTimeEndMonth	:'',
+                    CurDurationTimeEndDay:'',
+
+                    CurDurationTimeStartByMyself:'',
+                    CurDurationTimeOptionStartByMyself:'',
+                    CurDurationNumberOptionStartByMyself:0,
+                    CurDurationTimeEndByMyself:'',
+                    CurDurationTimeOptionEndByMyself:'',
+                    CurDurationNumberOptionEndByMyself:0,
+                    CurDurationInterval:'',
+
+                    CurPersonSkid:'',
+                    CurPersonId:'',
+                    CurPersonOpreation:'',
+
+                    rangeOperationList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                            label:'等于',
+                            value:'='
+                        }
+                    ],
+
+                    durationTimeOptionByMyselfList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                            label:'加',
+                            value:'+'
+                        },
+                        {
+                            label:'减',
+                            value:'-'
+                        }
+                    ],
+
+                    durationTimeByMyselfList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                             label:'今年',
+                             value:'system-thisyear'
+                        },
+                        {
+                            label:'去年',
+                            value:'system-thisyear-1'
+                        },
+                        {
+                            label:'明年',
+                            value:'system-thisyear+1'
+                        },
+                        {
+                             label:'今天',
+                             value:'system-today'
+                        },
+                        {
+                            label:'昨天',
+                            value:'system-today-1'
+                        },
+                        {
+                            label:'明天',
+                            value:'system-today+1'
+                        },
+                        {
+                            label:'本月',
+                            value:'system-thismonth'
+                        },
+                        {
+                            label:'上月',
+                            value:'system-thismonth-1'
+                        },
+                        {
+                            label:'下月',
+                            value:'system-thismonth+1'
+                        },
+                        {
+                            label:'本周',
+                            value:'system-thisweek'
+                        },
+                        {
+                            label:'上周',
+                            value:'system-thisweek-1'
+                        },
+                        {
+                            label:'下周',
+                            value:'system-thisweek+1'
+                        }
+                    ],
+
+                    durationIntervalList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        /*
+                        {
+                            label:'一天',
+                            value:'day',
+                        },
+                        {
+                            label:'一周',
+                            value:'week',
+                        },
+                        */
+                        {
+                            label:'一月',
+                            value:'month',
+                        },
+                        {
+                            label:'一年',
+                            value:'year',
+                        }
+                    ],
+
+                    personUserList:this.ajaxPersonUserList,
+                    personOperationList:[
+                        {
+                            label:'空',
+                            value:''
+                        },
+                        {
+                            label:'等于',
+                            value:'='
+                        }
+                    ],
+
+                    // 左侧节点选中的skid
+                    CurLeftNodeSkid:'',
+                    // 右侧节点选中的skid
+                    CurRightNodeSkid:''
+                };
+                this.operationsModal.push(_tempOperationsModal);
+            },
+
+            //列出所有的flows,初始化页面即执行
+            handleListFlows(){
+                this.$http.get(this.globalconfig.listflow,{
+                },{emulateJSON:true})
+                .then((response) => {
+                    if(response.body.error){
+                        this.$Message.error(response.body.error)
+                    }else{
+                        if(response.data){
+                            if(response.data.flows){
+                                var _tempArr = [
+                                    {
+                                        label:'空',
+                                        value:''
+                                    }
+                                ];
+                                for(var i = 0; i < response.data.flows.length; i++){
+                                    var _flowName = response.data.flows[i].name;
+                                    var _flowId = response.data.flows[i].id;
+                                    var _flowObj = {label:_flowName,value:_flowId};
+                                    //赋值给公共变量，在执行新加一行时候用
+                                    _tempArr.push(_flowObj);
+                                };
+                                this.ajaxFlowList = _tempArr;
+                            }
+                        }else{
+                            this.$Message.error('listflows获取失败')
+                        }
+                    }
+                },(response)=>{
+	            		  this.$Message.error('创建失败')
+	            	});
+            },
+
+            //列出所有的sk
+            handleListSks(){
+                this.$http.get(this.globalconfig.listsksapi,{
+                    params:{}
+                },{emulateJSON:true})
+                .then((response) => {
+                    if(response.data.sks){
+                        this.allSks = response.data.sks;
+                    }
+                },(response) => {
+                    this.$Message.error("读取sks失败")
+                })
+            },
+
+             // 列出当前流程下的sk
+            listCurFlowSk(flowid,isReShow){
+                var _sks = [
+                    {
+                        label:'空',
+                        value:''
+                    }
+                ];
+                for(var i = 0; i < this.allSks.length; i++){
+                    if(this.allSks[i].flowid == flowid){
+                        var _skid = this.allSks[i].id;
+                        var _skname = this.allSks[i].name;
+                        _sks.push({
+                            label:_skname,
+                            value:_skid
+                        })
+                    }
+                }
+                if(_sks.length == 0){
+                    _sks = [{
+                        label:'此流程下无sk',
+                        value:''
+                    }]
+                }
+                if(isReShow){
+                    return _sks;
+                }else{
+                    this.operationsModal[this.CurRowIndex].SkList = _sks;
+                }
+            },
+
+            // //列出用户表，页面初始化即执行
+            handleListUsers(){
+                this.$http.get(this.globalconfig.listusers,{
+                },{emulateJSON:true})
+                .then((response) => {
+                    if(response.data){
+                        if(response.data.users){
+                            this.operationsModal[this.CurRowIndex].personUserList = [
+                                {
+                                    label:'空',
+                                    value:''
+                                },
+                                {
+                                    value:'all',
+                                    label:'所有人'
+                                },
+                                {
+                                    value:'system-myself',
+                                    label:'我自己'
+                                },
+                                {
+                                    value:'system-myboss',
+                                    label:'我的上级'
+                                }
+                            ];//赋值之前先置空,只保留system条件
+
+                            for(var i = 0; i < response.data.users.length; i++){
+                                var _personName = response.data.users[i].realname ? response.data.users[i].realname : response.data.users[i].loginname;
+                                var _personId = response.data.users[i].id;
+                                var _personObj = {label:_personName,value:_personId};
+                                //先给operationsModal中第一个personUserList赋值
+                                this.operationsModal[this.CurRowIndex].personUserList.push(_personObj);
+                                //赋值给公共变量，在执行add新增一行时用
+                                this.ajaxPersonUserList.push(_personObj);
+                            }
+                        }
+                    }
+                },(response) => {
+                    this.$Message.error('listusers获取失败')
+                })
+            },
+
+            // 删除一行
+            handleRemove(index){
+                this.ckForm.operations.splice(index, 1);
+                this.operationsModal.splice(index,1);
+            },
+
+            // 重置，只保留第一行的相关信息，其中各种变量赋值为空
+            handleReset(name){
+                this.ckForm.ckName = '';
+                this.ckForm.ckDesc = '';
+
+                this.ckForm.operations = this.ckForm.operations.splice(0,1);
+
+                this.ckForm.operations[0].conditionBtnStatus = '还未设置';
+                this.ckForm.operations[0].leftNodeBtnStatus = '还未设置';
+                this.ckForm.operations[0].rightNodeBtnStatus = '还未设置';
+
+                this.ckForm.operations[0].preOperation = '';
+                this.ckForm.operations[0].flowid = '';
+
+                this.ckForm.operations[0].rangeSkid = '';
+                this.ckForm.operations[0].rangeOperation = '';
+                this.ckForm.operations[0].rangeValue = '';
+
+                this.ckForm.operations[0].durationSkid = '';
+                this.ckForm.operations[0].durationStart = '';
+                this.ckForm.operations[0].durationEnd = '';
+                this.ckForm.operations[0].durationInterval = '';
+
+                this.ckForm.operations[0].personSkid = '';
+                this.ckForm.operations[0].personWho = '';
+                this.ckForm.operations[0].personOperation = '';
+
+                this.ckForm.operations[0].leftNodeSkOperation = '';
+                this.ckForm.operations[0].leftNodeSkid = '';
+
+                this.ckForm.operations[0].operation = '';
+
+                this.ckForm.operations[0].rightNodeSkOpreation = '';
+                this.ckForm.operations[0].rightNodeSkid = '';
+
+                this.eachOperationsModal = {};
+                this.operationsModal = this.operationsModal.splice(0,1);
+                this.operationsModal[0].conditionBtnStatus = '还未设置';
+                this.operationsModal[0].leftNodeBtnStatus = '还未设置';
+                this.operationsModal[0].rightNodeBtnStatus = '还未设置';
+
+                this.operationsModal[0].CurFlowid = '';
+
+                this.operationsModal[0].CurRangeSkid = '';
+                this.operationsModal[0].CurRangeOption = '';
+                this.operationsModal[0].CurRangeValue = '';
+                this.operationsModal[0].CurSelectRangeValue = '';
+
+                this.operationsModal[0].CurDurationSkid = '';
+                this.operationsModal[0].CurDurationTime = '';
+
+                this.operationsModal[0].CurDurationTimeStartByMyself = '';
+                this.operationsModal[0].CurDurationTimeOptionStartByMyself = '';
+                this.operationsModal[0].CurDurationNumberOptionStartByMyself = 0;
+                this.operationsModal[0].CurDurationTimeEndByMyself = '';
+                this.operationsModal[0].CurDurationTimeOptionEndByMyself = '';
+                this.operationsModal[0].CurDurationNumberOptionEndByMyself = 0;
+                this.operationsModal[0].CurDurationInterval = '';
+
+                this.operationsModal[0].CurPersonSkid = '';
+                this.operationsModal[0].CurPersonId = '';
+                this.operationsModal[0].CurPersonOpreation = '';
+
+                this.operationsModal[0].CurLeftNodeSkid = '';
+
+                this.operationsModal[0].CurRightNodeSkid = '';
+            },
+
+            // 回显数据
+            handleGetSkByUrlParams(){
+                if(this.$router.currentRoute.query.ckid){
+                    var _ckid = this.$router.currentRoute.query.ckid;
+                    this.$http.get(this.globalconfig.getckapi,{
+                        params:{
+                            ckid:_ckid
+                        }
+                    },{emulateJSON:true})
+                    .then((response) => {
+                         if(response.data.ck){
+                         var _ck = response.data.ck;
+                             this.ckid = _ckid;
+                             this.ckForm.ckName = _ck.name;
+                             this.ckForm.ckDesc = _ck.desc;
+
+                             var _operations = [];
+                             var _operationsModal = [];
+                             if(!_ck.operations){ return }
+                             var _this = this;
+                             for(var i = 0;i < _ck.operations.length; i++){
+                                  var _operationsReshow = {
+                                      //以下4个值有回显和提交的时候读值两个作用
+                                      preOperation : _ck.operations[i].operation,
+                                      leftNodeSkOperation : _ck.operations[i].func.leftnodeskoperation,
+                                      operation : _ck.operations[i].func.operation,
+                                      rightNodeSkOpreation : _ck.operations[i].func.rightnodeskoperation,
+
+
+                                      //以下几个不在此回显，仅有提交时候读值作用
+                                      flowid : _ck.operations[i].flowid,
+
+                                      rangeSkid : _ck.operations[i].condition.range.skid,
+                                      rangeOperation : _ck.operations[i].condition.range.operation,
+                                      rangeValue : _ck.operations[i].condition.range.value,
+
+                                      durationSkid:_ck.operations[i].condition.duration.skid,
+                                      durationStart:_ck.operations[i].condition.duration.start,
+                                      durationEnd:_ck.operations[i].condition.duration.end,
+                                      durationInterval:_ck.operations[i].condition.duration.interval,
+
+                                      personSkid:_ck.operations[i].condition.persons.skid,
+                                      personWho:_ck.operations[i].condition.persons.who,
+                                      personOperation:_ck.operations[i].condition.persons.operation,
+
+                                      leftNodeSkOperation:_ck.operations[i].func.leftnodeskoperation,
+                                      leftNodeSkid:_ck.operations[i].func.leftnodeskid,
+
+                                      operation:_ck.operations[i].func.operation,
+
+                                      rightNodeSkOpreation:_ck.operations[i].func.rightnodeskoperation,
+                                      rightNodeSkid:_ck.operations[i].func.rightnodeskid,
+
+                                      leftNodeBtnStatus: _ck.operations[i].func.leftnodeskid ? "已设置" : "还未设置",
+                                      rightNodeBtnStatus: _ck.operations[i].func.rightnodeskid ? "已设置" : "还未设置",
+
+                                      conditionBtnStatus:"已设置",
+
+                                      preOperationList:[
+                                          {
+                                              value: '',
+                                              label: '空'
+                                          },
+                                          {
+                                              value: '+',
+                                              label: '加'
+                                          },
+                                          {
+                                              value: '-',
+                                              label: '减'
+                                          },
+                                          {
+                                              value: '*',
+                                              label: '乘'
+                                          },
+                                          {
+                                              value: '/',
+                                              label: '除'
+                                          }
+                                      ],
+
+                                      leftNodePreOperationList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'求和',
+                                              value:'sum'
+                                          },
+                                          {
+                                              label:'求平均',
+                                              value:'avg'
+                                          }
+                                      ],
+
+                                      operationList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'加',
+                                              value:'+'
+                                          },
+                                          {
+                                              label:'减',
+                                              value:'-'
+                                          },
+                                          {
+                                              label:'乘',
+                                              value:'*'
+                                          },
+                                          {
+                                              label:'除',
+                                              value:'/'
+                                          }
+                                      ],
+
+                                      rightNodePreOperationList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'求和',
+                                              value:'sum'
+                                          },
+                                          {
+                                              label:'求平均',
+                                              value:'avg'
+                                          }
+                                      ],
+                                  };
+                                  _operations.push(_operationsReshow);
+
+                                //  var _SkList = this.listCurFlowSk(_ck.operations[i].flowid,true);
+                                  var _operationsModalReshow = {
+
+                                      CurFlowid: _ck.operations[i].flowid,
+
+                                      CurRangeSkid : _ck.operations[i].condition.range.skid,
+                                      CurRangeOption : _ck.operations[i].condition.range.operation,
+
+                                      CurDurationSkid : _ck.operations[i].condition.duration.skid,
+                                      CurDurationInterval : _ck.operations[i].condition.duration.interval,
+
+                                      CurPersonSkid : _ck.operations[i].condition.persons.skid,
+                                      CurPersonOpreation : _ck.operations[i].condition.persons.operation,
+                                      CurPersonId : _ck.operations[i].condition.persons.who,
+
+                                      CurLeftNodeSkid:_ck.operations[i].func.leftnodeskid,
+                                      CurRightNodeSkid:_ck.operations[i].func.rightnodeskid,
+                                      //SkList:_SkList,
+
+                                      rangeOperationList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'等于',
+                                              value:'='
+                                          }
+                                      ],
+                                      durationIntervalList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                         /*
+                                          {
+                                              label:'一天',
+                                              value:'day',
+                                          },
+                                          {
+                                              label:'一周',
+                                              value:'week',
+                                          },
+                                          */
+                                          {
+                                              label:'一月',
+                                              value:'month',
+                                          },
+                                          {
+                                              label:'一年',
+                                              value:'year',
+                                          }
+                                      ],
+                                      personOperationList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'等于',
+                                              value:'='
+                                          }
+                                      ],
+                                      durationTimeByMyselfList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                               label:'今年',
+                                               value:'system-thisyear'
+                                          },
+                                          {
+                                              label:'去年',
+                                              value:'system-thisyear-1'
+                                          },
+                                          {
+                                              label:'明年',
+                                              value:'system-thisyear+1'
+                                          },
+                                          {
+                                               label:'今天',
+                                               value:'system-today'
+                                          },
+                                          {
+                                              label:'昨天',
+                                              value:'system-today-1'
+                                          },
+                                          {
+                                              label:'明天',
+                                              value:'system-today+1'
+                                          },
+                                          {
+                                              label:'本月',
+                                              value:'system-thismonth'
+                                          },
+                                          {
+                                              label:'上月',
+                                              value:'system-thismonth-1'
+                                          },
+                                          {
+                                              label:'下月',
+                                              value:'system-thismonth+1'
+                                          },
+                                          {
+                                              label:'本周',
+                                              value:'system-thisweek'
+                                          },
+                                          {
+                                              label:'上周',
+                                              value:'system-thisweek-1'
+                                          },
+                                          {
+                                              label:'下周',
+                                              value:'system-thisweek+1'
+                                          }
+                                      ],
+                                      durationTimeOptionByMyselfList:[
+                                          {
+                                              label:'空',
+                                              value:''
+                                          },
+                                          {
+                                              label:'加',
+                                              value:'+'
+                                          },
+                                          {
+                                              label:'减',
+                                              value:'-'
+                                          }
+                                      ],
+                                  };
+                                  if(_ck.operations[i].flowid){
+                                      _operationsModalReshow.SkList = this.listCurFlowSk(_ck.operations[i].flowid,true);
+                                  }
+
+                                   // 做出判断，范围条件的值是select中选中的值还是手输入的值，select中的值分两种：all和para.item
+                                  if( _ck.operations[i].condition.range.value == "all" || _ck.operations[i].condition.range.value == "para.itemid"){
+                                        _operationsModalReshow.CurSelectRangeValue = _ck.operations[i].condition.range.value;
+                                        _operationsModalReshow.CurRangeValue = "";
+                                  }else{
+                                        _operationsModalReshow.CurRangeValue = _ck.operations[i].condition.range.value;
+                                        _operationsModalReshow.CurSelectRangeValue = "";
+                                  }
+
+                                  //做出判断，回显系统关键字
+                                  if(_ck.operations[i].condition.duration.start.indexOf("system-") != -1){
+                                      var regS = /^system-[a-z]*/;
+                                      var _strS = _ck.operations[i].condition.duration.start.match(regS)[0];//结果是'system-thisyear'类似...
+                                      var _strlenS = _strS.length;
+                                      var _afterStrS = _ck.operations[i].condition.duration.start.slice(_strlenS);//结果是'-1'/'+2'....类似的
+                                      var _operationS = _afterStrS.slice(0,1)
+                                      var _numberS = _afterStrS.slice(1);
+
+                                      if(_numberS == 1){//这里只判断最后的数字，如果是1，则应该显示去年/明年，上月/下月...
+                                          _operationsModalReshow.CurDurationTimeStartByMyself = _ck.operations[i].condition.duration.start;
+                                          _operationsModalReshow.CurDurationTimeOptionStartByMyself = '';
+                                          _operationsModalReshow.CurDurationNumberOptionStartByMyself = 0;
+                                      }else{
+                                          _operationsModalReshow.CurDurationTimeStartByMyself = _strS;
+                                          _operationsModalReshow.CurDurationTimeOptionStartByMyself = _operationS;
+                                          _operationsModalReshow.CurDurationNumberOptionStartByMyself = _numberS != '' ? Number(_numberS) : 0;
+                                      }
+                                  }else{
+                                      var ajaxDurationStartTime = _ck.operations[i].condition.duration.start;
+                                      var _startYear = '';
+                                      var _startMonth = '';
+                                      var _startDay = '';
+                                      if(ajaxDurationStartTime.substr(0,4)){
+                                          _startYear = ajaxDurationStartTime.substr(0,4);
+                                      }
+
+                                      if(ajaxDurationStartTime.substr(5,2)){
+                                          _startMonth = ajaxDurationStartTime.substr(5,2);
+                                      }
+
+                                      if(ajaxDurationStartTime.substr(8,2)){
+                                          _startDay = ajaxDurationStartTime.substr(8,2);
+                                      }
+
+                                      _operationsModalReshow.CurDurationTimeStartYear = _startYear;
+                                      _operationsModalReshow.CurDurationTimeStartMonth = _startMonth;
+                                      _operationsModalReshow.CurDurationTimeStartDay = _startDay;
+
+                                      _operationsModalReshow.CurDurationTimeOptionStartByMyself = '';
+                                      _operationsModalReshow.CurDurationNumberOptionStartByMyself = 0;
+                                  };
+
+                                  if(_ck.operations[i].condition.duration.end.indexOf("system-") != -1){
+                                      var regE = /^system-[a-z]*/;
+                                      var _strE = _ck.operations[i].condition.duration.end.match(regE)[0];
+                                      var _strlenE = _strE.length;
+                                      var _afterStrE = _ck.operations[i].condition.duration.end.slice(_strlenE);
+                                      var _operationE =  _afterStrE.slice(0,1);
+                                      var _numberE = _afterStrE.slice(1);
+                                      if(_numberE == 1){
+                                          _operationsModalReshow.CurDurationTimeEndByMyself = _ck.operations[i].condition.duration.end;
+                                          _operationsModalReshow.CurDurationTimeOptionEndByMyself = '';
+                                          _operationsModalReshow.CurDurationNumberOptionEndByMyself = 0;
+                                      }else{
+                                          _operationsModalReshow.CurDurationTimeEndByMyself = _strE;
+                                          _operationsModalReshow.CurDurationTimeOptionEndByMyself = _operationE;
+                                          _operationsModalReshow.CurDurationNumberOptionEndByMyself = _numberE != '' ? Number(_numberE) : 0;
+                                      }
+                                  }else{
+                                      var _ajaxDurationEndTime = _ck.operations[i].condition.duration.end;
+                                      var _endYear = '';
+                                      var _endMonth = '';
+                                      var _endDay = '';
+                                      if(_ajaxDurationEndTime.substr(0,4)){
+                                          _endYear = _ajaxDurationEndTime.substr(0,4);
+                                      }
+
+                                      if(_ajaxDurationEndTime.substr(5,2)){
+                                          _endMonth = _ajaxDurationEndTime.substr(5,2);
+                                      }
+
+                                      if(_ajaxDurationEndTime.substr(8,2)){
+                                          _endDay = _ajaxDurationEndTime.substr(8,2);
+                                      }
+
+                                      _operationsModalReshow.CurDurationTimeEndYear = _endYear;
+                                      _operationsModalReshow.CurDurationTimeEndMonth = _endMonth;
+                                      _operationsModalReshow.CurDurationTimeEndDay = _endDay;
+
+                                      _operationsModalReshow.CurDurationTimeOptionEndByMyself = '';
+                                      _operationsModalReshow.CurDurationNumberOptionEndByMyself = 0;
+                                  }
+                                  _operationsModal.push(_operationsModalReshow);
+                             }
+                             this.ckForm.operations = _operations;
+                             this.operationsModal = _operationsModal;
+                         }
+                    },(response) => {
+                         this.$Message.error('获取ck失败');
+                    })
+                }
+            }
+        },
+        created:function(){
+            this.handleListFlows();
+            this.handleListUsers();
+            this.handleListSks();
+        },
+        mounted:function(){
+            this.handleGetSkByUrlParams();
+        }
+    }
+
+</script>

@@ -1,0 +1,157 @@
+<style scoped>
+.bg{
+    width:100%;
+    height:calc(100vh);
+    background:url("../assets/img/loginbg.png");
+    background-size:cover;
+}
+.login {
+    width: 360px;
+    height: 380px;
+    position:absolute;
+    right:10%;
+    top:calc(50vh - 180px);
+    z-index:99px;
+    border:1px solid #cdcdcd;
+}
+.loginbg{
+    width: 360px;
+    height: 380px;
+    position:absolute;
+    right:10%;
+    top:calc(50vh - 180px);
+    background:#fbf9f6;
+    z-index:1px;
+    opacity:0.5;
+}
+.login>div{
+    border-bottom:1px solid black;
+    width:270px;
+    height:24px;
+    font-size:18px;
+    line-height:24px;
+    margin:48px auto 15px auto;
+    padding-bottom:35px;
+}
+.inputstyle{
+    width:270px;
+    margin:0 auto;
+    margin-top:30px;
+}
+.submitbtn{
+    width:270px; 
+    margin:0 auto;
+    margin-top:30px;
+}
+.technicalsupport{
+    width:300px;
+    height:20px;
+    line-height:20px;
+    text-align:center;
+    font-size:14px;
+    font-weight:888; 
+    margin:0 auto;
+    position:relative;
+    top:calc(100vh - 44px);    
+}
+</style>
+<template>
+<div class="bg">
+    <div class="loginbg"></div>
+    <div class="login">
+        <div>用户登录</div>
+        <i-form ref="formInline" :model="formInline" :rules="ruleInline">
+            <Form-item prop="user" class="inputstyle">
+                <Input size=large type="text" v-model="formInline.user" placeholder="请输入账号" @on-enter="handleSubmit('formInline')">
+                    <Icon type="ios-person" slot="prepend"></Icon>
+                </Input>
+            </Form-item>
+            <Form-item prop="password" class="inputstyle">
+                <Input  size=large v-model="formInline.password" type="password" placeholder="请输入密码" @on-enter="handleSubmit('formInline')">
+                    <Icon type="ios-locked" slot="prepend"></Icon>
+                </Input>
+            </Form-item>
+            <Form-item class="submitbtn">
+                <i-button type="error" @click.native="handleSubmit('formInline')" long>登录</i-button>
+            </Form-item>
+        </i-form>
+    </div>
+    <div class="technicalsupport">技术支持 : 北京圣达康网络科技有限公司</div>
+</div>
+</template>
+
+<script>
+export default {
+    data() {
+            return {
+                formInline: {
+                    user: '',
+                    password: '',
+                },
+                ruleInline: {
+                    user: [{
+                        required: true,
+                        message: '请填写用户名',
+                        trigger: 'blur'
+                    }],
+                    password: [{
+                        required: true,
+                        message: '请填写密码',
+                        trigger: 'blur'
+                    }, {
+                        type: 'string',
+                        min: 6,
+                        message: '密码长度不能小于6位',
+                        trigger: 'blur'
+                    }]
+                }
+            }
+        },
+        methods: {
+            handleSubmit(name) {
+                    this.$refs[name].validate((valid) => {
+                        if (valid) {
+                            this.$http.get(this.globalconfig.loginapi,
+                                    {
+                                        params:{
+                                            loginname:this.formInline.user,
+                                            password:this.formInline.password
+                                        }
+                                    },  {emulateJSON: true})
+                                .then((response) => {
+                                    if(response.body.error){
+                                        this.$Message.error(response.body.error);
+                                    } else {
+                                        window.localStorage.setItem("usrid",response.body.usrid)
+                                        window.localStorage.setItem("menus",JSON.stringify(response.body.menus))
+                                        window.localStorage.setItem("adminmenus",JSON.stringify(response.body.adminmenus))
+                                        //返回页面信息  然后路由配置所有的页面路由
+                                        window.localStorage.setItem("pages",JSON.stringify(response.body.pages))
+                                        var _isadmin = false;
+                                        if(response.data.isadmin == "true"){
+                                            _isadmin = true;
+                                        }
+                                        var userinfo = {};
+                                        userinfo.isadmin = _isadmin;
+                                        userinfo.usrname = response.data.usrname
+                                        window.localStorage.setItem("usrinfo",JSON.stringify(userinfo));
+                                        var defaultsnode = response.body.menus[0].child[0];//默认第一个节点
+                                        var defaultspath = "/" + defaultsnode.flowid + "|" + defaultsnode.node + "|" + defaultsnode.page;
+                                        this.$router.push(defaultspath);
+                                    }
+                                }, (response) => {
+                                    this.$Message.success('这是一条失败的提示');
+                                });
+
+                        }
+                    });
+                },
+                handleReset(val) {
+
+                }
+        },
+        mounted:function(){
+           
+        }
+}
+</script>

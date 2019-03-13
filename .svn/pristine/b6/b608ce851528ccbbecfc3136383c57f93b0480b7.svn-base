@@ -1,0 +1,59 @@
+/*
+*index_page控制页,配置页面能看到的key(信息源)和value(xpath)
+*determine 确定
+*type为text是需要输入值，type为button是需要点击的
+*/
+  {
+	'search':{
+			'宝贝':'#sm-nav-2014 > div.head.clearfix > div > div > div.search > form > div.search-wrap > div > div.opt > span',
+			'商铺':'#sm-nav-2014 > div.head.clearfix > div > div > div.search > form > div.search-wrap > div > div.opt > div > ul > li > a > span',						
+			'search-Content':{
+				'type':'text',
+				'xpath':'#q',
+			},
+			'搜女装':'#sm-nav-2014 > div.head.clearfix > div > div > div.search > form > div.search-wrap > a.local.no-bg',
+			'搜全站':'#sm-nav-2014 > div.head.clearfix > div > div > div.search > form > div.search-wrap > a.global'
+			},				
+	'filter':{
+			'综合':'#J_relative > div.sort-row > div > ul > li:nth-child(1) > a',
+			'人气':'#J_relative > div.sort-row > div > ul > li:nth-child(2) > a',
+			'销量':'#J_relative > div.sort-row > div > ul > li:nth-child(3) > a',
+			'信用':'#J_relative > div.sort-row > div > ul > li:nth-child(4) > a',
+			'总价从高到低':'#J_relative > div.sort-row > div > ul > li.sort.has-droplist.J_LaterHover > ul > li:nth-child(1) > a',
+			'总价从低到高':'#J_relative > div.sort-row > div > ul > li.sort.has-droplist.J_LaterHover > ul > li:nth-child(2) > a',
+			'价格从低到高':'#J_relative > div.sort-row > div > ul > li.sort.has-droplist.J_LaterHover > ul > li:nth-child(3) > a',
+			'价格从高到低':'#J_relative > div.sort-row > div > ul > li.sort.has-droplist.J_LaterHover > ul > li:nth-child(4) > a',
+			'价格'{
+				'min':{
+				'type':'text',
+				'xpath':'#J_relative > div.sort-row > div > div.prices > div > div > ul > li:nth-child(1) > input',
+				},
+				'max':{
+				'type':'text',
+				'xpath':'#J_relative > div.sort-row > div > div.prices > div > div > ul > li:nth-child(3) > input',
+				},
+				'determine':{
+				'type':'button',
+				'xpath':'#J_relative > div.sort-row > div > div.prices > div > div > ul > li.submit > button',
+				}
+			},
+			'发货地':{
+				'address':{
+					'type':'text',//多个地区用逗号隔开
+					'xpath':'#J_relative > div.sort-row > div > div.location.J_LaterHover > div.sections > div.g-clearfix.search > input',
+				},
+				'determine':{
+					'type':'button',
+					'xpath':'#J_relative > div.sort-row > div > div.location.J_LaterHover > div.sections > div.g-clearfix.search > span',
+				}
+			},
+			'包邮':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(4) > span.icon.icon-btn-check-big',
+			'赠送退货运费险':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(5) > span.icon.icon-btn-check-big',
+			'货到付款':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(6) > span.icon.icon-btn-check-big',
+			'海外商品':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(7) > span.icon.icon-btn-check-big',
+			'二手':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(8) > span.icon.icon-btn-check-big',
+			'天猫':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(9) > span.icon.icon-btn-check-big',
+			'正品保障':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(10) > span.icon.icon-btn-check-big',
+			'7+天内退货':'#J_relative > div.filter-row > div.filter-box.J_LaterHover > div > div.filters > a:nth-child(11) > span.icon.icon-btn-check-big',
+			}
+	}

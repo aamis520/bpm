@@ -1,0 +1,5386 @@
+<template>
+	<section>
+		<Row>
+			<!--拖拽区域-->
+			<Col span="6">
+				<div class="dragfixed">
+					<Card class="ableDrag">
+						<p slot="title">可拖拽区域</p>
+						<Menu style="width: 90%;margin: 0 auto;">
+			                <Submenu name="input">
+							<template slot="title">
+								input
+							</template>
+							<Menu-item name="input-1" style="min-height: 60px;">
+								<Form :label-width="80" class="dragInputCss" id="inputdrag">
+									<div v-for="(item, index) in dragInputs.items"  :data-selfindex="index" draggable='true' @dragstart.capture='dragClone($event)' class="dragBox drag-div dragInputForm">
+										<Form-item class="dragInput" :key="index" v-bind:label="item.label" :prop="item.value">
+											<Row>
+												<Col span="8">
+												<Input type="text" disabled v-model="item.value" placeholder="请输入..."></Input>
+												</Col>
+												<Col span="7" offset="1">
+												<Button type="ghost" @click="changeLabel(index)">设置</Button>
+												</Col>
+												<Col span="7" offset="">
+												<Button type="ghost" @click="handleRemoveInput(index)">删除</Button>
+												</Col>
+											</Row>
+										</Form-item>
+									</div>
+								</Form>
+							</Menu-item>
+						</Submenu>
+			                <!--List-->
+			                <Submenu name="1">
+			                    <template slot="title">
+			                        列表
+			                    </template>
+			                    <!--普通列表-->
+			                    <Menu-item name="1-1" id="listdrag" style="min-height: 160px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="myList elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<div draggable="false" style="position: relative;top: -10px;width: 100%;margin: 0 auto;">
+			                    				<img draggable="false" style="display: block;width: 100%;" src="../../images/list.jpg"/>
+			                    			</div>
+		                    				<Button class="delLabel" @click.stop="delThisEl($event)" type="error">删除列表</Button>
+		                    				<Button class="setDummy"  @click="setMylist($event)" type="info">设置列表</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                    <!--strongList-->
+			                    <Menu-item name="1-2" id="stronglistdrag" style="min-height: 80px; position: relative; padding: 10px;">
+		                    		<div v-for="item in searchboxs" class="mystrongList elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+								        	<div class="searchbox" style="text-align: right;padding: 15px 0;">
+								        		<Button type="primary" @click="addSearch">添加搜索条件</Button>
+								        		<Button type="error" @click="delSearch">删除搜索条件</Button>
+								        		 <Input v-for="(search,index) in item.searchbox" :key="search.label" disabled placeholder="请输入..." style="margin: 10px 0;">
+											        <span slot="prepend" style="padding: 0 40px;cursor: pointer;" @click="setSearch(index)">{{search.label}}</span>
+											    </Input>
+								        	</div>
+								        	<div draggable="false" style="position: relative;top: -10px;width: 100%;margin: 0 auto;">
+			                    				<img draggable="false" style="display: block;width: 100%;" src="../../images/list.jpg"/>
+			                    			</div>
+		                    				<Button class="delLabel" @click.stop="delThisEl($event)" type="error">删除列表</Button>
+		                    				<Button class="setDummy"  @click="setMylist($event)" type="info">设置列表</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--横向布局-->
+			                <Submenu name="2">
+			                    <template slot="title">
+			                        横向布局
+			                    </template>
+			                    <Menu-item name="2-1" id="col1drag" style="min-height: 60px;position: relative;">
+			                    	<div class="colGrid col1" v-for="n in 50" draggable='true' @dragstart.capture='drag($event)'>
+			                    		<Row class="coloDisDrop">
+			                    			<Col span="24" class="colAbleDrop col2" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    		</Row>
+			                    		<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+			                    	</div>
+			                    </Menu-item>
+			                    <Menu-item name="2-2" id="col2drag" style="min-height: 60px;position: relative;">
+			                    	<div class="colGrid col2" v-for="n in 50" draggable='true' @dragstart.capture='drag($event)'>
+			                    		<Row class="coloDisDrop">
+			                    			<Col span="12" class="colAbleDrop col2" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="12" class="colAbleDrop col2" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    		</Row>
+			                    		<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+			                    	</div>
+			                    </Menu-item>
+			                    <Menu-item name="2-3" id="col3drag" style="min-height: 60px;position: relative;">
+			                    	<div class="colGrid col3" v-for="n in 50" draggable='true' @dragstart.capture='drag($event)'>
+			                    		<Row class="coloDisDrop">
+			                    			<Col span="8" class="colAbleDrop col3" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="8" class="colAbleDrop col3" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="8" class="colAbleDrop col3" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    		</Row>
+			                    		<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+			                    	</div>
+			                    </Menu-item>
+			                    <Menu-item name="2-4" id="col4drag" style="min-height: 60px;position: relative;">
+			                    	<div class="colGrid col4" v-for="n in 50" draggable='true' @dragstart.capture='drag($event)'>
+			                    		<Row class="coloDisDrop">
+			                    			<Col span="6" class="colAbleDrop col4" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="6" class="colAbleDrop col4" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="6" class="colAbleDrop col4" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="6" class="colAbleDrop col4" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    		</Row>
+			                    		<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+			                    	</div>
+			                    </Menu-item>
+			                    <Menu-item name="2-5" id="col6drag" style="min-height: 60px;position: relative;">
+			                    	<div class="colGrid col6" v-for="n in 50" draggable='true' @dragstart.capture='drag($event)'>
+			                    		<Row class="coloDisDrop">
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    			<Col span="4" class="colAbleDrop col6" @drop.stop='drop($event)' @dragover='allowDrop($event)'></Col>
+			                    		</Row>
+			                    		<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+			                    	</div>
+			                    </Menu-item>
+			                </Submenu>
+							<!--button-->
+			                <Submenu name="3">
+			                    <template slot="title">
+			                        Button
+			                    </template>
+			                    <Menu-item id="buttondrag" name="3-1" style="min-height: 60px; position: relative; padding: 10px;">
+		                    		<div class="moni anniu myButton" v-for="(anniu,index) in buttonGroup" draggable='true' @dragstart.capture='drag($event)'>{{anniu.value}}
+		                    			<Button class="delthis" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    			<Button class="setThis"  @click="setOpen($event)" type="info">设置BUTTON</Button>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--dummyUI-->
+			                <Submenu name="4">
+			                    <template slot="title">
+			                        dummyUI
+			                    </template>
+			                    <Menu-item name="4-1" id="dummyUIdrag" style="min-height: 360px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="dummyUI elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false" style="display: block;width: 80%;margin: 0 auto;" src="../../images/histogram.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setDummy($event)" type="info">设置dummyUI</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--myCard-->
+			                <Submenu name="5">
+			                    <template slot="title">
+			                        myCard
+			                    </template>
+			                    <Menu-item name="5-1" id="carddrag" style="min-height: 260px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="myCard elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false" style="display: block;width: 90%;margin: 0 auto;" src="../../images/card.png" alt="mycard" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setmycard($event)" type="info">设置CARD</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--uploadfile-->
+			                <Submenu name="6">
+			                    <template slot="title">
+			                        上传文件
+			                    </template>
+			                    <!--只有上传按钮-->
+			                    <Menu-item name="6-1" id="onlyuploaddrag" style="min-height: 100px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class=" elcss myuPload" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false"  src="../../images/myupload.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setmyupload($event)" type="info">设置上传</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                    <!--只有上传列表-->
+			                    <Menu-item name="6-2" id="onlyfilesdrag" style="min-height: 100px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class=" elcss myFiles" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false"  src="../../images/myfile.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setmyupload($event)" type="info">设置上传</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                    <!--上传按钮+上传列表-->
+			                    <Menu-item name="6-3" id="uploadfiledrag" style="min-height: 100px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class=" elcss fileListWithSubmit" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false"  src="../../images/upload.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setmyupload($event)" type="info">设置上传</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--pie-->
+			                <Submenu name="7">
+			                    <template slot="title">
+			                        PieChart
+			                    </template>
+			                    <Menu-item name="7-1" id="piedrag" style="min-height: 360px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="pieChart myPie elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false" style="display: block;width: 80%;margin: 0 auto;" src="../../images/piegram1.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setChart($event)" type="info">设置饼图</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <Submenu name="8">
+			                    <template slot="title">
+			                        HisToChart
+			                    </template>
+			                    <Menu-item name="8-1" id="histodrag" style="min-height: 360px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="pieChart myHisto elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false" style="display: block;width: 80%;margin: 0 auto;" src="../../images/histogram.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    				<Button class="setDummy"  @click="setChart($event)" type="info">设置柱状图</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			                <!--Label-->
+			                <Submenu name="9">
+			                    <template slot="title">
+			                        Label
+			                    </template>
+			                    <Menu-item name="9-1" id="labeldrag" style="min-height: 30px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="myLabel elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<span>Label</span>
+		                    				<Button class="delLabel" @click.stop="delThisEl($event)" type="error">删除Label</Button>
+		                    				<Button class="setDummy"  @click="setLabel($event)" type="info">设置Label</Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			               <Submenu name="10">
+			                    <template slot="title">
+			                        流程
+			                    </template>
+			                    <Menu-item name="10-1" id="Approvestepdrag" style="min-height: 100px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="Approvestep elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false"  src="../../images/approvalstep.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                    <Menu-item name="10-2" id="Approvehistorydrag" style="min-height: 100px; position: relative; padding: 10px;">
+		                    		<div v-for="n in 100" class="Approvehistory elcss" draggable="true" @dragstart="drag($event)">
+		                    			<div class="setting">
+			                    			<img draggable="false"  src="../../images/approvalhistory.png" alt="dummyUI" />
+		                    				<Button class="delChart" @click.stop="delThisEl($event)" type="error" shape="circle" icon="close"></Button>
+		                    			</div>
+		                    		</div>
+			                    </Menu-item>
+			                </Submenu>
+			            </Menu>
+					</Card>
+
+				</div>
+			</Col>
+			<!--放置区域-->
+			<Col span="17" offset="6">
+				<Card>
+					<p slot="title">拖拽放置区域</p>
+					<div class="form" v-show="formShow">
+
+				        <Form id="form" ref="formInline" :model="formInline" :label-width="80">
+				        	<!--页面标签-->
+				        	<div style="margin: 15px auto;padding-bottom: 60px;position: relative;">
+				        		<Tabs :value="tabName" @on-click="tabNameChange">
+				        			<Tab-pane :label="normaltablabel" key="form" name="form" style="position: relative;">
+				        				<!--第一个页签只可以拖拽普通输入框 不能拖组件-->
+				        				<Form-item>
+											输入框放置区域
+										</Form-item>
+				        				<div class="dropInputArea" id="dropinputarea" style="min-height: 100px;font-size: 24px;color: #ddd; text-align: center; padding-top: 40px;border: 1px solid darkseagreen;padding-bottom: 80px;margin: 15px 10px;position: relative;background: transparent;" @drop.stop='drop($event)' @dragover='allowDrop($event)'>
+										</div>
+										<div style="width: 100%;height: 80px;padding-left: 10px;">
+											<Button type="success" @click="autoformset" style="margin-right: 20px;">智能提交表单设置</Button>
+											<Button type="primary" @click="openformbasesetmodal">提交表单基本设置</Button>
+										</div>
+										<Form-item>
+											<div style="width: 100%;height: 80px;"></div>
+										</Form-item>
+
+							        </Tab-pane>
+							        <!--其他页签只可以导入页面-->
+							        <Tab-pane v-for="tab in pageTabs" v-bind:label="tab.label" v-bind:key="tab.importPageid" v-bind:name="tab.name" style="position: relative;">{{tab.value}}
+							        </Tab-pane>
+							    </Tabs>
+							    <!--页面标签设置-->
+					        	<div style="position: absolute; top: 5px;right: 40px;">
+					        		<Button type="info" shape="circle" icon="gear-b" size="small" @click="setTabs"></Button>
+					        	</div>
+							    <div style="position: absolute;top: 5px;right: 0;">
+							    	<Button type="info" shape="circle" icon="plus" size="small" @click="addTabs"></Button>
+							    </div>
+				        	</div>
+
+					        <Form-item>
+								其他组件放置区域
+							</Form-item>
+					        <div class="dropArea"  style="min-height: 200px; padding-top: 40px;border: 1px dashed #ddd;padding-bottom: 40px;margin: 15px 10px;"  @drop.stop='drop($event)' @dragover='allowDrop($event)'>
+
+				        	</div>
+					        <Form-item>
+					            <Button type="primary" @click="sendData">提交</Button>
+					        </Form-item>
+					    </Form>
+
+				    </div>
+				</Card>
+			</Col>
+		</Row>
+		<!--表单基本设置-->
+		<Modal width="300"
+			v-model="formbasesetmodal"
+			title="提交表单基本设置"
+			@on-ok="formbasesetOK"
+			@on-cancel="cancel">
+			<!--formbaseset.isshowchilddata-->
+				<Form>
+					<Form-item>
+						<Row style="text-align: right;">
+							<Col span="9"> 是否有子数据：
+							</Col>
+							<Col span="11" offset="1" style="text-align: left;">
+								<Checkbox v-model="formbaseset.isshowchilddata">
+		        					<span v-show="!formbaseset.isshowchilddata"> 无子数据 </span>
+		        					<span v-show="formbaseset.isshowchilddata"> 有子数据 </span>
+		        				</Checkbox>
+							</Col>
+						</Row>
+					</Form-item>
+				</Form>
+		</Modal>
+		<!--智能表单-->
+		<!--列表-->
+		<Modal width="800" v-model="autoformsetlistmodal" title="智能提交表单条件和动作列表" @on-ok="autoformsetOk" @on-cancel="cancel">
+			<!--条件和动作列表-->
+			<!--添加和删除条件和动作-->
+			<div style="text-align: right;padding: 10px 0;">
+				<Button type="success" @click="addautoformset">添加条件和动作</Button>
+			</div>
+			<Table border :columns="autoformsetkeys" :data="autoformsetdatas"></Table>
+		</Modal>
+		<!--添加条件-->
+		<Modal width="700" v-model="addautoformsetmodal" title="智能提交表单条件和动作设置" @on-ok="addautoformsetOk" @on-cancel="addautoformsetCancel">
+			<div>
+				<!--条件-->
+				<Form>
+					<h3>条件</h3>
+					<Form-item>
+						<Row style="text-align: right;">
+							<Col span="12"> 请输入条件描述
+							</Col>
+							<Col span="11" offset="1">
+								<Input v-model.trim="newautoformset.conditionname" placeholder="请输入..."></Input>
+							</Col>
+						</Row>
+					</Form-item>
+					<Form-item>
+						<Row style="text-align: right;">
+							<Col span="12"> 请输入条件条件不满足时要显示的警告描述
+							</Col>
+							<Col span="11" offset="1">
+								<Input v-model.trim="newautoformset.warningcontent" placeholder="请输入..."></Input>
+							</Col>
+						</Row>
+					</Form-item>
+					<Form-item>
+						<Row style="padding: 10px 0px;padding-right: 5px; border: 1px dashed #ddd;margin-bottom: 10px;" v-for="(item,index) in newautoformset.conditions" :key="index">
+							<Col span="6">
+								<!--conditionstypes-->
+								<Row>
+				        			<Col span="14" style="text-align: right;">
+				        				请选择类型：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.type">
+									        <Option v-for="(condition,conindex) in conditionstypes" :label="condition.value" :value="condition.name" :key="conindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+			        		</Col>
+				        	<Col span="6">
+				        		<Row v-if="item.type == 'time'">
+				        			<Col span="14" style="text-align: right;">
+				        				请选择key：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.key">
+									        <Option v-for="(condition,conindex) in keyoftime" :label="condition.value" :value="condition.name" :key="conindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+			        		</Col>
+				        	<Col span="6">
+				        		<Row v-if="item.type == 'who'">
+				        			<Col span="14" style="text-align: right;">
+				        				请选择key：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.key">
+									        <Option v-for="(condition,conindex) in keyofwho" :label="condition.value" :value="condition.name" :key="conindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+				        	</Col>
+				        	<Col span="6">
+				        		<!--计算方式-->
+				        		<Row v-if="item.type == 'time'">
+				        			<Col span="14" style="text-align: right;">
+				        				请选择计算方式：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.calc">
+									        <Option v-for="(condition,conindex) in calcs" :label="condition.value" :value="condition.name" :key="conindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+				        	</Col>
+				        	<Col span="6">
+				        		<!--值-->
+				        		<Row v-if="item.type == 'time'">
+				        			<Col span="14" style="text-align: right;">
+				        				请输入一个值：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Input v-model.trim="item.value" placeholder="请输入..."></Input>
+				        			</Col>
+				        		</Row>
+							</Col>
+						</Row>
+						<div style="text-align: right;padding: 10px 0;">
+							<Button type="success" @click="addnewautoformsetcondition">添加条件</Button>
+							<!--removenewautoformsetcondition-->
+							<Button type="error" @click="removenewautoformsetcondition">删除条件</Button>
+						</div>
+					</Form-item>
+					<!--动作-->
+					<hr></hr>
+					<h3 style="margin-top: 15px;">动作</h3>
+					<Form-item>
+						<Row style="text-align: right;">
+							<Col span="12"> 请输入动作描述
+							</Col>
+							<Col span="11" offset="1">
+								<Input v-model.trim="newautoformset.actionname" placeholder="请输入..."></Input>
+							</Col>
+						</Row>
+					</Form-item>
+					<Form-item>
+						<Row style="padding: 10px 0px;padding-right: 5px; border: 1px dashed #ddd;margin-bottom: 10px;" v-for="(item,index) in newautoformset.actions" :key="index">
+							<Col span="12">
+								<!--conditionstypes-->
+								<Row>
+									<!--所有的输入框 以及提交按钮-->
+				        			<Col span="14" style="text-align: right;">
+				        				请选择要动作的目标：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.type">
+									        <Option v-for="(target,tindex) in nowallsks" :value="target.label" :label="target.value" :key="tindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+			        		</Col>
+				        	<Col span="12">
+				        		<Row>
+				        			<Col span="14" style="text-align: right;">
+				        				请选择动作方式：
+				        			</Col>
+				        			<Col span="9" offset="1">
+				        				<Select v-model="item.action">
+									        <Option v-for="(condition,conindex) in disableactions" :label="condition.value" :value="condition.name" :key="conindex"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+			        		</Col>
+						</Row>
+						<div style="text-align: right;padding: 10px 0;">
+							<Button type="success" @click="addnewautoformsetaction">添加动作</Button>
+							<!--removenewautoformsetcondition-->
+							<Button type="error" @click="removenewautoformsetaction">删除动作</Button>
+						</div>
+					</Form-item>
+
+				</Form>
+			</div>
+		</Modal>
+		<!--智能表单-->
+		<!--设置Tabs-->
+		<Modal
+	        v-model="showSetTabModal"
+	        title="设置按钮"
+	        @on-ok="setTabOk"
+	        @on-cancel="cancel">
+	        <Form ref="setTabForm" :model="setTabForm" :rules="setTabRuleInline">
+	        	<Form-item prop="tabLabel">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请输入页签要展示的文字：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="setTabForm.label"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<div v-show="notnormaltab">
+		        	<Form-item prop="flowid">
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				请选择流程：
+		        			</Col>
+		        			<Col span="15" offset="1">
+		        				 <Select v-model="setTabForm.flowid" style="width:200px" @on-change="flowidchange(setTabForm.flowid)">
+							        <Option v-for="item in flowList" :value="item.flowid" :label="item.name" :key="item.flowid"></Option>
+							    </Select>
+		        			</Col>
+		        		</Row>
+		        	</Form-item>
+		        	<Form-item prop="pageid">
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				请选择节点：
+		        			</Col>
+		        			<Col span="15" offset="1">
+		        				 <Select v-model="setTabForm.nodeid" style="width:200px" @on-change="nodeidchange(setTabForm.nodeid)">
+							        <Option v-for="item in nodeList" :value="item.nodeid" :label="item.nodeid" :key="item.nodeid"></Option>
+							    </Select>
+		        			</Col>
+		        		</Row>
+		        	</Form-item>
+		        	<Form-item prop="importPageid">
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				请选择导入的页面：
+		        			</Col>
+		        			<Col span="15" offset="1">
+		        				 <Select v-model="setTabForm.importPageid" style="width:200px">
+							        <Option v-for="item in pageList" :value="item.pageid" :label="item.pagename" :key="item.pageid"></Option>
+							    </Select>
+		        			</Col>
+		        		</Row>
+		        	</Form-item>
+	        	</div>
+	        </Form>
+	    </Modal>
+		<!--设置表头-->
+		<Modal
+	        v-model="addTitleModal"
+	        width="900"
+	        title="添加表格表头"
+	        @on-ok="setTable"
+	        @on-cancel="cancelTable">
+	        <Row>
+	        	<Col span="12" offset="1">
+			        <!--选择一个流程-->
+			        <div style="padding: 20px 0;">
+			        	<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				请选择流程：
+		        			</Col>
+		        			<Col span="15" offset="1">
+		        				 <Select v-model="showonmodal.flowid" style="width:200px" @on-change="changetableflowid(showonmodal.flowid)">
+							        <Option v-for="item in flowList" :value="item.flowid" :label="item.name" :key="item.flowid"></Option>
+							    </Select>
+		        			</Col>
+		        		</Row>
+		        		<div style="width: 100%;height: 20px;"></div>
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				请选择节点：
+		        			</Col>
+		        			<Col span="15" offset="1">
+		        				 <Select v-model="showonmodal.nodeid" style="width:200px" @on-change="changetablenodeid(showonmodal.nodeid)">
+							        <Option v-for="item in nodeList" :value="item.nodeid" :label="item.nodeid" :key="item.nodeid"></Option>
+							    </Select>
+		        			</Col>
+		        		</Row>
+			        </div>
+			        <!--选择流程之后设置transfer-->
+	        		<div style="padding-bottom: 20px;">
+	        			<Transfer
+				        	style="max-width: 100%;margin: 0 auto;"
+					        :data="resourceData"
+					        :titles = "resourceName"
+					        :target-keys="resourceKeys"
+					        :render-format="titleRender"
+					        @on-change="titleChange">
+				        </Transfer>
+	        		</div>
+
+	        		<div>
+	        			<Button type="primary" @click="addcountcolunm">新增统计列</Button>
+	        		</div>
+	        	</Col>
+	        	<Col span="10" offset="1">
+	        		<div>
+	        			<div>
+	        				<Row>
+	        					<Col span="8">
+	        						<Checkbox v-model="isViewBtn" style="padding-bottom: 15px;">是否有查看按钮</Checkbox>
+	        					</Col>
+	        					<Col span="16">
+	        						<Checkbox v-model="showonmodal.viewinmodal" v-show="isViewBtn" style="padding-bottom: 15px;">是否在模态框中显示　
+	        							<span v-show="!showonmodal.viewinmodal" style="font-size: 12px;color: red;">否</span>
+	        							<span v-show="showonmodal.viewinmodal" style="font-size: 12px;color: red;">是</span>
+	        						</Checkbox>
+	        					</Col>
+	        				</Row>
+	        			</div>
+		        		<div v-show="isViewBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择页面
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="viewpageid" style="width:200px;margin-bottom: 15px;">
+								        <Option v-for="item in tablePageList" :value="item.pageid" :label="item.pagename" :key="item.pageid"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					请输入查看按钮要展示的文字
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Input placeholder="请输入..."  v-model.trim="showonmodal.viewbtnname"></Input>
+		        				</Col>
+		        			</Row>
+		        		</div>
+	        		</div>
+	        		<div>
+	        			<div>
+	        				<Row>
+	        					<Col span="8">
+	        						<Checkbox v-model="isEditBtn" style="padding-bottom: 15px;">是否有编辑按钮</Checkbox>
+	        					</Col>
+	        					<Col span="16">
+	        						<Checkbox v-model="showonmodal.editinmodal" v-show="isEditBtn" style="padding-bottom: 15px;">是否在模态框中显示　
+	        							<span v-show="!showonmodal.editinmodal" style="font-size: 12px;color: red;">否</span>
+	        							<span v-show="showonmodal.editinmodal" style="font-size: 12px;color: red;">是</span>
+	        						</Checkbox>
+	        					</Col>
+	        				</Row>
+	        			</div>
+	        			<div v-show="isEditBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择页面
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="editpageid" style="width:200px;margin-bottom: 15px;">
+								        <Option v-for="item in tablePageList" :value="item.pageid" :label="item.pagename" :key="item.pageid"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					请输入查看按钮要展示的文字
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Input placeholder="请输入..."  v-model.trim="showonmodal.editbtnname"></Input>
+		        				</Col>
+		        			</Row>
+		        		</div>
+	        		</div>
+	        		<!--是否有删除按钮-->
+	        		<div style="border: 1px dashed #ddd;padding: 5px;margin-bottom: 15px;">
+	        			<div>
+	        				<Checkbox v-model="showonmodal.isdelbtn" style="padding-bottom: 15px;">是否有删除按钮</Checkbox>
+	        			</div>
+	        		</div>
+
+	        		<!--是否有审批状态  isapprovalstatus-->
+	        		<div style="border: 1px dashed #ddd;padding: 5px;margin-bottom: 15px;">
+	        			<div>
+	        				<Checkbox v-model="showonmodal.isapprovalstatus" @on-change="addapproval" style="padding-bottom: 15px;">是否有审批状态</Checkbox>
+	        			</div>
+	        		</div>
+	        		<!--是否只显示子数据-->
+	        		<div style="border: 1px dashed #ddd;padding: 5px;margin-bottom: 15px;">
+	        			<div>
+	        				<Checkbox v-model="showonmodal.isonlyshowchilddata" style="padding-bottom: 15px;">是否只显示子数据</Checkbox>
+	        			</div>
+	        		</div>
+	        		<!--设置统计列-->
+	        		<div>
+	        			<!--先选择主动列-->
+	        			<!--选择被动列-->
+	        			<!--选择操作-->
+	        			<div>
+	        				<Checkbox v-model="showonmodal.iscountBtn" style="padding-bottom: 15px;">是否设置统计列</Checkbox>
+	        			</div>
+	        			<div v-show="showonmodal.iscountBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					设置统计列表头：
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Input placeholder="请输入..." v-model="showonmodal.countTitle" @on-change="countTitleChange"></Input>
+		        				</Col>
+		        			</Row>
+		        		</div>
+	        			<div v-show="showonmodal.iscountBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择主列
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="showonmodal.countColumnStart" style="width:200px;margin-bottom: 15px;">
+								        <Option v-for="item in countColumnData" :value="item.key" :label="item.title" :key="item.key"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+		        		</div>
+		        		<div v-show="showonmodal.iscountBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择计算方式
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="showonmodal.countColumnCalculation" style="width:200px;margin-bottom: 15px;">
+								        <Option v-for="item in countColumnCalculations" :label="item.value" :value="item.value" :key="item.key"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+		        		</div>
+		        		<div v-show="showonmodal.iscountBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择被动列
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="showonmodal.countColumnEnd" style="width:200px;margin-bottom: 15px;">
+								        <Option v-for="item in countColumnData" :label="item.title" :value="item.key" :key="item.key"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+		        		</div>
+	        		</div>
+	        		<!--设置统计列-->
+	        		<!--设置过滤条件-->
+	        		<div style="border: 1px dashed #ddd;padding: 5px;margin-bottom: 15px;">
+	        			<p>过滤条件:</p>
+	        			<div>
+	        				<Checkbox v-model="showonmodal.isfilterBtn" style="padding-bottom: 15px;">是否设置过滤条件</Checkbox>
+	        			</div>
+	        			<div v-show="showonmodal.isfilterBtn">
+		        			<Row>
+		        				<Col span="6" style="font-size: 14px;line-height: 30px;">
+		        					选择过滤条件列
+		        				</Col>
+		        				<Col span="17" offset="1">
+		        					<Select v-model="showonmodal.filterkey" style="width:200px;margin-bottom: 15px;" @on-change="filterkeyisstatus">
+								        <Option v-for="item in countColumnData" :value="item.key" :label="item.title" :key="item.key"></Option>
+								    </Select>
+		        				</Col>
+		        			</Row>
+			        		<div>
+		        				<Checkbox v-model="showonmodal.filterchoosesystemsk" style="padding-bottom: 15px;">选择过滤条件</Checkbox>
+		        			</div>
+			        		<div v-show="showonmodal.filterchoosesystemsk">
+			        			<Row>
+			        				<Col span="9" style="font-size: 14px;line-height: 30px;">
+			        					选择系统关键字
+			        				</Col>
+			        				<Col span="14">
+			        					<Select v-model="showonmodal.filtervaluebychoose" style="width:200px;margin-bottom: 15px;">
+									        <Option v-for="item in systemsks" :value="item.key" :label="item.value" :key="item.key"></Option>
+									    </Select>
+			        				</Col>
+			        			</Row>
+			        		</div>
+			        		<div v-show="!showonmodal.filterchoosesystemsk">
+			        			<Row>
+			        				<Col span="9" style="font-size: 14px;line-height: 30px;">
+			        					输入过滤条件的值
+			        				</Col>
+			        				<Col span="14">
+			        					<Input placeholder="请输入..." v-model="showonmodal.filtervaluebyfill" @on-change="countTitleChange"></Input>
+			        				</Col>
+			        			</Row>
+			        		</div>
+			        	</div>
+        			</div>
+        			<!--是否显示流程数据-->
+	        		<div>
+	        			<div>
+	        				<Checkbox v-model="showonmodal.isshowflowdata" style="padding-bottom: 15px;">是否显示流程数据</Checkbox>
+	        			</div>
+        			</div>
+	        	</Col>
+	        </Row>
+	    </Modal>
+	    <!--新增统计列-->
+	    <Modal
+	        v-model="newcountcolumnmodal"
+	        title="新增统计列设置"
+	        @on-ok="newcountcolumnOk"
+	        @on-cancel="cancel">
+	        <Form ref="newcountcolumnForm" :model="newcountcolumnForm" :rules="newcountcolumnFormRuline">
+	        	<!--统计列名字-->
+	        	<Form-item prop="title">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请输入列名：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="newcountcolumnForm.title"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="from">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择新列来源：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Select v-model="newcountcolumnForm.from" style="width:200px">
+						        <Option v-for="(item,index) in newcountcolumnfroms" :label="item.value" :value="item.key" :key="index"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<div v-show="newcountcolumnForm.from == 'own'">
+	        		<!--添加列-->
+	        		<Form-item prop="own">
+		        		<Row>
+		        			<Col span="24" style="text-align: center;">
+		        				<h3>源于本流程</h3>
+		        			</Col>
+		        		</Row>
+	        			<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				选择列和计算方式：
+		        			</Col>
+		        			<Col span="16">
+		        				<div v-for="(item,index) in newcountcolumnForm.own.columns" :key="index">
+		        					<Row>
+		        						<Col span="12">
+					        				<Select v-model="item.key" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnData" :label="item.title" :value="item.key" :key="item.key"></Option>
+										    </Select>
+					        			</Col>
+					        			<Col span="12">
+					        				<Select v-model="item.calculation" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnCalculations" :label="item.value" :value="item.key" :key="item.value"></Option>
+										    </Select>
+					        			</Col>
+		        					</Row>
+		        				</div>
+		        			</Col>
+		        		</Row>
+		        		<!--新增一项源于本流程-->
+		        		<div style="padding: 10px;text-align: right;">
+		        			<Button type="success" @click="addnewcountcolumnwithown">新增一项</Button>
+		        			<Button type="error" @click="removenewcountcolumnwithown">删除一项</Button>
+		        		</div>
+		        	</Form-item>
+	        	</div>
+	        	<div v-show="newcountcolumnForm.from == 'relate'">
+	        		<Form-item prop="relate">
+		        		<Row>
+		        			<Col span="24" style="text-align: center;">
+		        				<h3>源于相关流程</h3>
+		        			</Col>
+		        		</Row>
+		        		<!--新增一项源于相关流程-->
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				选择主流程和列：
+		        			</Col>
+		        			<Col span="16">
+		        				<div>
+		        					<Row>
+		        						<Col span="12">
+					        				<Select v-model="newcountcolumnForm.relate.flowid" disabled>
+										        <Option v-for="item in flowList" :value="item.flowid" :label="item.name" :key="item.flowid"></Option>
+										    </Select>
+					        			</Col>
+		        						<Col span="12">
+					        				<Select v-model="newcountcolumnForm.relate.maintagkey" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnData" :value="item.key" :label="item.title" :key="item.key"></Option>
+										    </Select>
+					        			</Col>
+		        					</Row>
+		        				</div>
+		        			</Col>
+		        		</Row>
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				选择子流程和列：
+		        			</Col>
+		        			<Col span="16">
+		        				<div>
+		        					<Row>
+		        						<Col span="12">
+					        				<Select v-model="newcountcolumnForm.relate.childflowid" @on-change="newcountchildflowidchange">
+										        <Option v-for="(item,index)  in flowList" :value="item.flowid" :label="item.name" :key="index"></Option>
+										    </Select>
+					        			</Col>
+		        						<Col span="12">
+					        				<Select v-model="newcountcolumnForm.relate.childtagkey" style="margin-bottom: 15px;">
+										        <Option v-for="(item,index) in newcountcolumndata" :value="item.key" :label="item.name" :key="index"></Option>
+										    </Select>
+					        			</Col>
+		        					</Row>
+		        				</div>
+		        			</Col>
+		        		</Row>
+		        		<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				选择子流程里的列和计算方式：
+		        			</Col>
+		        			<Col span="16">
+		        				<div v-for="(item,index) in newcountcolumnForm.relate.columns" :key="index">
+		        					<Row>
+		        						<Col span="12">
+					        				<Select v-model="item.key" style="margin-bottom: 15px;">
+										        <Option v-for="(item,index) in newcountcolumndata" :value="item.key" :label="item.name" :key="index"></Option>
+										    </Select>
+					        			</Col>
+					        			<Col span="12">
+					        				<Select v-model="item.calculation" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnCalculations" :value="item.key" :label="item.value" :key="item.value"></Option>
+										    </Select>
+					        			</Col>
+		        					</Row>
+		        				</div>
+		        			</Col>
+
+		        		</Row>
+		        		<div style="padding: 10px;text-align: right;">
+		        			<Button type="success" @click="addnewcountcolumnwithrelate">新增一项</Button>
+		        			<Button type="error" @click="removenewcountcolumnwithrelate">删除一项</Button>
+		        		</div>
+		        	</Form-item>
+	        	</div>
+	        	<div v-show="newcountcolumnForm.from == 'column'">
+	        		<!--源于列-->
+	        		<Form-item prop="own">
+		        		<Row>
+		        			<Col span="24" style="text-align: center;">
+		        				<h3>源于列</h3>
+		        			</Col>
+		        		</Row>
+	        			<Row>
+		        			<Col span="8" style="text-align: right;">
+		        				选择列和计算方式：
+		        			</Col>
+		        			<Col span="16">
+		        				<div v-for="(item,index) in newcountcolumnForm.column.columns" :key="index">
+		        					<Row>
+		        						<Col span="12">
+					        				<Select v-model="item.key" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnData" :value="item.key" :label="item.title" :key="item.key"></Option>
+										    </Select>
+					        			</Col>
+					        			<Col span="12">
+					        				<Select v-model="item.calculation" style="margin-bottom: 15px;">
+										        <Option v-for="item in countColumnCalculations" :value="item.key" :label="item.value" :key="item.value"></Option>
+										    </Select>
+					        			</Col>
+		        					</Row>
+		        				</div>
+		        			</Col>
+		        		</Row>
+		        		<!--新增一项源于本流程-->
+		        		<div style="padding: 10px;text-align: right;">
+		        			<Button type="success" @click="addnewcountcolumnwithcolumn">新增一项</Button>
+		        			<Button type="error" @click="removenewcountcolumnwithcolumn">删除一项</Button>
+		        		</div>
+		        	</Form-item>
+	        	</div>
+
+	        </Form>
+	    </Modal>
+	    <!--设置输入框的label-->
+		<Modal v-model="setLabelModal" title="设置输入框或下拉框的Label" @on-ok="setLabelModalOk()" @on-cancel="cancelInput">
+			<Form>
+				<Form-item>
+					<Row>
+						<Col span="10" style="text-align: right;"> 选择类型
+						</Col>
+						<Col span="13" offset="1">
+						<Select v-model="setInputType" placeholder="" v-on:on-change="changeInputType">
+							<Option value="input">Input</Option>
+							<Option value="date">时间选择器</Option>
+							<Option value="select">下拉框</Option>
+							<Option value="textarea">textarea</Option>
+							<Option value="specialtextarea">富文本编辑器</Option>
+							<Option value="chooseperson">人员选择</Option>
+						</Select>
+						</Col>
+					</Row>
+				</Form-item>
+				<Form-item>
+					<Row style="padding: 10px 0;">
+						<Col span="10" style="text-align: right;"> 请填写Label
+						</Col>
+						<Col span="13" offset="1">
+						<Input v-model.trim="setvalue" placeholder="请输入..."></Input>
+						</Col>
+					</Row>
+				</Form-item>
+				<Form-item>
+					<div v-show="inputIsInput">
+						<Row>
+							<Col span="10" style="text-align: right;"> 是否设置输入框为默认数据
+							</Col>
+							<Col span="13" offset="1">
+							<Checkbox v-model="issetInput">
+								<span v-show="!issetInput">否</span>
+								<span v-show="issetInput">是 并且输入框为不可用状态</span>
+							</Checkbox>
+							</Col>
+						</Row>
+					</div>
+				</Form-item>
+				<Form-item>
+					<!--输入框过滤条件-->
+					<div v-show="issetInput">
+						<!--checkbox-->
+						<Row>
+							<Col span="10" style="text-align: right;"> 请设置字体label的来源
+							</Col>
+							<Col span="13" offset="1">
+								<!--输入框为统计型数据-->
+								<RadioGroup v-model="setInputValueFromWhere" v-on:on-change="inputdatafromchange">
+							        <Radio label="keyword">术语</Radio>
+							        <Radio label="systemkeyword">系统关键字</Radio>
+							        <Radio label="countdata">统计数据</Radio>
+							    </RadioGroup>
+
+							</Col>
+						</Row>
+						<!--系统关键字下拉框-->
+						<div style="width: 100%;min-height: 20px;" v-show="setInputValueFromSystem">
+							<Row style="padding: 10px 0;">
+								<Col span="10" style="text-align: right;"> 请选择一个系统关键字
+								</Col>
+								<Col span="13" offset="1">
+								<Select v-model="keyofsetInputValue" placeholder="请选择一个关键字">
+									<Option v-for="(item,index) in systemsks" :label="item.value" :value="item.key" :key="index"></Option>
+								</Select>
+								</Col>
+							</Row>
+						</div>
+						<!--术语下拉框-->
+						<div style="width: 100%;min-height: 20px;" v-show="setInputValueFromkeyword">
+							<Row style="padding: 10px 0;">
+								<Col span="10" style="text-align: right;"> 请选择一个术语
+								</Col>
+								<Col span="13" offset="1">
+								<Select v-model="keyofsetInputValue" placeholder="请选择一个术语">
+									<Option v-for="(item,index) in queryCkids" :value="item.id" :key="index" :label="item.value"></Option>
+								</Select>
+								</Col>
+							</Row>
+						</div>
+						<!--统计数据下拉框-->
+						<!--需要获取所有已经添加的label 或者sk  由一项或者多项之间 的加减乘除得来-->
+						<!--新打开一个模态框来设置统计型数据-->
+
+					</div>
+				</Form-item>
+				<Form-item>
+
+					<div style="width: 100%;min-height: 20px;" v-show="inputIsSelect">
+						<Row style="padding: 10px 0;">
+							<Col span="10" style="text-align: right;"> 请选择一个流程
+							</Col>
+							<Col span="13" offset="1">
+							<Select v-model="setInputFlowid" placeholder="" v-on:on-change="selectFlow">
+								<Option v-for="(word,index) in flowList" :value="word.flowid" :key="index" :label="word.name"></Option>
+							</Select>
+							</Col>
+						</Row>
+						<Row style="padding: 10px 0;">
+							<Col span="10" style="text-align: right;"> 请选择下拉框数据来源
+							</Col>
+							<Col span="13" offset="1">
+							<Select v-model="setInputword" placeholder="">
+								<Option v-for="(setInputword,index) in queryAllSkids" :label="setInputword.value" :value="setInputword.id" :key="index"></Option>
+							</Select>
+							</Col>
+						</Row>
+					</div>
+
+					<!--设置下拉框联动项-->
+					<div style="padding: 20px 0;border: 1px dashed #ddd;" v-show="inputIsSelect">
+						<div style="padding: 5px 0;" v-for="(inputlinkage,index) in inputlinkages" :key="index">
+							<Row>
+								<!--当前表单的某一项-->
+								<Col span="10">
+									<Select v-model="inputlinkage.ownflowkey">
+							            <Option v-for="(option,index) in nowallsks" :value="option.label" :key="option" :label="option.value">
+							            </Option>
+						            </Select>
+								</Col>
+								<!--联动表单的某一项-->
+								<Col span="10" offset="4">
+									<Select v-model="inputlinkage.otherflowkey" placeholder="请选择">
+										<Option v-for="(otherflowkey,index) in queryAllSkids" :label="otherflowkey.value" :value="otherflowkey.key" :key="index"></Option>
+									</Select>
+								</Col>
+							</Row>
+
+						</div>
+						<div style="text-align: right;padding-right: 15px;">
+							<Button type="success" @click="addinputlinkage">添加联动项</Button>
+							<Button type="error" @click="removeinputlinkage">删除联动项</Button>
+						</div>
+					</div>
+
+				</Form-item>
+				<Form-item v-show="inputIsChooseperson">
+					<!--设置人员选择联动项-->
+					<div style="padding: 20px 0;border: 1px dashed #ddd;">
+						<div style="padding: 5px 0;" v-for="(program,index) in choosepersonset.programs" :key="index">
+							<Row>
+								<!--当前表单的某一项-->
+								<Col span="10">
+									<Select v-model="program.inputkey" clearable>
+							            <Option v-for="(option,index) in nowallsks" :value="option.label" :key="index" :label="option.value">
+							            </Option>
+						            </Select>
+								</Col>
+								<!--联动表单的某一项-->
+								<Col span="10" offset="4">
+									<Select v-model="program.personinfokey" placeholder="">
+										<Option v-for="(word,index) in personinfos" :value="word.key" :key="index" :label="word.label"></Option>
+									</Select>
+								</Col>
+							</Row>
+
+						</div>
+						<div style="text-align: right;padding-right: 15px;">
+							<Button type="success" @click="addchoosepersonsetprogram">添加人员选择联动项</Button>
+							<Button type="error" @click="removechoosepersonsetprogram">删除人员联动项</Button>
+						</div>
+					</div>
+
+				</Form-item>
+			</Form>
+		</Modal>
+		<!--设置文本输入框为统计数据-->
+		<Modal v-model="setinputfromcountmodal" title="设置文本输入框为统计数据" @on-ok="setinputfromcountOk" @on-cancel="cancel">
+			<!---->
+			<Form ref="countinputform" :model="countinputform" :label-width="80" class="form">
+				<Form-item
+		        	v-for="(countinputsk, index) in countinputform.countinputsks"
+		        	:key="index">
+		        	<!--下拉框-->
+		        	<Select v-model="countinputsk.sk" style="width:80px;" clearable>
+			            <Option v-for="(option,index) in nowallsks" :value="option.label" :key="index" :label="option.value">
+			                {{option.value}}
+			            </Option>
+		            </Select>
+
+		        	<!--加减乘除-->
+		        	<Select v-model="countinputsk.computemode" style="width:80px;" clearable>
+			            <Option v-for="(option,index) in computemodes" :value="option.label" :label="option.value" :key="index">
+			            </Option>
+		            </Select>
+
+		        	<!--新增按钮-->
+
+		        </Form-item>
+		        <div style="text-align: right;">
+		        	<Button type="success" @click="addcountinputsk">新增一项</Button>
+		        	<Button type="error" @click="removecountinputsk">删除一项</Button>
+		        </div>
+			</Form>
+
+
+		</Modal>
+    	<!--设置按钮-->
+		<Modal
+	        v-model="showButtonModal"
+	        title="设置按钮"
+	        @on-ok="setButtonOk"
+	        @on-cancel="cancel">
+	        <Form ref="setButtonForm" :model="setButtonForm" :rules="setButtonRuleInline">
+	        	<Form-item prop="buttonName">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请输入按钮要展示的字：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="setButtonForm.buttonName"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="flowid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择一个流程：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setButtonForm.flowid" style="width:200px" @on-change="flowidchange(setButtonForm.flowid)">
+						        <Option v-for="(item,index) in flowList" :value="item.flowid" :key="index" :label="item.name"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="nodeid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择一个节点：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setButtonForm.nodeid" style="width:200px" @on-change="nodeidchange(setButtonForm.nodeid)">
+						        <Option v-for="(item,index) in nodeList" :value="item.nodeid" :key="index" :label="item.nodeid"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="openpageid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择按钮要打开的页面：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setButtonForm.openPageid" style="width:200px">
+						        <Option v-for="(item,index) in pageList" :label="item.pagename" :value="item.pageid" :key="index"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="showInModal">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				新页面显示：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Checkbox v-model="setButtonForm.showInModal"></Checkbox>
+	        				<span v-show="setButtonForm.showInModal" style="color: #2d8cf0;">页面在模态框中显示</span>
+	        				<span v-show="!setButtonForm.showInModal" style="color: #19be6b;">点击按钮页面会跳转</span>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="modaltitle" v-show="setButtonForm.showInModal">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				模态框标题设置：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="setButtonForm.modaltitle"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	    <!--设置dummyUI-->
+		<Modal
+	        v-model="showDummyModal"
+	        title="选择控件"
+	        @on-ok="setDummyOk"
+	        @on-cancel="cancel">
+	        <Form ref="setDummyForm" :model="setDummyForm" :rules="setDummyRuleInline">
+
+	        	<Form-item prop="componet">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择控件：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setDummyForm.dummyComponet" style="width:200px">
+						        <Option v-for="item in dummyComponents" :label="item.value" :value="item.id" :key="item.id"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+		<!--设置图表-->
+		<Modal
+	        v-model="showSetChartModal"
+	        title="设置图表"
+	        @on-ok="setChartOk"
+	        @on-cancel="cancel">
+	        <Form ref="setChartForm" :model="setChartForm" :rules="setChartRuleInline">
+
+	        	<Form-item prop="ckid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择术语：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setChartForm.ckid" style="width:200px">
+						        <Option v-for="item in queryCkids" :value="item.id" :label="item.value" :key="item.id"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	    <!--设置Label-->
+		<Modal
+	        v-model="showSetLabelModal"
+	        width="900"
+	        title="设置Label"
+	        @on-ok="setLabelOk()"
+	        @on-cancel="cancel">
+	        <Form ref="setLabelForm" :model="setLabelForm" :rules="setLabelRuleInline">
+	        	<Form-item prop="fontSize">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请设置字体大小：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入一个数字" v-model="setLabelForm.fontStyle.fontSize"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="fontWeight">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请设置字体是否加粗：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Select v-model="setLabelForm.fontStyle.fontWeight" style="width:200px">
+						        <Option v-for="item in fontWeights" :value="item.value" :label="item.value" :key="item.value"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="textAlign">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请设置字体是否居中：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Select v-model="setLabelForm.fontStyle.textAlign" style="width:200px">
+						        <Option v-for="(item,index) in textAligns" :value="item.value" :label="item.value" :key="item.value"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="textAlign">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请设置字体label的来源：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Checkbox v-model="setLabelForm.chooseSkorck">
+	        					<span v-show="!setLabelForm.chooseSkorck">Label的来源是输入框输入的</span>
+	        					<span v-show="setLabelForm.chooseSkorck">Label的来源是通过关键字得来的</span>
+	        				</Checkbox>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+
+	        	<!--新增label设置描述-->
+	        	<Form-item prop="labeldesc" v-show="!setLabelForm.chooseSkorck">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请设置label内容：
+	        			</Col>
+
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入label要展示的文字" v-model="setLabelForm.labeldesc"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<!--label选择术语或者简单关键字的值-->
+	        	<Form-item prop="ckid" v-show="setLabelForm.chooseSkorck">
+	        		<Radio-group v-model="ckOrskId" style="width: 100%;" v-on:on-change="selectSkOrCk">
+				        <Row>
+				        	<Col span="10" offset="1">
+				        		<div>
+				        			<Radio label="选术语"></Radio>
+				        		</div>
+				        		<Row v-show="isCk">
+				        			<Col span="5" style="text-align: left;">
+				        				请选择术语：
+				        			</Col>
+				        			<Col span="15" offset="1">
+				        				 <Select v-model="setLabelForm.ckid" style="width:200px">
+									        <Option v-for="(item,index) in queryCkids" :label="item.value" :value="item.id" :key="index"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+				        	</Col>
+				        	<Col span="11" offset="1">
+								<div>
+									<Radio label="数据"></Radio>
+								</div>
+								<Row  v-show="!isCk" >
+				        			<Col span="5" style="text-align: left;">
+				        				请选择数据：
+				        			</Col>
+				        			<Col span="15" offset="1">
+				        				 <Select v-model="setLabelForm.skid" style="width:200px">
+									        <Option v-for="(item,index) in querySkids" :label="item.value" :value="item.id" :key="index"></Option>
+									    </Select>
+				        			</Col>
+				        		</Row>
+				        	</Col>
+				        </Row>
+				    </Radio-group>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	    <!--stronglist-->
+		<Modal
+	        v-model="showsetstronglistmodal"
+	        title="设置列表"
+	        @on-ok="setstronglistOk"
+	        @on-cancel="cancel">
+	        <Form ref="setstronglistForm" :model="setstronglistForm" :rules="setstronglistRuleInline">
+	        	<Form-item prop="label">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				Label：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="setstronglistForm.label"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="from">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				From：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="setstronglistForm.from" style="width:200px">
+						        <Option v-for="(item,index) in listheads" :label="item.title" :value="item.key" :key="index"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	    <!--myCard-->
+		<Modal
+	        v-model="showsetmycardmodal"
+	        title="设置卡片"
+	        @on-ok="setmycardOk"
+	        @on-cancel="cancel">
+	        <Form ref="mycardForm" :model="mycardForm" :rules="mycardRuleInline">
+	        	<Form-item prop="title">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				CardTitle：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Input placeholder="请输入..." v-model="mycardForm.cardTitle"></Input>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="flowid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择流程：
+	        			</Col>
+	        			<Col span="15" offset="1" :key="005">
+	        				 <Select v-model="mycardForm.flowid" style="width:200px" @on-change="flowidchange(mycardForm.flowid)">
+						        <Option v-for="(item,index) in flowList" :value="item.flowid" :label="item.name" :key="item.flowid"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="nodeid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择节点：
+	        			</Col>
+	        			<Col span="15" offset="1" :key="003">
+	        				 <Select v-model="mycardForm.nodeid" style="width:200px" @on-change="nodeidchange(mycardForm.nodeid)">
+						        <Option v-for="(item,index) in nodeList" :value="item.nodeid" :key="index" :label="item.nodeid"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="pageid">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				选择页面：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="mycardForm.pageid" style="width:200px">
+						        <Option v-for="(item,index) in pageList" :value="item.pageid" :key="index" :label="item.pagename"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	    <!--myupload-->
+		<Modal
+	        v-model="setmyuploadmodal"
+	        title="设置上传"
+	        @on-ok="setmyuploadOk"
+	        @on-cancel="cancel">
+	        <Form ref="myuploadForm" :model="myuploadForm" :rules="myuploadRuleInline">
+	        	<Form-item prop="foldertype">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择类型：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="myuploadForm.foldertype" style="width:200px" v-on:on-change="foldertypechange">
+						        <Option v-for="(item,index) in foldertypes"  :label="item.type" :value="item.type" :key="index"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="folderkey"  v-show="foldertypeisflows">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				请选择模块：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				 <Select v-model="myuploadForm.folderkey" style="width:200px">
+						        <Option v-for="(item,index) in flowList" :label="item.name" :value="item.flowid" :key="index"></Option>
+						    </Select>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        	<Form-item prop="isdelbtn">
+	        		<Row>
+	        			<Col span="8" style="text-align: right;">
+	        				是否有删除按钮：
+	        			</Col>
+	        			<Col span="15" offset="1">
+	        				<Checkbox v-model="myuploadForm.isdelbtn">
+	        					<span v-show="!myuploadForm.isdelbtn">无删除按钮</span>
+	        					<span v-show="myuploadForm.isdelbtn">有删除按钮</span>
+	        				</Checkbox>
+	        			</Col>
+	        		</Row>
+	        	</Form-item>
+	        </Form>
+	    </Modal>
+	</section>
+</template>
+<script>
+	import '../css/common.css'
+	let importstart;
+	let allsks = []
+	let dom = null
+	let allFlows = null
+	let newTableData = []
+	let pagecontent = []
+	let transstr = ''
+	let dropinputindex = 0
+	let dropinputindexs = []
+	let inputDragdata = []
+	let dropindex=0
+	let dropindexs=[]
+	let dropStronglistindex=0
+
+	let rowElStart='<Row>'
+	let rowElEnd='</Row>'
+	let colElStart='<Col span="'
+	let colElStartEnd ='">'
+	let colElEnd='</Col>'
+	let componentsContent = [
+		{
+			name:"myButton",
+			start:'<myButton openid="',
+			openstart:'" showinmodal="',
+			openend:'" openname="',
+			modaltitle:'" showmodaltitle="',
+			end:'"></myButton>'
+		},
+		{
+			name:"myCard",
+			start:'<myCard importcardpageid="',
+			openstart:'" cardTitle="',
+			end:'"></myCard>'
+		},
+		{
+			name:"fileListWithSubmit",
+			start:'<fileListWithSubmit uploadfilesetkey="',
+			openstart:'" uploadfilesettype="',
+			content:'" isdelbtn="',
+			end:'" :parentid="parentid"></fileListWithSubmit>'
+		},
+		{
+			name:"myuPload",
+			start:'<myUpload uploadfilesetkey="',
+			openstart:'" uploadfilesettype="',
+			end:'" :parentid="parentid"></myUpload>'
+		},
+		{
+			name:"myFiles",
+			start:'<myFiles uploadfilesetkey="',
+			openstart:'" uploadfilesettype="',
+			openend:'" uploadfilesetdel="',
+			content:'" isdelbtn="',
+			end:'"></myFiles>'
+		},
+		{
+			name:"myPie",
+			start:'<PieChart queryCkId="',
+			openstart:'',
+			end:'"></PieChart>'
+		},
+		{
+			name:"myHisto",
+			start:'<HistoGram queryCkId="',
+			openstart:'',
+			end:'"></HistoGram>'
+		},
+		//dummyUI
+		{
+			name:"pieGram",
+			start:'<img src="',
+			openstart:'" alt="',
+			end:'"/>'
+		},
+		{
+			name:"histoGram",
+			start:'<img src="',
+			openstart:'" alt="',
+			end:'"/>'
+		},
+		{
+			name:"Approvestep",
+			start:'<Approvestep>',
+			openstart:'',
+			end:'</Approvestep>'
+		},
+		{
+			name:"Approvehistory",
+			start:'<Approvehistory>',
+			openstart:'',
+			end:'</Approvehistory>'
+		},
+		{
+			name:"myLabel",
+			start:'<myLabel queryCkId="',
+			openstart:'" querySkId="',
+			openend:'" fontStyle="',
+			end:'"></myLabel>'
+		},
+		{
+			name:"myList",
+			start:'<myList viewpage="',
+			openstart:'" editpage="',
+			openend:'" newset="',
+			showinmodal:'" modalshow="',
+			end:'"></myList>'
+		},
+		{
+			name:"myStrongList",
+			start:'<myStrongList viewpage="',
+			openstart:'" editpage="',
+			openend:'" newset="',
+			searchstart:'" searchsby="',
+			showinmodal:'" modalshow="',
+			end:'"></myStrongList>'
+		}
+	]
+	let inputContent = '<Form-item label="项目"><i-input v-model.trim="formInline.xiangmu" placeholder="请输入..."></i-input></Form-item>'
+	let dateContent = '<Form-item label="时间"><Date-picker type="date" placeholder="选择日期" format="yyyy年MM月dd日" v-model:value="formInline.shijian" ></Date-picker></Form-item>'
+	let selectContent = '<Form-item label="选择"><Select v-model="formInline.xuanze" placeholder="请选择"><Option v-for="(item,index) in items" v-model="item.id" :key="index" :label="item.value"></Option></Select></Form-item>'
+    let textareaContent = '<Form-item label="文本"><Input v-model.trim="formInline.wenben" type="textarea" :autosize="{minRows: 5,maxRows: 5}" placeholder="请输入..."></Input></Form-item>'
+	let specialtextareaContent = '<Form-item label="编辑器"><vue-editor v-model.trim="formInline.bianjiqi" :editorToolbar="customToolbar"></vue-editor></Form-item>'
+    export default {
+    	components:{},
+        data () {
+            return {
+            	inputinmodelindex:"",
+				inputincolindex:"",
+				inputcolindexindata:"",
+            	//upload
+            	setmyuploadmodal:false,
+            	foldertypeisflows:true,
+            	myuploadForm:{
+            		foldertype:'flows',
+            		folderkey:"",
+            		isdelbtn:false
+            	},
+            	myuploadRuleInline:{
+
+            	},
+            	foldertypes:[
+            		{type:"flows"},
+            		{
+            			type:"private"
+            		}
+            	],
+            	tabName:'form',
+            	notnormaltab:false,
+            	normaltablabel:"form",
+            	pageTabs:[
+	            	{
+	         			label:'页签1',
+	         			value:'页面1',
+	         			name:'tab1',
+	         			importPageid:''
+	         		}
+            	],
+            	pageTabsCount:1,
+            	//页面标签 modal
+            	showSetTabModal:false,
+            	setTabForm:{
+            		label:'',
+            		flowid:'',
+            		nodeid:'',
+            		importPageid:''
+            	},
+            	setTabRuleInline:{
+                	label:[{
+                		required:true,
+                		message:"请填写一个名称",
+                		trigger:'blur'
+                	}],
+                	importPageid:[{
+                		required:true,
+                		message:"请选择一个页面",
+                		trigger:'blur'
+                	}],
+                },
+            	//mycard start
+            	showsetmycardmodal:false,
+            	mycardForm:{
+            		flowid:'',
+            		nodeid:'',
+            		pageid:'',
+            		cardTitle:''
+            	},
+            	mycardRuleInline:{
+            		pageid:[{
+            			required:true,
+                		message:"请选择一个页面",
+                		trigger:'blur'
+            		}]
+            	},
+            	//mycard end
+            	//test start
+            	showsetstronglistmodal:false,
+            	setstronglistIndex:'',
+            	listIndex:'',
+            	stronglistIndex:'',
+            	setstronglistForm:{
+            		label:'',
+            		from:''
+            	},
+            	setstronglistRuleInline:{
+            		label:[{
+                		required:true,
+                		message:"请输入Label",
+                		trigger:'blur'
+                	}],
+                	from:[{
+                		required:true,
+                		message:"请选择一列",
+                		trigger:'blur'
+                	}]
+            	},
+            	listheads:[],
+                searchboxs:[
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]},
+                	{searchbox:[{label:'',from:''}]}
+                ],
+            	//test end
+            	//List
+            	tablePageList:[
+            		{
+            			pageid:'',
+            			filename:'',
+            			pagename:''
+            		}
+            	],
+            	tabledata:[],
+            	showonmodal:{
+            		viewinmodal:false,
+            		editinmodal:false,
+            		editbtnname:'',
+            		viewbtnname:'',
+            		iscountBtn:false,
+            		isfilterBtn:false,
+            		isshowflowdata:false,
+            		countTitle:'',
+            		countLabel:'',
+            		filterColumn:'',
+	            	countColumnStart:'', //主动列
+	            	countColumnEnd:'', //被动列
+	            	countColumnCalculation:'',
+	            	filterkey:"",
+	            	filtervaluebychoose:'',
+	            	filtervaluebyfill:'',
+	            	filterchoosesystemsk:false,
+	            	isdelbtn:false, //是否有删除
+	            	isapprovalstatus:false,
+	            	isonlyshowchilddata:false,
+	            	flowid:'',
+	            	nodeid:'',
+	            	//新增统计列
+	            	newcountcolumns:[]
+            	},
+            	isViewBtn:false,
+            	isEditBtn:false,
+            	viewpageid:'',
+            	editpageid:'',
+            	systemsks:[
+            		{
+            			key:"system-myself",
+            			value:"我自己"
+            		},
+            		{
+            			key:"system-myboss",
+            			value:"我的上级"
+            		}
+            	],
+            	countColumnData:[],
+            	newcountcolumndata:[],
+            	countColumnCalculations:[
+            		{
+            			key:'+',
+            			value:"加"
+            		},
+            		{
+            			key:'-',
+            			value:"减"
+            		},
+            		{
+            			key:'*',
+            			value:"乘"
+            		},
+            		{
+            			key:'/',
+            			value:"除"
+            		}
+            	],
+            	//新增统计列
+            	newcountcolumnmodal:false,
+            	newcountcolumnFormRuline:{},
+            	newcountcolumnForm:{
+	            		title:'',
+	            		key:'',
+	            		isuse:true,
+	            		from:'column',
+	            		own:{
+	            			flowid:"",
+	            			columns:[]
+	            		},
+	            		column:{
+	            			flowid:"",
+	            			columns:[]
+	            		},
+	            		relate:{
+	            			flowid:'',
+	            			childflowid:'',
+	            			maintagkey:"",
+	            			childtagkey:'',
+	            			columns:[]
+	            		}
+	            	},
+            	newcountcolumnfroms:[
+            		{
+            			key:'own',
+            			value:'源于本流程',
+            		},
+            		{
+            			key:'relate',
+            			value:'源于相关流程',
+            		},
+            		{
+            			key:'column',
+            			value:'源于列',
+            		},
+            	],
+            	allpages:[
+            		{
+            			pageid:'',
+            			value:''
+            		}
+            	],
+            	resourceName:["所有列","选择列"],
+            	//数据源
+            	resourceData: [
+            		{label:'',key:''}
+            	],
+                resourceKeys: [],
+                addTitleModal:false,
+                tableTitles: [
+                	{
+                		title:'',
+                		key:''
+                	}
+                ],
+            	querydata:{
+
+            	},
+            	//Label
+            	ckOrskId:'选术语',
+            	isCk:true,
+            	showSetLabelModal:false,
+            	setLabelForm:{
+            		ckid:'',
+            		skid:'',
+            		chooseSkorck:true,
+            		labeldesc:'',
+            		fontStyle:{
+            			fontSize:'',
+            			fontWeight:'',
+            			textAlign:''
+            		}
+            	},
+            	fontWeights:[
+            		{value:"normal"},
+            		{value:"bold"},
+            		{value:"100"},
+            		{value:"200"},
+            		{value:"300"},
+            		{value:"400"},
+            		{value:"500"},
+            		{value:"600"},
+            		{value:"700"},
+            		{value:"800"},
+            		{value:"900"},
+            	],
+            	textAligns:[
+            		{value:"left"},
+            		{value:"center"},
+            		{value:"right"},
+            	],
+            	setLabelRuleInline:{
+                	id:[{
+                		required:true,
+                		message:"请选择一个关键字",
+                		trigger:'blur'
+                	}]
+                },
+            	//chart
+            	showSetChartModal:false,
+            	setChartForm:{
+            		ckid:''
+            	},
+            	setChartRuleInline:{
+                	id:[{
+                		required:true,
+                		message:"请选择一个关键字",
+                		trigger:'blur'
+                	}]
+                },
+                //需要列出本流程所有复杂关键字
+                queryCkids:[],
+                querySkids:[],
+                //当前系统所有简单关键字
+                queryAllSkids:[],
+                flowidList:[],
+            	//dummyUI
+            	showDummyModal:false,
+            	setDummyForm:{
+            		dummyComponet:''
+            	},
+            	dummyComponents:[
+            		{
+            			src:'../../images/histogram.png',
+            			value:'柱状图',
+            			id:1,
+            			elType:'histoGram'
+            		},
+            		{
+            			src:'../../images/piegram.png',
+            			value:'饼图',
+            			id:2,
+            			elType:'pieGram'
+            		},
+            		{
+            			src:'',
+            			value:"Approvestep",
+            			id:3,
+            			elType:'Approvestep'
+            		},
+            		{
+            			src:'',
+            			id:4,
+            			value:"Approvehistory",
+            			elType:'Approvehistory'
+            		}
+            	],
+            	setDummyRuleInline:{
+                	id:[{
+                		required:true,
+                		message:"请选择一个控件类型",
+                		trigger:'blur'
+                	}]
+                },
+            	//设置按钮模态框
+            	showButtonModal:false,
+            	//设置按钮模态框model
+            	noareaIndex:'',
+            	colIndex:'',
+            	colButtonIndex:'',
+            	pageList:[
+            		{
+            			pageid:'',
+            			filename:'',
+            			pagename:''
+            		}
+            	],
+            	flowAndNodeAndpages:[],
+            	flowList:[
+            		{
+            			flowid:'',
+            			name:''
+            		}
+            	],
+            	nodeList:[
+            		{
+            			nodeid:'',
+            			name:''
+            		}
+            	],
+            	setButtonForm:{
+                	buttonName:'',
+                	openPageid:'',
+                	flowid:'',
+                	nodeid:'',
+                	showInModal:false,
+                	modaltitle:''
+                },
+                setButtonRuleInline:{
+                	buttonName:[{
+                		required:true,
+                		message:"请输入按钮的名称，比如打开XX页面",
+                		trigger:'blur'
+                	}],
+                	openPageid:[{
+                		required:true,
+                		message:"请选择一个需要打开的页面",
+                		trigger:'blur'
+                	}]
+                },
+                buttonGroup:[{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"},{value:"按钮"}],
+                setLabelModal: false,
+				setInputType: 'input',
+				setInputword: '',
+				setInputFlowid: '',
+				inputIsSelect: false,
+				inputIsChooseperson:false,
+				issetInput: false,
+				inputIsInput: true,
+				setInputValueFromSystem: true,
+				setInputValueFromkeyword:false,
+				setInputValueFromcount:false,
+				setinputfromcountmodal:false,
+				setInputValueFromWhere:"systemkeyword",
+				countinputform:{
+					countinputsks:[
+						{
+							sk:"",
+							computemode:"加",
+						}
+					]
+				},
+				nowallsks:[
+					{
+						value:"",
+						label:''
+					}
+				],
+				computemodes:[
+					{value:"",label:''},
+					{value:"加",label:'加'},
+					{value:"减",label:'减'}
+				],
+				//选择人员联动项
+				choosepersonset:{
+					key:'',
+					programs:[]
+				},
+				personinfos:[
+				  {
+				    key:'',
+				    label:'空'
+				  },
+				  {
+				    key:'loginId',
+				    label:'人员ID'
+				  },
+					{
+						key:'personName',
+						label:'姓名'
+					},{
+						key:'loginname',
+						label:'登录名'
+					},{
+						key:'userStatus',
+						label:'账户状态'
+					},{
+						key:'sex',
+						label:'性别'
+					},{
+						key:'personBirthday',
+						label:'出生日期'
+					},{
+						key:'officePhone',
+						label:'办公室电话'
+					},{
+						key:'telPhone',
+						label:'手机号'
+					},{
+						key:'email',
+						label:'电子邮箱'
+					},{
+						key:'departmentId',
+						label:'所属部门'
+					},{
+						key:'personStatus',
+						label:'人员状态'
+					},{
+						key:'positionId',
+						label:'岗位'
+					},{
+						key:'personType',
+						label:'人员类型'
+					},{
+						key:'workPlace',
+						label:'工作地'
+					},{
+						key:'inductionTime',
+						label:'入职时间'
+					},{
+						key:'personDesc',
+						label:'说明'
+					}
+				],
+				inputlinkages:[{ownflowkey:'',otherflowkey:''}],
+				keyofsetInputValue: '',
+				setvalue: '',
+				setindex: '',
+				formShow: true,
+				//表单基本设置
+				formbasesetmodal:false,
+				formbaseset:{
+					isshowchilddata:false
+				},
+				//智能提交表单
+				addautoformsetmodal:false,
+				autoformsetlistmodal:false,
+				autoformsetkeys:[
+					{
+						title:"条件",
+						key:"conditionname"
+					},
+					{
+						title:"动作",
+						key:"actionname"
+					},
+					{
+						title:"删除",
+						key:"delautoset",
+						width:100,
+						align:"center",
+						render:(h, params) => {
+		                    return h('div', [
+		                        h('Button', {
+		                            props: {
+		                                type: 'error',
+		                                size: 'small'
+		                            },
+		                            style: {
+		                                marginRight: '5px'
+		                            },
+		                            on: {
+		                                click: () => {
+		                                    this.deleteautoformset(params.index)
+		                                }
+		                            }
+		                        }, '删除')]
+	                        )
+	                   }
+					}
+				],
+				autoformsetdatas:[
+				],
+				newautoformset:{
+					conditionname:"",
+					actionname:"",
+					warningcontent:"",
+					warningkey:"",
+					conditions:[],
+					actions:[]
+				},
+				conditionstypes:[
+					{
+						name:"time",
+						value:"时间"
+					},
+					{
+						name:"who",
+						value:"人员"
+					}
+				],
+				keyofwho:[
+					{
+						name:'loginuser',
+						value:"人员"
+					}
+				],
+				keyoftime:[
+					{
+						name:'monthend',
+						value:"月底",
+					},
+					{
+						name:'month',
+						value:"月初",
+					}
+				],
+				calcs:[
+					{
+						name:">",
+						value:"大于"
+					},
+					{
+						name:"=",
+						value:"等于"
+					},
+					{
+						name:"<",
+						value:"小于"
+					}
+				],
+				disableactions:[
+					{
+						name:"hide",
+						value:"隐藏"
+					},
+					{
+						name:"show",
+						value:"显示"
+					},
+					{
+						name:"disabled",
+						value:"禁用"
+					}
+				],
+				formItem: {
+					input: '',
+				},
+                formInline:{
+                	items: []
+                },
+                dragInputs: {
+					items: [{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+						{
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						}, {
+							value: 'Input',
+							label: "项目"
+						},
+					]
+				},
+
+            }
+        },
+         methods: {
+         	//表单基本设置
+			openformbasesetmodal(){
+				//设置是否有子数据
+				this.formbasesetmodal = true
+			},
+			formbasesetOK(){
+
+			},
+         	//智能提交表单
+			autoformset(){
+				this.autoformsetlistmodal = true
+			},
+			addautoformset(){
+				this.nowallsks = []
+				for(var i=0,lid=inputDragdata.length;i<lid;i++){
+					var temp = i
+					if(inputDragdata[temp].child){
+						for(var j=0,lidc=inputDragdata[temp].child.length;j<lidc;j++){
+							var tmp = j
+							this.nowallsks.push({
+								label:inputDragdata[temp].child[tmp].elabel,
+								value:inputDragdata[temp].child[tmp].label
+							})
+						}
+						this.nowallsks.push({
+							label:"submitbtn",
+							value:"提交按钮"
+						},{
+							label:"backbtn",
+							value:"返回按钮"
+						})
+					}
+				}
+				this.addautoformsetmodal = true
+			},
+			autoformsetOk(){
+
+			},
+			addautoformsetOk(){
+				var newobjstr = JSON.stringify(this.newautoformset)
+				var newobj = JSON.parse(newobjstr)
+				newobj.conditionname = stripscript(newobj.conditionname)
+				newobj.warningkey = this.getPinyin(newobj.conditionname)
+				if(newobj.conditions.length == 0 || newobj.actions.length == 0){
+					return false;
+				}
+				this.autoformsetdatas.push(newobj)
+				this.newautoformset.conditions = []
+				this.newautoformset.actions = []
+				this.newautoformset.conditionname = ""
+				this.newautoformset.actionname = ""
+				this.newautoformset.warningcontent = ""
+			},
+			addautoformsetCancel(){
+				this.newautoformset.conditions = []
+				this.newautoformset.actions = []
+				this.newautoformset.conditionname = ""
+				this.newautoformset.warningcontent = ""
+			},
+			addnewautoformsetcondition(){
+				this.newautoformset.conditions.push({
+					type:"time",
+					key:"monthend",
+					value:"0",
+					calc:"="
+				})
+			},
+			removenewautoformsetcondition(){
+				this.newautoformset.conditions.pop()
+			},
+			addnewautoformsetaction(){
+				this.newautoformset.actions.push({
+					action:"hide",
+					type:"submitbtn",
+				})
+			},
+			removenewautoformsetaction(){
+				this.newautoformset.actions.pop()
+			},
+			deleteautoformset(index){
+				this.autoformsetdatas.splice(index,1)
+			},
+         	//文件上传
+          	setmyupload(event){
+          		this.setIndex(event)
+          		this.setmyuploadmodal = true
+          	},
+          	foldertypechange(){
+          		if(this.myuploadForm.foldertype == "flows"){
+          			this.foldertypeisflows = true
+          		}else if(this.myuploadForm.foldertype == "private"){
+          			this.foldertypeisflows = false
+          			this.myuploadForm.folderkey = ""
+          		}
+          	},
+          	setmyuploadOk(){
+          		var value = this.myuploadForm.foldertype
+				var open = this.myuploadForm.folderkey
+				var modaltitle = this.myuploadForm.isdelbtn
+				if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+					pagecontent[this.noAreaIndex ].value = value
+					pagecontent[this.noAreaIndex ].open = open
+					pagecontent[this.noAreaIndex ].modaltitle = modaltitle
+				}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+					pagecontent[this.colIndex].child[this.colButtonIndex].value = value
+					pagecontent[this.colIndex].child[this.colButtonIndex].open = open
+					pagecontent[this.colIndex].child[this.colButtonIndex].modaltitle = modaltitle //这里modaltitle是为了存储是否有删除按钮
+				}
+
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				this.myuploadForm.foldertype =''
+				this.myuploadForm.folderkey = ''
+				this.myuploadForm.isdelbtn = false
+          	},
+          	changetableflowid(id){
+          		let flowid = id
+         		this.nodeList = []
+         		this.tablePageList = []
+         		if(this.showonmodal.nodeid !== this.querydata.nodeid){
+         			this.showonmodal.nodeid = ""
+         		}
+         		for(let i=0,len=this.flowAndNodeAndpages.length;i<len;i++){
+     				if(this.flowAndNodeAndpages[i].id == flowid){
+     					this.nodeList = this.flowAndNodeAndpages[i].nodes
+     					this.pageList = []
+     				}
+     			}
+         		//同时获取 根据flowid 获取所有的表头
+         		this.resourceKeys = []
+         		this.resourceData = []
+         		this.$http.get(this.globalconfig.getsksapi,{
+					params:{
+    					flowid:flowid,
+    				}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					var gettedData = response.data.simplekeywords
+    					this.resourceData = []
+    					for(var i=0;i<gettedData.length;i++){
+    						this.resourceData.push({
+    							label:gettedData[i].name,
+    							key:gettedData[i].key
+    						})
+    					}
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+    			})
+
+          	},
+          	changetablenodeid(id){
+          		let nodeid = id
+          		this.tablePageList = []
+          		for(let i=0,len = this.nodeList.length;i<len;i++){
+         			if(this.nodeList[i].nodeid == nodeid){
+         				this.tablePageList = this.nodeList[i].pageList
+         			}
+         		}
+          	},
+         	flowidchange(id){
+         		let flowid = id
+         		this.nodeList = []
+     			this.pageList = []
+     			this.setButtonForm.nodeid = ""
+     			this.setButtonForm.openPageid = ""
+     			this.mycardForm.nodeid = ""
+     			this.mycardForm.pageid = ""
+     			for(let i=0,len=this.flowAndNodeAndpages.length;i<len;i++){
+     				if(this.flowAndNodeAndpages[i].id == flowid){
+     					this.nodeList = this.flowAndNodeAndpages[i].nodes
+     					this.pageList = []
+     				}
+     			}
+
+         	},
+         	nodeidchange(id){
+         		let nodeid = id
+         		this.pageList = []
+         		this.setButtonForm.openPageid = ""
+         		this.mycardForm.pageid = ""
+         		for(let i=0,len = this.nodeList.length;i<len;i++){
+         			if(this.nodeList[i].nodeid == nodeid){
+         				this.pageList = this.nodeList[i].pageList
+         			}
+         		}
+         	},
+         	//mycard start
+         	setmycard(event){
+         		this.setIndex(event)
+         		this.showsetmycardmodal = true
+         	},
+         	setmycardOk(){
+         		var value = this.mycardForm.cardTitle
+				var open = this.mycardForm.pageid
+				if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+					pagecontent[this.noAreaIndex ].value = value
+					pagecontent[this.noAreaIndex ].open = open
+				}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+					pagecontent[this.colIndex].child[this.colButtonIndex].value = value
+					pagecontent[this.colIndex].child[this.colButtonIndex].open = open
+				}
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				this.mycardForm.cardTitle =''
+				this.mycardForm.pageid = ''
+         	},
+         	//mycard end
+         	//test start
+         	setstronglistOk(){
+         		let n = parseInt(this.stronglistIndex)
+         		var index = this.setstronglistIndex
+         		this.searchboxs[n].searchbox[index].label = this.setstronglistForm.label
+         		this.searchboxs[n].searchbox[index].from = this.setstronglistForm.from
+         		//获取 data-index
+				if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+					pagecontent[this.noAreaIndex ].searchs[index].label = this.setstronglistForm.label
+					pagecontent[this.noAreaIndex ].searchs[index].from = this.setstronglistForm.from
+				}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+					pagecontent[this.colIndex].child[this.colButtonIndex].searchs[index].label = this.setstronglistForm.label
+					pagecontent[this.colIndex].child[this.colButtonIndex].searchs[index].from = this.setstronglistForm.from
+				}
+				this.setstronglistForm.label = ''
+				this.setstronglistForm.from = ''
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex = ''
+         		this.stronglistIndex = ""
+         	},
+         	setSearch(index){
+         		//打开设置的模态框
+         		let target = event.target
+         		if(/ivu-btn/.test(target.getAttribute('class'))){
+         			target = target
+         		}else{
+         			target = event.target.parentElement
+         		}
+         		target = target.parentElement.parentElement.parentElement.parentElement
+         		//
+         		let n =this.searchboxs.length - parseInt(target.getAttribute('list-index'))
+         		let m = target.getAttribute('data-index')
+         		let targetParent = target.parentElement
+         		if(/dropArea/.test(targetParent.getAttribute('class'))){
+         			this.noAreaIndex = m
+         		}else{
+         			this.colIndex = targetParent.parentElement.parentElement.getAttribute('data-index')
+					this.colButtonIndex = m
+         		}
+         		//给下拉框的model赋值
+         		if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+         			if(!pagecontent[this.noAreaIndex ].newSetting){
+         				this.$Message.error("请先设置表格的表头")
+         				return false;
+         			}else{
+	       				this.listheads = JSON.parse(pagecontent[this.noAreaIndex ].newSetting)
+	       				this.listheads.unshift({
+	       					title:"",
+	       					key:""
+	       				})
+         			}
+         		}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+         			if(!pagecontent[this.colIndex].child[this.colButtonIndex].newSetting){
+         				this.$Message.error("请先设置表格的表头")
+         				return false;
+         			}else{
+         				this.listheads = JSON.parse(pagecontent[this.colIndex].child[this.colButtonIndex].newSetting)
+         				this.listheads.unshift({
+	       					title:"",
+	       					key:""
+	       				})
+         			}
+         		}
+         		this.stronglistIndex  = n
+         		this.listIndex  = m
+         		this.setstronglistIndex = index
+         		this.showsetstronglistmodal = true
+         	},
+         	addSearch(){
+         		let n = this.getsearchIndex()
+         		let lss = this.searchboxs[n].searchbox.length
+         		if(lss >= 4) {
+         			this.$Message.error("不能添加超过四个搜索条件")
+         			return false;
+         		}
+				this.searchboxs[n].searchbox.push({
+					label:'',
+					from:''
+				})
+				let target = event.target
+         		if(/ivu-btn/.test(target.getAttribute('class'))){
+         			target = target
+         		}else{
+         			target = event.target.parentElement
+         		}
+         		target = target.parentElement.parentElement.parentElement
+         		let m = target.getAttribute('data-index')
+         		let targetParent = target.parentElement
+         		if(/dropArea/.test(targetParent.getAttribute('class'))){
+         			this.noAreaIndex = m
+         		}else{
+         			if(/colGrid/.test(targetParent.parentElement.getAttribute("class"))){
+         				this.colIndex = targetParent.parentElement.getAttribute('data-index')
+         			}else if(/colGrid/.test(targetParent.parentElement.parentElement.getAttribute("class"))){
+         				this.colIndex = targetParent.parentElement.parentElement.getAttribute('data-index')
+         			}
+					this.colButtonIndex = m
+         		}
+         		//添加一项
+         		if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+         			pagecontent[this.noAreaIndex].searchs.push({
+         				label:'',
+         				from:''
+         			})
+         		}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+         			pagecontent[this.colIndex].child[this.colButtonIndex].searchs.push({
+         				label:'',
+         				from:''
+         			})
+         		}
+         		this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex = ''
+         	},
+         	delSearch(){
+         		let n = this.getsearchIndex()
+         		let len = this.searchboxs[n].searchbox.length - 1
+         		this.searchboxs[n].searchbox.splice(len,1)
+         		//获取相应的 index
+         		//打开设置的模态框
+         		let target = event.target
+         		if(/ivu-btn/.test(target.getAttribute('class'))){
+         			target = target
+         		}else{
+         			target = event.target.parentElement
+         		}
+         		target = target.parentElement.parentElement.parentElement
+         		let m = target.getAttribute('data-index')
+         		let targetParent = target.parentElement
+         		if(/dropArea/.test(targetParent.getAttribute('class'))){
+         			this.noAreaIndex = m
+         		}else{
+         			if(/colGrid/.test(targetParent.parentElement.getAttribute("class"))){
+         				this.colIndex = targetParent.parentElement.getAttribute('data-index')
+         			}else if(/colGrid/.test(targetParent.parentElement.parentElement.getAttribute("class"))){
+         				this.colIndex = targetParent.parentElement.parentElement.getAttribute('data-index')
+         			}
+					this.colButtonIndex = m
+         		}
+         		//删除searchs 的最后一项
+         		if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+         			if(pagecontent[this.noAreaIndex].searchs.length ==0){
+         				this.$Message.error("数组为空")
+         				return false;
+         			}else{
+         				let l = pagecontent[this.noAreaIndex].length - 1
+	       				pagecontent[this.noAreaIndex].searchs.splice(l,1)
+         			}
+         		}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+         			if(pagecontent[this.colIndex].child[this.colButtonIndex].searchs.length == 0){
+         				this.$Message.error("数组为空")
+         				return false;
+         			}else{
+         				let t = pagecontent[this.colIndex].child[this.colButtonIndex].searchs.length -1
+         				pagecontent[this.colIndex].child[this.colButtonIndex].searchs.splice(t,1)
+         			}
+         		}
+         		this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex = ''
+         	},
+         	getsearchIndex(){
+         		let target = event.target
+         		if(/ivu-btn/.test(target.getAttribute('class'))){
+         			target = target
+         		}else{
+         			target = event.target.parentElement
+         		}
+         		let targetP = target.parentElement.parentElement.parentElement
+
+         		let n = this.searchboxs.length -  parseInt(targetP.getAttribute('list-index'))
+         		return n
+         	},
+            //test end
+         	//list
+         	setMylist(event){
+         		this.setIndex(event)
+         		this.addTitleModal = true
+         	},
+         	countTitleChange(){
+         		this.showonmodal.countLabel = this.getPinyin(this.showonmodal.countTitle)
+         	},
+         	//表头内容设置 提交
+            setTable(){
+            	var open = this.viewpageid
+            	var value = this.editpageid
+            	if(this.showonmodal.countTitle == ""){
+            		this.showonmodal.countTitle = "统计"
+            		this.showonmodal.countLabel = "tongji"
+            	}
+            	if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+					pagecontent[this.noAreaIndex ].value = value
+					pagecontent[this.noAreaIndex ].open = open
+					if(this.countColumnData.length != 0){
+						pagecontent[this.noAreaIndex ].newSetting = JSON.stringify(this.countColumnData)
+					}else{
+						pagecontent[this.noAreaIndex ].newSetting = "[]"
+					}
+					pagecontent[this.noAreaIndex ].opensk = JSON.stringify(this.showonmodal)
+				}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+					pagecontent[this.colIndex].child[this.colButtonIndex].value = value
+					pagecontent[this.colIndex].child[this.colButtonIndex].open = open
+					if(this.countColumnData.length != 0){
+						pagecontent[this.colIndex].child[this.colButtonIndex].newSetting = JSON.stringify(this.countColumnData)
+					}else{
+						pagecontent[this.colIndex].child[this.colButtonIndex].newSetting = "[]"
+					}
+					pagecontent[this.colIndex].child[this.colButtonIndex].opensk = JSON.stringify(this.showonmodal)
+				}
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex = ''
+				this.resourceKeys = []
+				newTableData = []
+				this.viewpageid =''
+				this.editpageid = ''
+				this.isViewBtn = false
+				this.isEditBtn = false
+				this.showonmodal.viewinmodal = false
+				this.showonmodal.editinmodal = false
+				this.showonmodal.iscountBtn = false
+				this.showonmodal.isdelbtn = false
+				this.showonmodal.editbtnname = ""
+				this.showonmodal.viewbtnname = ""
+				this.showonmodal.countColumnCalculation = ""
+				this.showonmodal.countColumnData = []
+				this.showonmodal.countColumnStart = ""
+				this.showonmodal.countColumnEnd = ""
+				this.showonmodal.countTitle = ""
+				this.showonmodal.countLabel = ""
+            },
+            cancelTable(){},
+            filterkeyisstatus(){
+            	var arr1 = [
+            		{
+            			key:"system-myself",
+            			value:"我自己"
+            		},
+            		{
+            			key:"system-myboss",
+            			value:"我的上级"
+            		}
+            	]
+            	var arr2 = [
+            		{
+            			key:"system-submit",
+            			value:"待审批"
+            		},
+            		{
+            			key:"system-approve",
+            			value:"审批中"
+            		},
+            		{
+            			key:"system-finished",
+            			value:"已通过"
+            		},
+            		{
+            			key:"system-deny",
+            			value:"已拒绝"
+            		}
+            	]
+            	if(this.showonmodal.filterkey == "approvalstatus"){
+            		this.systemsks = arr2
+            	}else{
+            		this.systemsks = arr1
+            	}
+            },
+            //表格设置以及编辑开始
+            titleRender (item) {
+                return item.label;
+            },
+            //发送变化时 记录 移动的key
+            titleChange (newTargetKeys, direction, moveKeys) {
+                this.resourceKeys = newTargetKeys;
+                let newTableDatas = []
+            	for (var i=0,l=this.resourceKeys.length;i<l;i++) {
+            		for(var j=0,l=this.resourceData.length;j<l;j++){
+            			if(this.resourceKeys[i] == this.resourceData[j].key){
+            				newTableDatas.push({
+            					title:this.resourceData[j].label,
+            					key:this.resourceData[j].key
+            				})
+            			}
+            		}
+            	}
+            	//同时设置统计数据列的源
+            	this.countColumnData = newTableDatas
+				if(this.showonmodal.isapprovalstatus){
+					this.countColumnData.push({
+					title:"审批状态",
+					key:'approvalstatus'
+					})
+				}
+            },
+			addapproval(){
+				if(this.showonmodal.isapprovalstatus){
+					this.countColumnData.push({
+					title:"审批状态",
+					key:'approvalstatus'
+					})
+				} else {
+					this.countColumnData.pop()
+				}
+			},
+            //新增统计列
+            addcountcolunm(){
+            	//同时设置flowid
+            	this.newcountcolumnForm.own.flowid = this.showonmodal.flowid
+            	this.newcountcolumnForm.column.flowid = this.showonmodal.flowid
+            	this.newcountcolumnForm.relate.flowid = this.showonmodal.flowid
+            	this.newcountcolumnmodal = true
+
+            },
+            newcountcolumnOk(){
+            	var formObjStr = JSON.stringify(this.newcountcolumnForm)
+            	var formObj=JSON.parse(formObjStr)
+            	formObj.title = stripscript(formObj.title)
+            	formObj.key = this.getPinyin(formObj.title)
+            	this.resourceData.push({
+            		key:formObj.key,
+            		label:formObj.title
+            	})
+            	this.showonmodal.newcountcolumns.push(formObj)
+            	this.newcountcolumnForm.title = ""
+            	this.newcountcolumnForm.key = ""
+            	this.newcountcolumnForm.relate.childflowid = ""
+            	this.newcountcolumnForm.relate.childtagkey = ""
+            	this.newcountcolumnForm.relate.maintagkey = ""
+            	this.newcountcolumnForm.own.columns = []
+            	this.newcountcolumnForm.relate.columns = []
+            	this.newcountcolumnForm.column.columns = []
+            },
+            addnewcountcolumnwithown(){
+            	this.newcountcolumnForm.own.columns.push({
+            		key:'',
+            		calculation:'+'
+            	})
+            },
+            removenewcountcolumnwithown(){
+            	this.newcountcolumnForm.own.columns.pop()
+            },
+            addnewcountcolumnwithcolumn(){
+            	this.newcountcolumnForm.column.columns.push({
+            		key:'',
+            		calculation:'+'
+            	})
+            },
+            removenewcountcolumnwithcolumn(){
+            	this.newcountcolumnForm.column.columns.pop()
+            },
+            addnewcountcolumnwithrelate(){
+            	this.newcountcolumnForm.relate.columns.push({
+            		key:'',
+            		calculation:'+'
+            	})
+            },
+            removenewcountcolumnwithrelate(){
+            	this.newcountcolumnForm.relate.columns.pop()
+            },
+            newcountchildflowidchange(){
+            	//动态的获取所有的key  newcountcolumndata
+            	var id = this.newcountcolumnForm.relate.childflowid
+            	if(id == ""){
+            		return false;
+            	}
+            	for(let i=0,lsks=allsks.length;i<lsks;i++){
+            		if(allsks[i].flowid == id){
+            			this.newcountcolumndata = allsks[i].sks
+            		}
+            	}
+            },
+            //tabs
+         	tabNameChange(name){
+         		//将tabs的value 赋值 以便设置tab的label的时候 做匹配
+         		this.tabName = name
+         		if(this.tabName != "form"){
+         			this.notnormaltab = true
+         		}else{
+         			this.notnormaltab = false
+         		}
+         	},
+         	setTabs(){
+         		//先获取点击的是某个页签
+         		//设置对应的页签label 和要导入的页面
+         		for(var i=0,l=this.pageTabs.length;i<l;i++){
+					if(this.tabName == this.pageTabs[i].name){
+						//
+						this.setTabsIndex = i
+						//模态框回显
+						this.setTabForm.label = this.pageTabs[i].label
+						this.setTabForm.importPageid = this.pageTabs[i].importPageid
+						//
+					}
+         		}
+         		this.showSetTabModal = true
+         	},
+            addTabs(){
+         		this.pageTabsCount ++
+         		this.pageTabs.push({
+         			label:'标签',
+         			value:'页面',
+         			name:'tab' + this.pageTabsCount
+         		})
+         	},
+         	setTabOk(){
+         		//获取 index
+         		//处理默认第一个页签
+         		if(this.tabName == "form"){
+					this.normaltablabel = this.setTabForm.label
+         		}else{
+         			var n = this.setTabsIndex
+         			this.pageTabs[n].label = this.setTabForm.label
+         			if(this.setTabForm.importPageid != ""){
+         				this.pageTabs[n].value = "您已经导入了" + this.setTabForm.label + "的页面"
+         			}
+         			this.pageTabs[n].importPageid = this.setTabForm.importPageid
+         		}
+         		this.setTabForm.label = ""
+         		this.setTabForm.flowid = ""
+         		this.setTabForm.nodeid = ""
+         		this.setTabForm.importPageid = ""
+
+         	},
+         	selectSkOrCk(){
+         		this.isCk = !this.isCk
+         		this.setLabelForm.ckid = ''
+         		this.setLabelForm.skid = ''
+         	},
+         	pageincol(coldom,arr,tp){    //tp 对应pagecontent 的 index
+				for(var j=0;j<arr.length;j++){
+					var tmp = j
+					//找到coldom 中对应的 col dom
+					var incoldom = coldom.children[0].children[tmp]
+					//找对应拖拽的组件
+					var indom = null
+					var settings = JSON.stringify(arr[tmp])
+					if(arr[tmp].elType == "myButton"){
+						indom = jQuery("#buttondrag").children()[jQuery("#buttondrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myLabel"){
+						indom = jQuery("#labeldrag").children()[jQuery("#labeldrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myCard"){
+						indom = jQuery("#carddrag").children()[jQuery("#carddrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myList"){
+						indom = jQuery("#listdrag").children()[jQuery("#listdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myStrongList"){
+						indom = jQuery("#stronglistdrag").children()[jQuery("#stronglistdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						dropStronglistindex ++
+						indom.setAttribute('list-index',dropStronglistindex)
+						//搜索条件回显
+						var ret = []
+						ret.push({label:'',from:''})
+						pagecontent[tp].child[tmp].searchs = ret
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "GanttGram"){
+						//dummyUIdrag
+						indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "PieGram"){
+						indom = jQuery("#piedrag").children()[jQuery("#piedrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "HistoGram"){
+						indom = jQuery("#histodrag").children()[jQuery("#histodrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myFiles"){
+						//dummyUIdrag
+						indom = jQuery("#onlyfilesdrag").children()[jQuery("#onlyfilesdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myuPload"){
+
+						indom = jQuery("#onlyuploaddrag").children()[jQuery("#onlyuploaddrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "fileListWithSubmit"){
+
+						indom = jQuery("#uploadfiledrag").children()[jQuery("#uploadfiledrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myPie"){
+						//dummyUIdrag
+						indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myHisto"){
+						//dummyUIdrag
+						indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "myDummy"){
+						//dummyUIdrag
+						indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "Approvestep"){
+						indom = jQuery("#Approvestepdrag").children()[jQuery("#Approvestepdrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}else if(arr[tmp].elType == "Approvehistory"){
+						indom = jQuery("#Approvehistorydrag").children()[jQuery("#Approvehistorydrag").children().length-1]
+						indom.setAttribute('settings',settings)
+						indom.setAttribute('data-index',tmp)
+						incoldom.appendChild(indom)
+					}
+				}
+			},
+			pageoutcol(arr,temp){
+				var huixianout = jQuery('.dropArea')[0]
+				var indom = null
+				var settings = JSON.stringify(arr[temp])
+				if(arr[temp].elType == "myButton"){
+					indom = jQuery("#buttondrag").children()[jQuery("#buttondrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myLabel"){
+					indom = jQuery("#labeldrag").children()[jQuery("#labeldrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myCard"){
+					indom = jQuery("#carddrag").children()[jQuery("#carddrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myList"){
+					indom = jQuery("#listdrag").children()[jQuery("#listdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myStrongList"){
+					indom = jQuery("#stronglistdrag").children()[jQuery("#stronglistdrag").children().length-1]
+					dropStronglistindex ++
+					indom.setAttribute('list-index',dropStronglistindex)
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+					var ret = []
+						ret.push({label:'',from:''})
+						pagecontent[temp].searchs = ret
+				}else if(arr[temp].elType == "GanttGram"){
+					indom = document.createTextNode(" ")
+				}else if(arr[temp].elType == "pieGram"){
+					indom = jQuery("#piedrag").children()[jQuery("#piedrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "HistoGram"){
+					indom = jQuery("#histodrag").children()[jQuery("#histodrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myuPload"){
+					indom = jQuery("#onlyuploaddrag").children()[jQuery("#onlyuploaddrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myFiles"){
+					indom = jQuery("#onlyfilesdrag").children()[jQuery("#onlyfilesdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "fileListWithSubmit"){
+					indom = jQuery("#uploadfiledrag").children()[jQuery("#uploadfiledrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myPie"){
+					//DummyUI
+					indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myHisto"){
+					//DummyUI
+					indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "myDummy"){
+					//DummyUI
+					indom = jQuery("#dummyUIdrag").children()[jQuery("#dummyUIdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "Approvestep"){
+					//DummyUI
+					indom = jQuery("#Approvestepdrag").children()[jQuery("#Approvestepdrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}else if(arr[temp].elType == "Approvehistory"){
+					//DummyUI
+					indom = jQuery("#Approvehistorydrag").children()[jQuery("#Approvehistorydrag").children().length-1]
+					indom.setAttribute('settings',settings)
+					indom.setAttribute('data-index',temp)
+				}
+				if(indom != null){
+					huixianout.append(indom)
+				}
+			},
+         	handleQueryData:function(){
+				dropindexs = []
+				dropStronglistindex = 0
+         		pagecontent = []
+         		dropindex = 0
+
+         		dropinputindexs= []
+				inputDragdata = []
+				dropinputindex = 0
+
+         		//获取路由携带的参数
+         		if(this.$router.currentRoute.query.flowid != undefined){
+        			this.querydata = this.$router.currentRoute.query
+        		}
+         		if(this.querydata.items && this.querydata.items != "null"){
+         			this.formInline.items  = JSON.parse(this.querydata.items)
+         		}
+         		//autoformsetdatas
+				//智能提交表单回显
+				this.$http.get(this.globalconfig.getautoformsetapi, {
+						params: {
+							pageid: this.querydata.pageid,
+						}
+					}, {
+						emulateJSON: true
+					})
+					.then((response) => {
+						if(response.body.error) {
+							this.$Message.error(response.body.error)
+						} else {
+							var autoformsetdatas = response.data.autoformset.autoformsetdatas
+							this.autoformsetdatas = JSON.parse(autoformsetdatas)
+							var end = new Date().getTime()
+							var runtime = end - start
+							console.log("智能提交表单回显"+ runtime/1000 +"s" )
+						}
+					}, (response) => {
+						this.$Message.error('失败');
+					})
+         		//回显UI start
+         		this.$http.get(this.globalconfig.getonepageapi,{
+					params:{
+    					pageid:this.querydata.pageid,
+    				}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					var page = response.data.page
+    					if(page.isshowchilddata){
+							var isshowchilddata = page.isshowchilddata
+							if(isshowchilddata == "true"){
+								this.formbaseset.isshowchilddata = true
+							}else{
+								this.formbaseset.isshowchilddata = false
+							}
+						}
+    					var huixian = jQuery('.dropArea')[0]
+    					if(page.pageui && page.pageui !=""){
+    						var tabsstr = page.tabsstr
+    						//页签回显
+    						this.pageTabs = JSON.parse(tabsstr)
+    						var pageui = JSON.parse(page.pageui)
+    						var dropindexsstr = []
+    						if(page.dropindexsstr && page.pageui !=""){
+    							dropindexsstr = JSON.parse(page.dropindexsstr)
+    						}
+    						dropindexs = dropindexsstr
+    						pagecontent = pageui
+    						dropindex = dropindexsstr.length
+    						for(var i=0;i<pageui.length;i++){
+    							//先判断 是否有外围布局
+    							var temp = i
+    							if(dropindexsstr[temp] == -1 || dropindexsstr[temp] == undefined){
+    								continue
+    							}
+    							if(pageui[temp].isCol == true){
+    								//在判断是几列布局
+    								var colNum = pageui[temp].colNum
+    								//找到所需dom
+    								var coldom = null
+    								if(colNum == 1){
+    									coldom = jQuery("#col1drag").children()[jQuery("#col1drag").children().length-1] //div.colgrid
+    									coldom.setAttribute('data-index',temp)
+    									//循环child
+										this.pageincol(coldom,pageui[temp].child,temp)
+
+    								}else if(colNum == 2){
+    									coldom = jQuery("#col2drag").children()[jQuery("#col2drag").children().length-1] //div.colgrid
+    									coldom.setAttribute('data-index',temp)
+    									//循环child
+										this.pageincol(coldom,pageui[temp].child,temp)
+
+    								}else if(colNum == 3){
+    									coldom = jQuery("#col3drag").children()[jQuery("#col3drag").children().length-1]
+    									coldom.setAttribute('data-index',temp)
+    									this.pageincol(coldom,pageui[temp].child,temp)
+    								}else if(colNum == 4){
+    									coldom = jQuery("#col4drag").children()[jQuery("#col4drag").children().length-1]
+    									coldom.setAttribute('data-index',temp)
+    									this.pageincol(coldom,pageui[temp].child,temp)
+    								}else if(colNum == 6){
+    									coldom = jQuery("#col6drag").children()[jQuery("#col6drag").children().length-1]
+    									coldom.setAttribute('data-index',temp)
+    									this.pageincol(coldom,pageui[temp].child,temp)
+    								}
+    								if(coldom !=null){
+    									huixian.append(coldom)
+    								}
+
+    							}else if(pageui[temp].isCol == false){
+    								//根据eltype 回显
+    								this.pageoutcol(pageui,temp)
+    							}
+
+    						}
+    					}
+    					if(page.inputsui){
+							var inputsui = JSON.parse(page.inputsui)
+							var dropinputindexsstr = JSON.parse(page.dropinputindexsstr)
+							var inputdropdom = jQuery("#dropinputarea")
+							inputDragdata = inputsui
+							dropinputindexs = dropinputindexsstr
+							dropinputindex = dropinputindexsstr.length
+							var draginputindexback = 0
+							for(var j=0,lj = dropinputindexsstr.length;j<lj;j++){
+								var tmp = j
+								if(dropinputindexsstr[tmp] != -1){
+									var colnum = inputsui[tmp].colNum
+									var coldom = null
+									var  rowdomid = "#col"+colnum+"drag"
+									var rowdom = jQuery(rowdomid).children()[jQuery(rowdomid).children().length - 1]
+									rowdom.setAttribute("data-index",tmp)
+									var inputchild = inputsui[tmp].child
+									for(var h=0,lh=inputchild.length;h<lh;h++){
+										var temp = h
+										if(inputchild[temp].live == 1 ){
+												if(inputchild[temp].index != undefined && inputchild[temp].elabel != ""){
+													var inputdom = jQuery("#inputdrag").children()[0]
+													inputdom.setAttribute("data-index",temp)
+													var q = inputchild[temp].index
+													rowdom.children[0].children[q].append(inputdom)
+													this.dragInputs.items[draginputindexback].label = inputchild[temp].label
+													var val = "文本输入框"
+													if(inputchild[temp].eltype == "date"){
+														val = "时间选择框"
+													}else if(inputchild[temp].eltype == "select"){
+														val = "下拉框"
+													}else if(inputchild[temp].eltype == "textarea"){
+														val = "Textarea"
+													}else if(inputchild[temp].eltype == "specialtextarea"){
+														val = "富文本编辑器"
+													}else if(inputchild[temp].eltype == "chooseperson"){
+														val = "人员选择"
+													}
+													this.dragInputs.items[draginputindexback].value = val
+													draginputindexback ++
+												}
+											}
+									}
+									inputdropdom.append(rowdom)
+								}
+							}
+						}
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+    			})
+         		//回显UI end
+
+//       		 this.$http.get(this.globalconfig.getsksapi,{
+//					params:{
+//  					flowid:this.querydata.flowid,
+//  				}
+//				},{emulateJSON:true})
+//				.then((response)=>{
+//					if(response.body.error){
+//  					this.$Message.error(response.body.error)
+//  				}else{
+//  					var gettedData = response.data.simplekeywords
+//  					this.resourceData = []
+//  					for(var i=0;i<gettedData.length;i++){
+//  						this.resourceData.push({
+//  							label:gettedData[i].name,
+//  							key:gettedData[i].key
+//  						})
+//  					}
+//  				}
+//				},(response)=>{
+//  				this.$Message.success('成功');
+//  			})
+//       		//给设置列表选择页面的模态框里的下拉框设置参数
+//       		this.$http.get(this.globalconfig.getpagesapi,{
+//					params:{
+//					    flowid:this.querydata.flowid,
+//          			nodeid:this.querydata.nodeid
+//  				}
+//				},{emulateJSON:true})
+//				.then((response)=>{
+//					if(response.body.error){
+//  					this.$Message.error(response.body.error)
+//  				}else{
+//  					this.$Message.success('成功');
+//  					var result = response.data.finn
+//  					this.tablePageList = []
+//  					for(var i=0;i<result.length;i++){
+//  						this.tablePageList.push({
+//  							pageid:result[i].pageid,
+//  							filename:result[i].filename
+//  						})
+//  					}
+//  				}
+//				},(response)=>{
+//  				this.$Message.success('成功');
+//  			})
+
+				///可以打开所有页面start
+				//获取所有flow 和nodes
+				this.$http.get(this.globalconfig.listflow,{
+					params:{}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					this.$Message.success('成功');
+    					let flows = response.data.flows
+    					this.flowAndNodeAndpages = flows
+    					this.flowList = []
+    					for(let i=0,len=flows.length;i<len;i++){
+    						this.flowList.push({
+    							flowid:flows[i].id,
+    							name:flows[i].name,
+    							sks:[]
+    						})
+    					}
+
+    					//获取所有流程的简单关键字
+		         		this.$http.get(this.globalconfig.getallsksapi,{
+							params:{}
+						},{emulateJSON:true})
+						.then((response)=>{
+							if(response.body.error){
+		    					this.$Message.error(response.body.error)
+		    				}else{
+		    					var gettedData = response.data.sks
+		    					//配合所有的flow
+		    					var allflows =  this.flowList
+		    					for(let z=0,lfl=allflows.length;z<lfl;z++){
+		    						var ztemp = z
+		    						for(let x=0,lsks=gettedData.length;x<lsks;x++){
+		    							var xtemp = x
+			    						if(allflows[ztemp].flowid === gettedData[xtemp].flowid){
+			    							allflows[ztemp].sks.push(gettedData[xtemp])
+			    						}
+			    					}
+		    					}
+			    				allsks = allflows
+		    				}
+						},(response)=>{
+		    				this.$Message.success('成功');
+		    			})
+    					//获取所有页面
+						this.$http.get(this.globalconfig.getallpagesapi,{
+							params:{}
+						},{emulateJSON:true})
+						.then((response)=>{
+							if(response.body.error){
+		    					this.$Message.error(response.body.error)
+		    				}else{
+		    					let pages = response.data.pages
+								for(let j=0,l=this.flowAndNodeAndpages.length;j<l;j++){
+									if(this.flowAndNodeAndpages[j].nodes){
+										for(let m=0,lm=this.flowAndNodeAndpages[j].nodes.length;m<lm;m++){
+											this.flowAndNodeAndpages[j].nodes[m].pageList = []
+										}
+									}
+			    					for(let i=0,len=pages.length;i<len;i++){
+		    							if(pages[i].flowid == this.flowAndNodeAndpages[j].id){
+		    								if(this.flowAndNodeAndpages[j].nodes){
+		    									for(let k=0,lk=this.flowAndNodeAndpages[j].nodes.length;k<lk;k++){
+		    										if(pages[i].nodeid == this.flowAndNodeAndpages[j].nodes[k].nodeid){
+		    											this.flowAndNodeAndpages[j].nodes[k].pageList.push({
+		    												pageid:pages[i].id,
+		    												filename:pages[i].filename,
+		    												pagename:pages[i].pagename
+		    											})
+		    										}
+		    									}
+		    								}
+		    							}
+		    						}
+		    					}
+								//列表设置默认值
+								this.showonmodal.flowid = this.querydata.flowid
+								this.showonmodal.nodeid = this.querydata.nodeid
+		    				}
+						},(response)=>{
+		    				this.$Message.success('成功');
+		    			})
+						//可以打开所有页面end
+    					//获取当前系统所有简单关键字 getallsksapi
+						this.$http.get(this.globalconfig.getallsksapi,{
+							params:{
+		    				}
+						},{emulateJSON:true})
+						.then((response)=>{
+							if(response.body.error){
+		    					this.$Message.error(response.body.error)
+		    				}else{
+		    					var result = response.data.sks
+		    					var queryAllSkids = []
+		    					for(let i=0;i<result.length;i++){
+		    						queryAllSkids.push(
+		    							{
+		    								id:result[i].id,
+		    								value:result[i].name,
+		    								key:result[i].key,
+		    								flowid:result[i].flowid
+		    							}
+									)
+		    					}
+		    					//整理数据给提交表单设置使用
+		    					for(let j=0,lf=this.flowList.length;j<lf;j++){
+		    						for(let m=0,lq=queryAllSkids.length;m<lq;m++){
+		    							if(this.flowList[j].flowid == queryAllSkids[m].flowid){
+		    								this.flowList[j].sks.push({
+		    									id:queryAllSkids[m].id,
+		    									value:queryAllSkids[m].value,
+		    									key:queryAllSkids[m].key,
+		    									flowid:queryAllSkids[m].flowid
+		    								})
+		    							}
+		    						}
+		    					}
+		    				}
+						},(response)=>{
+		    				this.$Message.success('成功');
+		    			})
+
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+    			})
+
+				//获取所有复杂关键字
+				this.$http.get(this.globalconfig.listcksapi,{
+					params:{
+					    flowid:this.querydata.flowid,
+            			nodeid:this.querydata.nodeid
+    				}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					this.$Message.success('成功');
+    					var result = response.data.cks
+    					this.queryCkids = []
+    					for(var i=0;i<result.length;i++){
+    						this.queryCkids.push(
+    							{
+    								id:result[i].id,
+    								value:result[i].name
+    							}
+							)
+    					}
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+    			})
+				//获取本流程所有简单关键字
+				this.$http.get(this.globalconfig.getsksapi,{
+					params:{
+					    flowid:this.querydata.flowid
+    				}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					this.$Message.success('成功');
+    					var result = response.data.simplekeywords
+    					this.querySkids = []
+    					for(var i=0;i<result.length;i++){
+    						this.querySkids.push(
+    							{
+    								id:result[i].id,
+    								value:result[i].name
+    							}
+							)
+    					}
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+    			})
+         	},
+         	drag:function(event){
+         		dom = event.target
+
+         	},
+         	dragClone:function(event){
+         		dom = event.target
+         	},
+			drop: function(event) {
+
+				event.preventDefault();
+				var dragDomClass = dom.getAttribute('class')
+				var dropDomClass = event.target.getAttribute('class')
+
+				if(/colAbleDrop/.test(dropDomClass)){
+					if(event.target.childElementCount > 0){
+						this.$Message.error('现在暂时只支持布局内放置一个组件');
+						return false
+					}
+				}
+
+				if(/dragInputForm/.test(dragDomClass) && /dropInputArea/.test(event.target.parentElement.parentElement.parentElement.getAttribute("class"))) {
+					if(/colAbleDrop/.test(dropDomClass)) {
+						var parent = event.target.parentElement.parentElement
+						var parentPos = this.getElAbsolute(parent)
+						var parentPosLeft = parentPos.left
+						var parentPosWidth = parentPos.width
+						var dropPos = this.zmousePosition(event).x
+						//获取要操作的布局的索引值  该索引值对应数组的的对应索引值
+						var corprationIndex = parent.getAttribute('data-index')
+						//判断布局组件是1 2 3 4 6 列的布局
+						if(/col1/.test(dropDomClass)) {
+							dom.setAttribute('data-index', '0')
+						} else if(/col2/.test(dropDomClass)) {
+							if(dropPos < parentPosLeft + parentPosWidth / 2) {
+								dom.setAttribute('data-index', '0')
+							} else {
+								dom.setAttribute('data-index', '1')
+							}
+						} else if(/col3/.test(dropDomClass)) {
+							if(dropPos < parentPosLeft + parentPosWidth / 3) {
+								dom.setAttribute('data-index', '0')
+							} else if(dropPos < parentPosLeft + 2 * parentPosWidth / 3) {
+								dom.setAttribute('data-index', '1')
+							} else {
+								dom.setAttribute('data-index', '2')
+							}
+
+						} else if(/col4/.test(dropDomClass)) {
+							if(dropPos < parentPosLeft + parentPosWidth / 4) {
+								dom.setAttribute('data-index', '0')
+							} else if(dropPos < parentPosLeft + 2 * parentPosWidth / 4) {
+								dom.setAttribute('data-index', '1')
+							} else if(dropPos < parentPosLeft + 3 * parentPosWidth / 4) {
+								dom.setAttribute('data-index', '2')
+							} else {
+								dom.setAttribute('data-index', '3')
+							}
+						} else if(/col6/.test(dropDomClass)) {
+							if(dropPos < parentPosLeft + parentPosWidth / 6) {
+								dom.setAttribute('data-index', '0')
+							} else if(dropPos < parentPosLeft + 2 * parentPosWidth / 6) {
+								dom.setAttribute('data-index', '1')
+							} else if(dropPos < parentPosLeft + 3 * parentPosWidth / 6) {
+								dom.setAttribute('data-index', '2')
+							} else if(dropPos < parentPosLeft + 4 * parentPosWidth / 6) {
+								dom.setAttribute('data-index', '3')
+							} else if(dropPos < parentPosLeft + 5 * parentPosWidth / 6) {
+								dom.setAttribute('data-index', '4')
+							} else {
+								dom.setAttribute('data-index', '5')
+							}
+						}
+						event.target.appendChild(dom)
+						return false;
+					}
+
+				}
+				//获取被放置区域的xy
+				//获取放置时鼠标的XY  event.clientX event.clientY
+				//获取被拖拽元素的类型
+				//同时将对应的数据存到一个中间数组中<mybutton openid=""></mybutton>
+				if(dragDomClass == dropDomClass || /moni/.test(dropDomClass)){
+					return false;
+				}
+				var elType=""
+				//先判断放置的是什么
+				if(/myButton/.test(dragDomClass)){
+					elType = "myButton"
+				}else if(/myLabel/.test(dragDomClass)){
+					elType = "myLabel"
+				}else if(/myCard/.test(dragDomClass)){
+					elType = "myCard"
+				}else if(/myList/.test(dragDomClass)){
+					elType = "myList"
+				}else if(/mystrongList/.test(dragDomClass)){
+					elType = "myStrongList"
+					dropStronglistindex ++
+					dom.setAttribute('list-index',dropStronglistindex)
+				}else if(/GanttGram/.test(dragDomClass)){
+					elType = "GanttGram"
+				}else if(/PieGram/.test(dragDomClass)){
+					elType = "PieGram"
+				}else if(/HisToGram/.test(dragDomClass)){
+					elType = "HisToGram"
+				}else if(/myFiles/.test(dragDomClass)){
+					elType = "myFiles"
+				}else if(/myuPload/.test(dragDomClass)){
+					elType = "myuPload"
+				}else if(/fileListWithSubmit/.test(dragDomClass)){
+					elType = "fileListWithSubmit"
+				}else if(/myPie/.test(dragDomClass)){
+					elType = "myPie"
+				}else if(/myHisto/.test(dragDomClass)){
+					elType = "myHisto"
+				}else if(/dummyUI/.test(dragDomClass)){
+					elType = "myDummy"
+				}else if(/Approvehistory/.test(dragDomClass)){
+					elType = "Approvehistory"
+				}else if(/Approvestep/.test(dragDomClass)){
+					elType = "Approvestep"
+				}
+				if(/colGrid/.test(dragDomClass)){
+					//拖拽的是横向布局
+					if(/dropInputArea/.test(dropDomClass)) {
+						event.target.appendChild(dom)
+						dom.setAttribute("draggable", false)
+						dom.setAttribute('data-index', dropinputindex)
+						dom.setAttribute("data-content", "input")
+						dropinputindexs.push(dropinputindex)
+						dropinputindex++
+						if(/col1/.test(dragDomClass)) {
+							inputDragdata.push({
+								dragComponent: 'input',
+								colNum: 1,
+								child: [{
+									eltype: "",
+									label: "",
+									elabel: '',
+									live:1,
+									value: '',
+								}]
+							})
+						} else if(/col2/.test(dragDomClass)) {
+							inputDragdata.push({
+								dragComponent: 'input',
+								colNum: 2,
+								child: [{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									}
+								]
+							})
+						} else if(/col3/.test(dragDomClass)) {
+							inputDragdata.push({
+								dragComponent: 'input',
+								colNum: 3,
+								child: [{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									}
+								]
+							})
+						} else if(/col4/.test(dragDomClass)) {
+							inputDragdata.push({
+								dragComponent: 'input',
+								colNum: 4,
+								child: [{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									}
+								]
+							})
+						} else if(/col6/.test(dragDomClass)) {
+							inputDragdata.push({
+								dragComponent: 'input',
+								colNum: 6,
+								child: [{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									},
+									{
+										eltype: "",
+										label: "",
+										elabel: '',
+										live:1,
+										value: '',
+									}
+								]
+							})
+						}
+					}else if(/dropArea/.test(dropDomClass)){
+						event.target.appendChild(dom)
+						dom.setAttribute("draggable",false)
+						dom.setAttribute('data-index',dropindex)
+						dropindexs.push(dropindex)
+						dropindex++
+						//判断拖拽的是哪一种横向布局
+						if(/col1/.test(dragDomClass)){
+							pagecontent.push(
+								{
+									isCol:true,
+									colNum:1,
+									child:[
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+									]
+								}
+							)
+						}else if(/col2/.test(dragDomClass)){
+							pagecontent.push(
+								{
+									isCol:true,
+									colNum:2,
+									child:[
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										}
+									]
+								}
+							)
+						}else if(/col3/.test(dragDomClass)){
+							pagecontent.push(
+								{
+									isCol:true,
+									colNum:3,
+									child:[
+										{
+											elType:'',
+											value:"",
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											open:'',
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											open:'',
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											open:'',
+											modaltitle:'',
+											openSk:''
+										}
+									]
+								}
+							)
+						}else if(/col4/.test(dragDomClass)){
+							pagecontent.push(
+								{
+									isCol:true,
+									colNum:4,
+									child:[
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										}
+									]
+								}
+							)
+						}else if(/col6/.test(dragDomClass)){
+							pagecontent.push(
+								{
+									isCol:true,
+									colNum:6,
+									child:[
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										},
+										{
+											elType:'',
+											value:"",
+											open:'',
+											searchs:[
+												{
+													label:'',
+													from:''
+												}
+											],
+											modaltitle:'',
+											openSk:''
+										}
+									]
+								}
+							)
+						}
+					}else{
+						//布局里面不能放置布局
+						return false;
+
+					}
+				}else{
+					//放置组件
+					if(dropDomClass == "dropArea" && !(/dragInputForm/.test(dragDomClass))) {
+						event.target.appendChild(dom)
+						dom.setAttribute("draggable",false)
+						dom.setAttribute('data-index',dropindex)
+						dropindexs.push(dropindex)
+						pagecontent.push({
+							isCol:false,
+							elType:elType,
+							value:"",
+							open:'',
+							searchs:[
+										{
+											label:'',
+											from:''
+										}
+									],
+							modaltitle:'',
+							openSk:''
+						})
+						dropindex++
+					} else if(/ivu-col/.test(dropDomClass) && !(/dragInputForm/.test(dragDomClass)) && !(/dropInputArea/.test(event.target.parentElement.parentElement.parentElement.getAttribute("class")))) {
+						event.target.appendChild(dom)
+						dom.setAttribute("draggable",false)
+						//判断放置位置，来修改对应的数组中的数据
+						var parent = event.target.parentElement.parentElement
+						var parentPos = this.getElAbsolute(parent)
+						var parentPosLeft = parentPos.left
+						var parentPosWidth = parentPos.width
+						var dropPos = this.zmousePosition(event).x
+						//获取要操作的布局的索引值  该索引值对应数组的的对应索引值
+						var corprationIndex = parent.getAttribute('data-index')
+						//判断布局组件是2 3 4 6 列的布局
+						if(/col1/.test(dropDomClass)){
+							dom.setAttribute('data-index','0')
+							pagecontent[corprationIndex].child[0].elType = elType
+						}else if(/col2/.test(dropDomClass)){
+							if(dropPos < parentPosLeft + parentPosWidth/2){
+								dom.setAttribute('data-index','0')
+								pagecontent[corprationIndex].child[0].elType = elType
+							}else{
+								dom.setAttribute('data-index','1')
+								pagecontent[corprationIndex].child[1].elType = elType
+							}
+						}else if(/col3/.test(dropDomClass)){
+							if(dropPos < parentPosLeft + parentPosWidth/3){
+								dom.setAttribute('data-index','0')
+								pagecontent[corprationIndex].child[0].elType = elType
+							}else if(dropPos < parentPosLeft + 2*parentPosWidth/3){
+								dom.setAttribute('data-index','1')
+								pagecontent[corprationIndex].child[1].elType = elType
+							}else{
+								dom.setAttribute('data-index','2')
+								pagecontent[corprationIndex].child[2].elType = elType
+							}
+
+						}else if(/col4/.test(dropDomClass)){
+							if(dropPos < parentPosLeft + parentPosWidth/4){
+								dom.setAttribute('data-index','0')
+								pagecontent[corprationIndex].child[0].elType = elType
+							}else if(dropPos < parentPosLeft + 2*parentPosWidth/4){
+								dom.setAttribute('data-index','1')
+								pagecontent[corprationIndex].child[1].elType = elType
+							}else if(dropPos < parentPosLeft + 3*parentPosWidth/4){
+								dom.setAttribute('data-index','2')
+								pagecontent[corprationIndex].child[2].elType = elType
+							}else{
+								dom.setAttribute('data-index','3')
+								pagecontent[corprationIndex].child[3].elType = elType
+							}
+						}else if(/col6/.test(dropDomClass)){
+							if(dropPos < parentPosLeft + parentPosWidth/6){
+								dom.setAttribute('data-index','0')
+								pagecontent[corprationIndex].child[0].elType = elType
+							}else if(dropPos < parentPosLeft + 2*parentPosWidth/6){
+								dom.setAttribute('data-index','1')
+								pagecontent[corprationIndex].child[1].elType = elType
+							}else if(dropPos < parentPosLeft + 3*parentPosWidth/6){
+								dom.setAttribute('data-index','2')
+								pagecontent[corprationIndex].child[2].elType = elType
+							}else if(dropPos < parentPosLeft + 4*parentPosWidth/6){
+								dom.setAttribute('data-index','3')
+								pagecontent[corprationIndex].child[3].elType = elType
+							}else if(dropPos < parentPosLeft + 5*parentPosWidth/6){
+								dom.setAttribute('data-index','4')
+								pagecontent[corprationIndex].child[4].elType = elType
+							}else{
+								dom.setAttribute('data-index','5')
+								pagecontent[corprationIndex].child[5].elType = elType
+							}
+						}
+					}
+				}
+			},
+			allowDrop: function(event) {
+				event.preventDefault();
+			},
+            //移除
+            handleRemoveInput (index) {
+				//获取点击的input 在 draginput的 位置index
+				//获取 点击的input 外围布局的index 和自己在布局里面的位置
+				var clicktarget = event.target
+				if(/ivu-btn/.test(event.target.getAttribute("class"))) {
+					clicktarget = event.target
+				} else {
+					clicktarget = event.target.parentElement
+				}
+				var parent = clicktarget.parentElement.parentElement.parentElement.parentElement.parentElement
+				var inputincolindex  = parent.getAttribute("data-index")
+				var inputinmodelindex = parent.getAttribute("data-selfindex")
+				var inputcolindexindata =parent.parentElement.parentElement.parentElement.getAttribute("data-index")
+				this.inputinmodelindex = inputinmodelindex
+				this.inputincolindex = inputincolindex
+				this.inputcolindexindata = inputcolindexindata
+				inputDragdata[this.inputcolindexindata].child[this.inputincolindex].live = 0
+				//同时删除dom
+				parent.parentNode.removeChild(parent)
+			},
+            //设置input
+            changeLabel(index){
+				//获取点击的input 在 draginput的 位置index
+				//获取 点击的input 外围布局的index 和自己在布局里面的位置
+				var clicktarget = event.target
+				if(/ivu-btn/.test(event.target.getAttribute("class"))) {
+					clicktarget = event.target
+				} else {
+					clicktarget = event.target.parentElement
+				}
+				var parent = clicktarget.parentElement.parentElement.parentElement.parentElement.parentElement
+				var inputincolindex  = parent.getAttribute("data-index")
+				var inputinmodelindex = parent.getAttribute("data-selfindex")
+				var inputcolindexindata =parent.parentElement.parentElement.parentElement.getAttribute("data-index")
+				this.inputinmodelindex = inputinmodelindex
+				this.inputincolindex = inputincolindex
+				this.inputcolindexindata = inputcolindexindata
+				this.setLabelModal = true
+				if(this.setInputValueFromWhere == "countdata"){
+					this.issetInput = true
+					this.setInputValueFromSystem = false
+					this.setInputValueFromkeyword = false
+					this.setInputValueFromcount = true
+					this.nowallsks = []
+					for(var i=0,lid=inputDragdata.length;i<lid;i++){
+						var temp = i
+						if(inputDragdata[temp].child){
+							for(var j=0,lidc=inputDragdata[temp].child.length;j<lidc;j++){
+								var tmp = j
+								this.nowallsks.push({
+									label:inputDragdata[temp].child[tmp].elabel,
+									value:inputDragdata[temp].child[tmp].label
+								})
+							}
+						}
+					}
+					this.setinputfromcountmodal = true
+				}
+				this.setindex = index
+			},
+            setLabelModalOk(){
+				//判断类型
+				if(this.setvalue == '') {
+					this.$Message.error('请输入内容')
+					return false
+				} else {
+					this.setvalue = stripscript(this.setvalue);
+					var pinyin = require("pinyin");
+					var pinyinArr = pinyin(this.setvalue, {
+						style: pinyin.STYLE_NORMAL, // 设置拼音风格
+						heteronym: true
+					})
+					var pinyinChar = ''
+					for(var i = 0, l = pinyinArr.length; i < l; i++) {
+						pinyinChar += pinyinArr[i][0]
+					}
+					this.dragInputs.items[this.inputinmodelindex].label = this.setvalue
+					inputDragdata[this.inputcolindexindata].child[this.inputincolindex].label = this.setvalue
+					inputDragdata[this.inputcolindexindata].child[this.inputincolindex].elabel = pinyinChar
+					inputDragdata[this.inputcolindexindata].child[this.inputincolindex].eltype = this.setInputType
+					inputDragdata[this.inputcolindexindata].child[this.inputincolindex].live = 1
+					inputDragdata[this.inputcolindexindata].child[this.inputincolindex].index = this.inputincolindex
+
+					if(this.setInputType == "select") {
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputword = this.setInputword
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputflowid = this.setInputFlowid
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].inputlinkages = JSON.stringify(this.inputlinkages)
+						this.dragInputs.items[this.inputinmodelindex].value = "下拉框"
+					}else if(this.setInputType == "chooseperson") {
+						this.choosepersonset.key = pinyinChar
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputword = this.setInputword
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputflowid = this.setInputFlowid
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].choosepersonset = JSON.stringify(this.choosepersonset)
+						this.dragInputs.items[this.inputinmodelindex].value = "人员选择"
+					} else if(this.setInputType == "input") {
+						this.dragInputs.items[this.inputinmodelindex].value = "文本输入框"
+						inputDragdata[this.inputcolindexindata].child[this.inputincolindex].issetInput = this.issetInput
+						if(this.issetInput) {
+							if(this.setInputValueFromSystem == true){
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setvaluebysystem = this.setInputValueFromSystem
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].keyofsetinputvalue = this.keyofsetInputValue
+							}else if(this.setInputValueFromkeyword == true){
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputValueFromkeyword = this.setInputValueFromkeyword
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].keyofsetinputvalue = this.keyofsetInputValue
+							}else if(this.setInputValueFromcount == true){
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].setInputValueFromcount = this.setInputValueFromcount
+								inputDragdata[this.inputcolindexindata].child[this.inputincolindex].keyofsetinputvalue = JSON.stringify(this.countinputform.countinputsks)
+							}
+						}
+					} else if(this.setInputType == "date") {
+						this.dragInputs.items[this.inputinmodelindex].value = "时间选择"
+					}else if(this.setInputType == "textarea") {
+						this.dragInputs.items[this.inputinmodelindex].value = "textarea"
+					}else if(this.setInputType == "specialtextarea") {
+						this.dragInputs.items[this.inputinmodelindex].value = "富文本编辑器"
+					}
+					pinyinChar = ''
+					this.countinputform.countinputsks = []
+					this.issetInput = false
+					this.setInputValueFromSystem = false
+					this.keyofsetInputValue = ""
+					this.setvalue = ''
+					this.setInputType = 'input'
+					this.setInputword = ''
+					this.setInputFlowid = ''
+					this.inputlinkages = []
+					this.choosepersonset.programs = []
+					this.setInputValueFromWhere = "systemkeyword"
+					this.setInputValueFromSystem = true
+					this.setInputValueFromkeyword = false
+					this.setInputValueFromcount= false
+
+				}
+			},
+            cancelInput(){
+				this.issetInput = false
+				this.setInputValueFromSystem = false
+				this.keyofsetInputValue = ""
+				this.setvalue = ''
+				this.setInputType = 'input'
+				this.setInputword = ''
+				this.setInputFlowid = ''
+            },
+            //设置Label
+			setLabel(event){
+				this.setIndex(event)
+				this.showSetLabelModal = true
+			},
+			 //label设置提交
+            changeInputType(){
+				if(this.setInputType == "select") {
+					this.inputIsInput = false
+					this.inputIsSelect = true
+					this.inputIsChooseperson = false
+					this.issetInput = false
+					this.nowallsks = []
+					for(var i=0,lid=inputDragdata.length;i<lid;i++){
+						var temp = i
+						if(inputDragdata[temp].child){
+							for(var j=0,lidc=inputDragdata[temp].child.length;j<lidc;j++){
+								var tmp = j
+								this.nowallsks.push({
+									label:inputDragdata[temp].child[tmp].elabel,
+									value:inputDragdata[temp].child[tmp].label
+								})
+							}
+						}
+					}
+				}else if(this.setInputType == "chooseperson") {
+					this.inputIsInput = false
+					this.inputIsSelect = false
+					this.inputIsChooseperson = true
+					this.issetInput = false
+					this.nowallsks = []
+					for(var i=0,lid=inputDragdata.length;i<lid;i++){
+						var temp = i
+						if(inputDragdata[temp].child){
+							for(var j=0,lidc=inputDragdata[temp].child.length;j<lidc;j++){
+								var tmp = j
+								this.nowallsks.push({
+									label:inputDragdata[temp].child[tmp].elabel,
+									value:inputDragdata[temp].child[tmp].label
+								})
+							}
+						}
+					}
+				} else if(this.setInputType == "input") {
+					this.inputIsChooseperson = false
+					this.inputIsInput = true
+					this.inputIsSelect = false
+				} else {
+					this.inputIsChooseperson = false
+					this.inputIsInput = false
+					this.inputIsSelect = false
+					this.issetInput = false
+				}
+			},
+            selectFlow(){
+            	for(let i=0,lf=this.flowList.length;i<lf;i++){
+            		if(this.setInputFlowid == this.flowList[i].flowid){
+            			this.queryAllSkids = this.flowList[i].sks
+            		}
+            	}
+
+            },
+            inputdatafromchange(){
+				var setInputValueFromWhere = this.setInputValueFromWhere
+				if(setInputValueFromWhere == "keyword"){
+					this.setInputValueFromSystem = false
+					this.setInputValueFromkeyword = true
+					this.setInputValueFromcount= false
+				}else if(setInputValueFromWhere == "systemkeyword"){
+					this.setInputValueFromSystem = true
+					this.setInputValueFromkeyword = false
+					this.setInputValueFromcount= false
+				}else if(setInputValueFromWhere == "countdata"){
+					this.setInputValueFromSystem = false
+					this.setInputValueFromkeyword = false
+					this.setInputValueFromcount = true
+					this.nowallsks = []
+					for(var i=0,lid=inputDragdata.length;i<lid;i++){
+						var temp = i
+						if(inputDragdata[temp].child){
+							for(var j=0,lidc=inputDragdata[temp].child.length;j<lidc;j++){
+								var tmp = j
+								this.nowallsks.push({
+									label:inputDragdata[temp].child[tmp].elabel,
+									value:inputDragdata[temp].child[tmp].label
+								})
+							}
+						}
+					}
+					this.setinputfromcountmodal = true
+				}
+
+			},
+			setinputfromcountOk(){
+			},
+			addcountinputsk(){
+				this.countinputform.countinputsks.push({
+					sk:"",
+					computemode:"加"
+				})
+			},
+			addinputlinkage(){
+				this.inputlinkages.push({
+					ownflowkey:'',
+					otherflowkey:''
+				})
+			},
+			removeinputlinkage(){
+				this.inputlinkages.pop()
+			},
+			removecountinputsk(){
+				this.countinputform.countinputsks.pop()
+			},
+			addchoosepersonsetprogram(){
+				this.choosepersonset.programs.push({
+					inputkey:'',
+					personinfokey:''
+				})
+			},
+			removechoosepersonsetprogram(){
+				this.choosepersonset.programs.pop()
+			},
+			setLabelOk(){
+				//判断设置label来源
+				if(this.setLabelForm.chooseSkorck){
+					if(this.setLabelForm.ckid != ""){
+						this.setPageContentByCkid(this.setLabelForm.ckid,"myLabel")
+					}else if(this.setLabelForm.skid != ""){
+						this.setPageContentBySkid(this.setLabelForm.skid,"myLabel")
+					}
+				}else{
+					//设置label的文字存储
+					if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+						pagecontent[this.noAreaIndex ].modaltitle = this.setLabelForm.labeldesc
+						pagecontent[this.noAreaIndex ].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+						pagecontent[this.colIndex].child[this.colButtonIndex].modaltitle = this.setLabelForm.labeldesc
+						pagecontent[this.colIndex].child[this.colButtonIndex].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}
+				}
+				this.setLabelForm.ckid=""
+				this.setLabelForm.skid=""
+				this.setLabelForm.fontStyle.fontSize = ''
+				this.setLabelForm.fontStyle.fontWeight = ''
+				this.setLabelForm.fontStyle.textAlign = ''
+			},
+			//设置图表
+			setChart(event){
+				this.setIndex(event)
+				this.showSetChartModal = true
+			},
+			setChartOk(){
+				this.setPageContentByCkid(this.setChartForm.ckid)
+				this.setChartForm.ckid = ''
+			},
+			//dummy
+			setDummy(event){
+				//打开模态框
+				//获取index
+				this.setIndex(event)
+				this.showDummyModal = true
+			},
+			setDummyOk(){
+				//同时根据选择的控件  设置pagecontent对应的控件的elType 为 myPie  或者myHisto
+				for(var i=0,l=this.dummyComponents.length;i<l;i++){
+					if(this.dummyComponents[i].id == this.setDummyForm.dummyComponet ){
+						if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+							pagecontent[this.noAreaIndex ].value = this.dummyComponents[i].value
+							pagecontent[this.noAreaIndex ].open = this.dummyComponents[i].src
+							pagecontent[this.noAreaIndex ].elType = this.dummyComponents[i].elType
+						}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+							pagecontent[this.colIndex].child[this.colButtonIndex].value = this.dummyComponents[i].value
+							pagecontent[this.colIndex].child[this.colButtonIndex].open = this.dummyComponents[i].src
+							pagecontent[this.colIndex].child[this.colButtonIndex].elType = this.dummyComponents[i].elType
+						}
+					}
+				}
+//				//设置完成之后 将所有中间model置空
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				this.setDummyForm.dummyComponet = ''
+			},
+
+			//设置按钮信息
+			setOpen:function(event){
+				//被点击的按钮
+				let tarDom = null
+				if(/setThis/.test(event.target.getAttribute('class'))){
+					tarDom = event.target.parentElement
+				}
+				else{
+					tarDom = event.target.parentElement.parentElement
+				}
+				//设置index  设置的是布局里面的按钮 还是无布局包围 的按钮
+				if(/dropArea/.test(tarDom.parentElement.getAttribute('class'))){
+					//无包围的按钮，只需找到一个index
+					this.noAreaIndex = tarDom.getAttribute('data-index')
+				}else{
+					//布局里的按钮 需要按钮的index 和布局的index
+					this.colIndex=tarDom.parentElement.parentElement.parentElement.getAttribute('data-index')
+					this.colButtonIndex = tarDom.getAttribute('data-index')
+				}
+				this.showButtonModal = true
+				//给模态框里面的下拉框赋值 选择页面
+			},
+			setButtonOk:function(){
+				//index   anniu名称  打开页面的id
+				var value = this.setButtonForm.buttonName
+				var open = this.setButtonForm.openPageid
+				var opensk = this.setButtonForm.showInModal
+				var modaltitle = this.setButtonForm.modaltitle
+				if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+					pagecontent[this.noAreaIndex ].value = value
+					pagecontent[this.noAreaIndex ].open = open
+					pagecontent[this.noAreaIndex ].openSk = opensk
+					pagecontent[this.noAreaIndex ].modaltitle = modaltitle
+				}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+					pagecontent[this.colIndex].child[this.colButtonIndex].value = value
+					pagecontent[this.colIndex].child[this.colButtonIndex].open = open
+					pagecontent[this.colIndex].child[this.colButtonIndex].openSk = opensk
+					pagecontent[this.colIndex].child[this.colButtonIndex].modaltitle = modaltitle
+				}
+				//设置完成之后 将所有中间model置空
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				this.setButtonForm.buttonName =''
+				this.setButtonForm.openPageid = ''
+				this.setButtonForm.modaltitle = ''
+				this.setButtonForm.showInModal = false
+			},
+			//取消
+			cancel:function(){
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+			},
+			//
+			setPageContentByCkid(id,str){
+				for(var i=0;i< this.queryCkids.length;i++){
+					if(id == this.queryCkids[i].id){
+						if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+							pagecontent[this.noAreaIndex ].open = this.queryCkids[i].id
+						}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+							pagecontent[this.colIndex].child[this.colButtonIndex].open = this.queryCkids[i].id
+						}
+					}
+				}
+				//
+				if(str == "myLabel"){
+					if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+						pagecontent[this.noAreaIndex ].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+						pagecontent[this.colIndex].child[this.colButtonIndex].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}
+				}
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				id = ''
+			},
+			setPageContentBySkid(id,str){
+				for(var i=0;i< this.querySkids.length;i++){
+					if(id == this.querySkids[i].id){
+						if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+							pagecontent[this.noAreaIndex ].openSk = this.querySkids[i].id
+						}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+							pagecontent[this.colIndex].child[this.colButtonIndex].openSk = this.querySkids[i].id
+						}
+					}
+				}
+				if(str == "myLabel"){
+					if(this.noAreaIndex != "" && (this.colIndex == "" || this.colIndex == undefined)){
+						pagecontent[this.noAreaIndex ].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}else if((this.noAreaIndex == "" || this.noAreaIndex == undefined) && this.colIndex !=""){
+						pagecontent[this.colIndex].child[this.colButtonIndex].value = JSON.stringify(this.setLabelForm.fontStyle)
+					}
+				}
+				this.noAreaIndex = ''
+				this.colIndex = ''
+				this.colButtonIndex =''
+				id = ''
+			},
+			//获取点击的dom以及设置所需中间变量（model）的Index
+			setIndex(event){
+				let tarDom = null
+				if(/setDummy/.test(event.target.getAttribute('class'))){
+					tarDom = event.target.parentElement.parentElement
+				}else{
+					tarDom = event.target.parentElement.parentElement.parentElement
+				}
+				//设置index  设置的是布局里面的按钮 还是无布局包围 的按钮
+				if(/dropArea/.test(tarDom.parentElement.getAttribute('class'))){
+					//无包围的按钮，只需找到一个index
+					this.noAreaIndex = tarDom.getAttribute('data-index')
+				}else{
+					//布局里的按钮 需要按钮的index 和布局的index
+					this.colIndex=tarDom.parentElement.parentElement.parentElement.getAttribute('data-index')
+					this.colButtonIndex = tarDom.getAttribute('data-index')
+				}
+			},
+			//删除拖拽的元素
+			delThisEl:function(event){
+				var clicktarget = null
+				if(/ivu-icon/.test(event.target.getAttribute('class'))) {
+					clicktarget = event.target.parentElement
+				} else if(/ivu-btn/.test(event.target.getAttribute('class'))) {
+					clicktarget = event.target
+				} else {
+					clicktarget = event.target.parentElement
+				}
+
+				//找到要删除的元素
+				//找到删除元素的父节点
+				var corprationIndex = -1
+				var dropAreaClass = clicktarget.parentElement.parentElement.getAttribute("class") //放置区域 删除布局
+				var settingClass = clicktarget.parentElement.getAttribute("class")  //删除布局里面的组件
+				var pppClass = clicktarget.parentElement.parentElement.parentElement.getAttribute("class")
+				//按钮组件单独处理
+				if(/myButton/.test(settingClass)){
+					//在判断 是在布局内还是布局外
+					if(/dropArea/.test(dropAreaClass)){
+						//删除组件
+						corprationIndex = clicktarget.parentElement.getAttribute('data-index')
+						for(var i=0,len=dropindexs.length;i<len;i++){
+							var temp = i
+							if(corprationIndex == dropindexs[temp]){
+								dropindexs[temp] = -1
+								//同时删除元素
+								clicktarget.parentElement.parentNode.removeChild(clicktarget.parentElement)
+								break
+							}
+						}
+
+					}else if(/colAbleDrop/.test(dropAreaClass)){
+						//删除布局内的组件
+						var parent = clicktarget.parentElement
+						var ppParent = parent.parentElement.parentElement.parentElement
+						var selfindex = parent.getAttribute("data-index")
+						var colindex = ppParent.getAttribute("data-index")
+						parent.parentNode.removeChild(parent)
+						pagecontent[colindex].child[selfindex] = {}
+					}
+				}
+				//如果删除的是放置输入框里面的布局 或者删除放置普通组件的区域 或者删除的是 布局里面的组件
+				if(/dropInputArea/.test(dropAreaClass)){
+					//删除放置区域里面的布局
+					//删除布局  直接将数组中的对应的index 置为 -1
+					//dropinputindexs  array
+					corprationIndex = clicktarget.parentElement.getAttribute('data-index')
+					for(var i=0,len=dropinputindexs.length;i<len;i++){
+						var temp = i
+						if(corprationIndex == dropinputindexs[temp]){
+							dropinputindexs[temp] = -1
+							//同时删除元素
+							clicktarget.parentElement.parentNode.removeChild(clicktarget.parentElement)
+							break
+						}
+					}
+
+				}else if(/dropArea/.test(dropAreaClass) && !(/myButton/.test(settingClass))){
+					//删除放置区域里面的布局
+					//删除布局  直接将数组中的对应的index 置为 -1 dropindexs
+					corprationIndex = clicktarget.parentElement.getAttribute('data-index')
+					for(var i=0,len=dropindexs.length;i<len;i++){
+						var temp = i
+						if(corprationIndex == dropindexs[temp]){
+							dropindexs[temp] = -1
+							//同时删除元素
+							clicktarget.parentElement.parentNode.removeChild(clicktarget.parentElement)
+							break
+						}
+					}
+				}else if(/setting/.test(settingClass) && /colAbleDrop/.test(pppClass)){
+					//删除布局里面的组件
+					//删除布局组件内的控件  删除对应布局的内容下对应的控件内容 pagecontent
+					//获取 布局的index 以及组件 的index
+					var parent = clicktarget.parentElement.parentElement
+					var ppParent = parent.parentElement.parentElement.parentElement
+					var selfindex = parent.getAttribute("data-index")
+					var colindex = ppParent.getAttribute("data-index")
+					parent.parentNode.removeChild(parent)
+					pagecontent[colindex].child[selfindex] = {}
+
+
+				}else if(/setting/.test(settingClass) && /dropArea/.test(pppClass)){
+					//删除放置区域的组件
+					//删除布局  直接将数组中的对应的index 置为 -1
+					var parent = clicktarget.parentElement.parentElement
+					corprationIndex = parent.getAttribute("data-index")
+					for(var i=0,len=dropindexs.length;i<len;i++){
+						var temp = i
+						if(corprationIndex == dropindexs[temp]){
+							dropindexs[temp] = -1
+							//同时删除元素
+							parent.parentNode.removeChild(parent)
+							break
+						}
+					}
+
+				}
+			},
+			//获取元素的位置信息
+			getElAbsolute(elem) {
+			    var t = elem.offsetTop;
+			    var l = elem.offsetLeft;
+			    var w = elem.offsetWidth;
+			    var h = elem.offsetHeight;
+			    elem = elem.offsetParent;
+			    while (elem) {
+			        t += elem.offsetTop;
+			        l += elem.offsetLeft;
+			        elem = elem.offsetParent;
+			    };
+			    return {
+			        top: t,
+			        left: l,
+			        width: w,
+			        height: h
+			    };
+			},
+			//兼容各种浏览器的,获取鼠标真实位置
+			zmousePosition(ev) {
+			    if (!ev) ev = window.event;
+			    if (ev.pageX || ev.pageY) {
+			        return { x: ev.pageX, y: ev.pageY };
+			    }
+			    return {
+			        x: ev.clientX + document.documentElement.scrollLeft - document.body.clientLeft,
+			        y: ev.clientY + document.documentElement.scrollTop - document.body.clientTop
+			    };
+			},
+            //提交数据
+            sendData(){
+            	//获取form表单元素数量
+            	//获取列名
+            	//flowid nodeid temid
+				//保存items  用于编辑页面的展示
+				var tabStart ='<Tab-pane label="'
+            	var tabLabel = '" name="'
+            	var importPage= '"><importpages importpageid="'
+            	var tabEnd = '"></importpages></Tab-pane>'
+
+				//需要设置第一个tab的名称
+            	var pagecontentstr = ''
+				var inputsstr = ''
+				var newArr_input = []
+				var newArr_date = []
+				var newArr_select = []
+				var newArr_textarea = []
+				var newArr_specialtextarea = []
+				var selectwords = []
+				var choosepersons = []
+				var inputsets = []
+				var sks = []
+				var rowstart = "<Row>"
+				var rowend = "</Row>"
+				var colstart = '<Col span="'
+				var colspan = 24
+				var colend = "</Col>"
+				var inputdragcolnum = 1
+
+            	for(var m=0,l=dropinputindexs.length;m<l;m++){
+					if(dropinputindexs[m] != -1){
+						inputsstr += rowElStart
+						var tmp = m
+						inputdragcolnum = inputDragdata[tmp].colNum
+
+						for(var n=0,lc= inputDragdata[tmp].child.length;n<lc;n++){
+							var tp = n
+							inputsstr += colElStart + colspan/inputdragcolnum + '">'
+							if(inputDragdata[tmp].child[tp].live == 1){
+								if(inputDragdata[tmp].child[tp].elabel !== ""){
+										sks.push({
+										flowid: this.querydata.flowid,
+										pageid:this.querydata.pageid,
+										name: inputDragdata[tmp].child[tp].label,
+										key: inputDragdata[tmp].child[tp].elabel,
+									})
+								}
+								if(inputDragdata[tmp].child[tp].eltype == "input"){
+									newArr_input = inputContent.split(' ')
+									for(var k = 0, ln = newArr_input.length; k < ln; k++) {
+										if(/label="项目"/.test(newArr_input[k])) {
+											newArr_input[k] = 	'v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" ' +
+																'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' + 'label="' + inputDragdata[tmp].child[tp].label +
+																'"><i-input'
+										}
+										if(/v-model.trim="formInline.xiangmu"/.test(newArr_input[k])) {
+											newArr_input[k] = 	':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+																'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"'
+											if(inputDragdata[tmp].child[tp].issetInput == true) {
+												newArr_input[k] += " disabled "
+												inputsets.push(inputDragdata[tmp].child[tp])
+											}
+										}
+
+									}
+									inputsstr +=newArr_input.join(' ') + '\n'
+								}else if(inputDragdata[tmp].child[tp].eltype == "chooseperson"){
+									choosepersons.push(inputDragdata[tmp].child[tp])
+									newArr_input = inputContent.split(' ')
+									for(var k = 0, ln = newArr_input.length; k < ln; k++) {
+										if(/label="项目"/.test(newArr_input[k])) {
+											newArr_input[k] = 	'v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" ' +
+																'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' + 'label="' + inputDragdata[tmp].child[tp].label +
+																'"><i-input'
+										}
+										if(/v-model.trim="formInline.xiangmu"/.test(newArr_input[k])) {
+											newArr_input[k] = 	':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+																'v-on:on-focus="showPersonSelectModalFn('+"'"+inputDragdata[tmp].child[tp].elabel+"'"+')" ' +
+																'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"'
+										}
+
+									}
+									inputsstr +=newArr_input.join(' ') + '\n'
+								}else if(inputDragdata[tmp].child[tp].eltype == "date"){
+									newArr_date = dateContent.split(' ')
+									for(let z = 0, ld = newArr_date.length; z < ld; z++) {
+										if(/label="时间"/.test(newArr_date[z])) {
+											newArr_date[z] = 'v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" '+'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' +  'label="' + inputDragdata[tmp].child[tp].label + '"><Date-picker'
+										}
+										if(/v-model.trim="formInline.shijian"/.test(newArr_date[z])) {
+											newArr_date[z] = ':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+															 'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"'
+										}
+									}
+									inputsstr += newArr_date.join(' ') + '\n'
+								}else if(inputDragdata[tmp].child[tp].eltype == "select"){
+									selectwords.push(inputDragdata[tmp].child[tp])
+									newArr_select = selectContent.split(' ')
+									for(let x = 0, lse = newArr_select.length; x < lse; x++) {
+										if(/label="选择"/.test(newArr_select[x])) {
+											newArr_select[x] = 'v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" '+'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' + 'label="' + inputDragdata[tmp].child[tp].label + '"><Select'
+										}
+										if(/v-model.trim="formInline.xuanze"/.test(newArr_select[x])) {
+											newArr_select[x] =  ':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+																'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"' + '@on-change="changeselect(formInline.'+inputDragdata[tmp].child[tp].elabel+",'"+inputDragdata[tmp].child[tp].elabel+"')"+'" '
+										}
+										if(/items"/.test(newArr_select[x])) {
+											newArr_select[x] = inputDragdata[tmp].child[tp].elabel + 's"'
+										}
+									}
+									inputsstr += newArr_select.join(' ') + '\n'
+								}else if(inputDragdata[tmp].child[tp].eltype == "textarea"){
+									newArr_textarea  = textareaContent.split(" ")
+									for(let p=0,lnt=newArr_textarea.length;p<lnt;p++){
+										if(/label="文本"/.test(newArr_textarea[p])){
+											newArr_textarea[p] ='v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" '+'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' + 'label="' + inputDragdata[tmp].child[tp].label + '"><Input'
+										}
+										if(/v-model.trim="formInline.wenben"/.test(newArr_textarea[p])) {
+											newArr_textarea[p] =':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+																'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"'
+										}
+									}
+									inputsstr += newArr_textarea.join(' ') + '\n'
+								}else if(inputDragdata[tmp].child[tp].eltype == "specialtextarea"){
+									newArr_specialtextarea  = specialtextareaContent.split(" ")
+									for(let q=0,lnst=newArr_specialtextarea.length;q<lnst;q++){
+										if(/label="编辑器"/.test(newArr_specialtextarea[q])){
+											newArr_specialtextarea[q] = 'v-show="showformInline.'+ inputDragdata[tmp].child[tp].elabel + '" '+'prop="'+inputDragdata[tmp].child[tp].elabel +'" ' + 'label="' + inputDragdata[tmp].child[tp].label + '"><vue-editor'
+										}
+										if(/v-model.trim="formInline.bianjiqi"/.test(newArr_specialtextarea[q])) {
+											newArr_specialtextarea[q] =':disabled="disabledformInline.' + inputDragdata[tmp].child[tp].elabel + '" ' +
+																		'v-model.trim="formInline.' + inputDragdata[tmp].child[tp].elabel + '"'
+										}
+									}
+									inputsstr += newArr_specialtextarea.join(' ') + '\n'
+								}else{
+									inputsstr += "&nbsp;"
+								}
+							}
+							inputsstr += colElEnd
+							//
+						}
+						inputsstr += rowElEnd
+					}
+				}
+				//表单 layout
+				pagecontentstr = tabStart + this.normaltablabel + tabLabel + 'form">'+ inputsstr + "</Tab-pane>"
+            	//传递的参数
+            	var newstr = ''
+            	//dropindexs 里面存的是页面上所有的布局的index  对应到pagecontent的数据
+            	for (var i = 0, l = dropindexs.length; i < l; i++) {
+            		var temp = dropindexs[i]
+            		if(temp == -1) {
+            			continue
+            		}
+            		//判断是否有外包围的布局元素
+            		if(pagecontent[temp].isCol == true){
+            			//先把Row 加上
+            			newstr += rowElStart
+            			for(var k=0,len = parseInt(pagecontent[temp].colNum);k < len;k++){
+            				//循环是2 3 四列布局
+            				//每次先把 Col 加上
+            				newstr += colElStart + 24/pagecontent[temp].colNum + colElStartEnd
+            				let newPageStr=''
+							for(var n=0, componentL = componentsContent.length;n < componentL ; n++){
+								if(pagecontent[temp].child[k].elType == componentsContent[n].name){
+									if(pagecontent[temp].child[k].elType == "myLabel"){
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+ pagecontent[temp].child[k].openSk+ componentsContent[n].openend +pagecontent[temp].child[k].value + componentsContent[n].end
+									}else if(pagecontent[temp].child[k].elType == "myButton"){
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+ pagecontent[temp].child[k].openSk+ componentsContent[n].openend +pagecontent[temp].child[k].value +componentsContent[n].modaltitle + pagecontent[temp].child[k].modaltitle + componentsContent[n].end
+									}else if(pagecontent[temp].child[k].elType == "myList"){
+										if(pagecontent[temp].child[k].opensk == undefined){
+											pagecontent[temp].child[k].opensk = "{}"
+										}
+										if(pagecontent[temp].child[k].newSetting == undefined){
+											pagecontent[temp].child[k].newSetting = "[]"
+										}
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+ pagecontent[temp].child[k].value+ componentsContent[n].showinmodal+ pagecontent[temp].child[k].opensk+ componentsContent[n].openend +pagecontent[temp].child[k].newSetting + componentsContent[n].end
+									}else if(pagecontent[temp].child[k].elType == "myStrongList"){
+										if(pagecontent[temp].child[k].opensk == undefined){
+											pagecontent[temp].child[k].opensk = "{}"
+										}
+										if(pagecontent[temp].child[k].newSetting == undefined){
+											pagecontent[temp].child[k].newSetting = "[]"
+										}
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+ pagecontent[temp].child[k].value+ componentsContent[n].showinmodal+ pagecontent[temp].child[k].opensk+ componentsContent[n].openend +pagecontent[temp].child[k].newSetting + componentsContent[n].searchstart + JSON.stringify(pagecontent[temp].child[k].searchs) + componentsContent[n].end
+									}else if(pagecontent[temp].child[k].elType == "fileListWithSubmit" || pagecontent[temp].child[k].elType == "myFiles"){
+										//fileListWithSubmit  myFiles
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+pagecontent[temp].child[k].value + componentsContent[n].content +pagecontent[temp].child[k].modaltitle + componentsContent[n].end
+									}else{
+										newPageStr += componentsContent[n].start + pagecontent[temp].child[k].open +componentsContent[n].openstart+pagecontent[temp].child[k].value + componentsContent[n].end
+									}
+								}else if(pagecontent[temp].child[k].elType == "" || !pagecontent[temp].child[k].elType){
+									newPageStr +=''
+								}
+							}
+							if(newPageStr !=''){
+								newstr += newPageStr
+								newstr += colElEnd
+							}else{
+								newstr +='&nbsp;'
+								newstr += colElEnd
+							}
+            			}
+            			newstr += rowElEnd
+            		}else if(pagecontent[temp].isCol == false){
+						for(var j=0,lc = componentsContent.length ; j < lc ; j++){
+							if(pagecontent[temp].elType == componentsContent[j].name){
+								if(pagecontent[temp].elType == "myLabel"){
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart + pagecontent[temp].openSk +componentsContent[j].openend +pagecontent[temp].value + componentsContent[j].end
+								}else if(pagecontent[temp].elType == "myButton"){
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart + pagecontent[temp].openSk +componentsContent[j].openend +pagecontent[temp].value + componentsContent[j].modaltitle + pagecontent[temp].modaltitle + componentsContent[j].end
+								}else if(pagecontent[temp].elType == "myList"){
+									if(pagecontent[temp].opensk == undefined){
+										pagecontent[temp].opensk = "{}"
+									}
+									if(pagecontent[temp].newSetting == undefined){
+										pagecontent[temp].newSetting = "[]"
+									}
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart + pagecontent[temp].value+componentsContent[j].showinmodal + pagecontent[temp].opensk +componentsContent[j].openend +pagecontent[temp].newSetting + componentsContent[j].end
+								}else if(pagecontent[temp].elType == "myStrongList"){
+									if(pagecontent[temp].opensk == undefined){
+										pagecontent[temp].opensk = "{}"
+									}
+									if(pagecontent[temp].newSetting == undefined){
+										pagecontent[temp].newSetting = "[]"
+									}
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart + pagecontent[temp].value+componentsContent[j].showinmodal + pagecontent[temp].opensk +componentsContent[j].openend + pagecontent[temp].newSetting + componentsContent[j].searchstart + JSON.stringify(pagecontent[temp].searchs) + componentsContent[j].end
+								}else if(pagecontent[temp].elType == "fileListWithSubmit" || pagecontent[temp].elType == "myFiles"){
+									//fileListWithSubmit  myFiles
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart +pagecontent[temp].value + componentsContent[j].content +pagecontent[temp].modaltitle + componentsContent[j].end
+								}else{
+									newstr += componentsContent[j].start + pagecontent[temp].open +componentsContent[j].openstart +pagecontent[temp].value + componentsContent[j].end
+								}
+							}
+						}
+            		}
+            	}
+
+            	//newstr 组件layout
+            	//获取导入页签
+            	var tabs = this.pageTabs
+            	var tabsstr = JSON.stringify(tabs)
+            	//页签参数
+
+            	var tabStr = ''
+
+            	//页签 layout
+            	for(var x=0,tabLen = tabs.length;x<tabLen;x++){
+            		//拼接页签参数
+            		tabStr += tabStart + tabs[x].label + tabLabel + tabs[x].name + importPage + tabs[x].importPageid + tabEnd
+            	}
+
+				//对于 带有提交表单的页签 传递 tslayout参数
+            	var tabsubmitlayout = {}
+            	tabsubmitlayout.submitStr = pagecontentstr
+            	tabsubmitlayout.tabStr = tabStr
+            	tabsubmitlayout.newstr = newstr
+            	var pageui = JSON.stringify(newstr)
+            	var dropindexsstr =  JSON.stringify(dropindexs)
+            	var tabsstr = JSON.stringify(this.pageTabs)
+            	var inputsetting = JSON.stringify(inputsets)
+            	var autoformsetdatas = JSON.stringify(this.autoformsetdatas)
+            	var inputsui = JSON.stringify(inputDragdata)
+				var dropinputindexsstr  = JSON.stringify(dropinputindexs)
+            	//更新page  和 pageUI
+    			//写入文件
+				this.$http.get(this.globalconfig.updateframeapi,{
+					params:{
+    					flowid:this.querydata.flowid,
+    					nodeid:this.querydata.nodeid,
+    					pageid:this.querydata.pageid,
+              			tempid:this.querydata.tempid,
+              			selectwords:JSON.stringify(selectwords),
+              			choosepersons:JSON.stringify(choosepersons),
+              			inputsetting:inputsetting,
+              			filename:this.querydata.filename,
+              			tabsubmitlayout:tabsubmitlayout,
+              			sks:sks,
+              			isshowchilddata:this.formbaseset.isshowchilddata,
+            			autoformsetdatas:autoformsetdatas
+    				}
+				},{emulateJSON:true})
+				.then((response)=>{
+					if(response.body.error){
+    					this.$Message.error(response.body.error)
+    				}else{
+    					this.$http.get(this.globalconfig.updatepageapi,{
+		    				params:{
+		    					flowid:this.querydata.flowid,
+		    					nodeid:this.querydata.nodeid,
+		    					pageid:this.querydata.pageid,
+		              			tempid:this.querydata.tempid,
+		              			selectwords:JSON.stringify(selectwords), // 提交表单中的所有下拉框的简单关键字
+		              			inputsetting:inputsetting,
+		              			pageui:pageui,
+		              			dropindexsstr:dropindexsstr,
+		              			inputsui:inputsui,
+		              			isshowchilddata:this.formbaseset.isshowchilddata,
+		              			dropinputindexsstr:dropinputindexsstr,
+								tabsstr:tabsstr
+		    				}
+		    			},{emulateJSON:true})
+		    			.then((response)=>{
+		    				if(response.body.error){
+		    					this.$Message.error(response.body.error)
+		    				}else{
+		    					this.$http.get(this.globalconfig.createautoformsetapi, {
+									params: {
+										pageid: this.querydata.pageid,
+										autoformsetdatas:autoformsetdatas
+									}
+								}, {
+									emulateJSON: true
+								})
+								.then((response) => {
+									if(response.body.error) {
+										this.$Message.error(response.body.error)
+									} else {
+										//将中间变量赋值为空
+				    					dropindexs = []
+		  								pagecontent = []
+		  								dropindex = 0
+
+		  								dropinputindexs= []
+										inputDragdata = []
+										dropinputindex = 0
+
+				    					this.$router.push({
+					                  		path:'/list',
+					                  		query:{
+					                  			flowid:this.querydata.flowid,
+												nodeid:this.querydata.nodeid,
+												qwer:"liuguochao"
+
+					                  		}
+					                    });
+									}
+								}, (response) => {
+									this.$Message.error('智能提交表单存库失败');
+								})
+		    				}
+		    			},(response)=>{
+		    				this.$Message.success('成功');
+		    			})
+    				}
+				},(response)=>{
+    				this.$Message.success('成功');
+
+    			})
+            },
+            //获取中文字符的拼音
+            getPinyin(el){
+            	var pinyin = require("pinyin");
+            	var pinyinArr = pinyin(el,{
+            		style:pinyin.STYLE_NORMAL
+            	})
+            	var pinyinChar=''
+            	for (var i=0, l=pinyinArr.length;i<l;i++) {
+        			pinyinChar += pinyinArr[i][0]
+        		}
+            	el = pinyinChar;
+            	pinyinChar=''
+            	return el;
+            }
+        },
+        mounted : function () {
+            this.handleQueryData();
+        }
+    }
+
+    function stripscript(s) {
+	    var pattern = new RegExp("[`~!@#$^&*()=|{}':;',\\[\\].<>/?~！@#￥……&*（）——|{}【】‘；：”“'。，、？-]")
+	        var rs = "";
+	    for (var i = 0; i < s.length; i++) {
+	        rs = rs + s.substr(i, 1).replace(pattern, '');
+	    }
+	    return rs;
+	}
+</script>

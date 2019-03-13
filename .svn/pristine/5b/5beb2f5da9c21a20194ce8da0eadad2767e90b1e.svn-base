@@ -1,0 +1,41 @@
+<view class="flex box box-tb box-align-center">
+  <view class="calendar pink-color box box-tb">
+        <view class="top-handle fs32 box box-lr box-align-center box-pack-center">
+            <view class="prev box box-rl" bindtap="handleCalendar" data-handle="prev">
+                <view class="prev-handle box box-lr box-align-center box-pack-center">《</view>
+            </view>
+            <view class="date-area box box-lr box-align-center box-pack-center">{{cur_year || "--"}} 年 {{cur_month || "--"}} 月</view>
+            <view class="next box box-lr" bindtap="handleCalendar" data-handle="next">
+                <view class="next-handle box box-lr box-align-center box-pack-center">》</view>
+            </view>
+        </view>
+        <view class="weeks box box-lr box-pack-center box-align-center">
+            <view class="flex week fs28" wx:for="{{weeks_ch}}" wx:key="{{logs}}" data-idx="{{logs}}">{{item}}</view>
+        </view>
+        <view class="days box box-lr box-wrap">
+            <view wx:if="{{hasEmptyGrid}}" class="grid white-color box box-align-center box-pack-center" wx:for="{{empytGrids}}" wx:key="{{logs}}" data-idx="{{logs}}">
+            </view>
+            <view class="grid white-color box box-align-center box-pack-center" wx:for="{{days}}" wx:key="{{logs}}" data-idx="{{logs}}">
+                <view bindtap="checkDay" id="{{item}}" class="day {{item == checkedDay ? 'border-radius pink-bg' : ''}} box box-align-center box-pack-center">{{item}}</view>
+            </view>
+        </view>
+    </view>
+    <view wx:if="{{showdetail}}" class="signDetail">
+        <view class="signOn">
+            <view class="signType">
+                上班打卡<text>{{signRecode.on.range}}</text>
+            </view>
+            <view class="signTime">
+                {{signRecode.on.time}}<text>{{signRecode.on.type}}</text>
+            </view>
+        </view>
+        <view class="signOn">
+            <view class="signType">
+                下班打卡<text>{{signRecode.off.range}}</text>
+            </view>
+            <view class="signTime">
+              {{signRecode.off.time}}<text>{{signRecode.off.type}}</text>
+            </view>
+        </view>
+    </view>
+</view>

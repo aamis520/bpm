@@ -1,0 +1,46 @@
+{
+  "newlayout": {
+    "start":"<div id = \"layouttobeadd\">",
+    "end":"</div>"
+  },
+  "setting": "",
+  "importpages": "",
+  "action":[
+    {
+      "type":"replace",
+      "from":{
+        "start":"v-model.trim=\"formInline.",
+        "end":"\""
+      },
+      "to":{
+        "start":"var item = ",
+        "end":";"
+      },
+      "totype":"json"
+    },
+    {
+        "type":"replace",
+        "from":{
+          "start":"v-show=\"showformInline.",
+          "end":"\""
+        },
+        "to":{
+          "start":"var itemshow = ",
+          "end":";"
+        },
+        "totype":"json"
+     },
+     {
+         "type":"replace",
+         "from":{
+           "start":"v-show=\"warninglabels.",
+           "end":"\""
+         },
+         "to":{
+           "start":"var warningitem = ",
+           "end":";"
+         },
+         "totype":"json"
+     }
+  ]
+}

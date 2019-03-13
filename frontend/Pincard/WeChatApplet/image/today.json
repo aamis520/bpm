@@ -1,0 +1,12 @@
+{
+  "on": {
+    "time": "8:30",
+    "type": "0",
+    "range": true
+  },
+  "off": {
+    "time": "18:30",
+    "type": "0",
+    "range": true
+  }
+}

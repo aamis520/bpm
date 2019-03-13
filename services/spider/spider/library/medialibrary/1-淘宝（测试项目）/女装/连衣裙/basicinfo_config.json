@@ -1,0 +1,19 @@
+/**
+*url:index_page的url;
+*xpath:detail_page选择器，detail_page是商品的详情页面;
+*nextPage:'下一页'按钮的选择器';
+*type类型有两个，一个是button，一个是url，其中button使用模拟点击的方式跳转到下一页，url则是爬取页码的url;
+*1模拟点击：{type:'button',xpath:'input#nextPage'};
+*2爬取页面的url：{'type':'url',xpath:'http://wap.jd.com/product/list?page='};
+**/
+{
+	'url':'https://s.taobao.com/list?spm=a21bo.2017.201867-links-0.11.638eef7b0HG4OV&style=grid&seller_type=taobao&cps=yes&cat=51108009',
+	'xpath':'a[id^='J_Itemlist_TLink_']',
+	'下一页标记':{
+		'type':'button',
+		'xpath':'#listsrp-pager > div > div > div > ul > li.item.next > a > span:nth-child(1)',
+	} 
+}
+
+
+

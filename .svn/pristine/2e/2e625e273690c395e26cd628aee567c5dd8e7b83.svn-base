@@ -1,0 +1,823 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>流程设计</title>
+  <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
+  <style type="text/css">
+    body,html{
+      width: 100%;
+      height: 100%;
+      font-size: 12px;
+    }
+    .headerDiv{
+      width: 100%;
+      height: 30px;
+      line-height: 30px;
+      background: #f2f2f2;
+      padding-left: 15px;
+    }
+
+    .contentDiv{
+      width: 100%;
+      height: calc(100% - 30px);
+      overflow: auto;
+    }
+    .menuDiv{
+      width: 15%;
+      height: 100%;
+      overflow: auto;
+      float: left;
+    }
+    .icon-cell{
+      text-align: center;
+    }
+    .mainDivWarpper{
+      float: right;
+      width: 85%;
+      height: 100%;
+      overflow: scroll;
+    }
+    .mainDiv{
+      width: 6000px;
+      height:3000px;
+      background: url("assets/img/grid.jpg");
+      position: relative;
+    }
+    .red{
+      color:#f0c674;
+      cursor: pointer;
+      margin-left: 10px;
+    }
+    .red:hover{
+      color: #fc4381;
+    }
+    .txt{
+      font-style:normal;
+    }
+    div.aLabel{
+      color: #333;
+      background: #f2f2f2;
+      z-index: 1;
+      border:1px solid #ccc;
+      border-radius: 4px ;
+      cursor: pointer;
+    }
+    .aLabelHover{
+      background: red;
+    }
+    .node-step{
+      border-radius: 5px;
+      border:1px solid #ddd;
+      background: #f2f2f2;
+      vertical-align: middle;
+    }
+    .cell-active{
+      background: #fc4381;
+    }
+    .node-flag-forward{
+      background: #0ff;
+    }
+    .node-flag-backward{
+      background: #f00;
+    }
+    .addChildFlow{
+      cursor: pointer;
+    }
+
+  </style>
+</head>
+<body>
+<div class="headerDiv">
+  <p class="flowname"></p>
+</div>
+<div class="contentDiv">
+  <div class="menuDiv" id="menuDiv">
+    <div class="list-group">
+      <div class="list-group-item text-center">基础流程图</div>
+      <div class="listGroupHide">
+        <ul class="list-group">
+          <li class="list-group-item">
+            <div class="icon-cell" id="icon-start" data-type="anchor" data-nodetype="normal" draggable="true" ondragstart='drag(event)'>
+              <img src="assets/img/icon-start.png" alt="" width="50" height="50">
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="icon-cell" id="icon-check" data-type="anchor" data-nodetype="normal" draggable="true" ondragstart='drag(event)'>
+              <img src="assets/img/icon-check.png" alt="" width="50" height="50">
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="icon-cell" id="icon-submit" data-type="anchor" data-nodetype="normal" draggable="true" ondragstart='drag(event)'>
+              <img src="assets/img/icon-submit.png" alt="" width="50" height="50">
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="icon-cell" id="icon-end" data-type="anchor" data-nodetype="end" draggable="true" ondragstart='drag(event)'>
+              <img src="assets/img/icon-end.png" alt="" width="50" height="50">
+            </div>
+          </li>
+          <li class="list-group-item">
+            <div class="icon-cell" id="icon-autocheck" data-type="anchor" data-nodetype="autocheck" draggable="true" ondragstart='drag(event)'>
+              <img src="assets/img/icon-autocheck.png" alt="" width="50" height="50">
+            </div>
+          </li>
+        <!--<div class="icon-cell flow-line cell-active" id="icon-solid" data-type="connector" draggable="false" lineType="forward">-->
+          <!--<img src="assets/img/icon-solid.jpg" alt="" width="75" height="75">-->
+        <!--</div>-->
+        <!--<div class="icon-cell flow-line" id="icon-dotted" data-type="connector" draggable="false"  lineType="backward">-->
+          <!--<img src="assets/img/icon-dotted.jpg" alt="" width="75" height="75">-->
+        <!--</div>-->
+        </ul>
+      </div>
+      <!--<div class="list-group-item">工序流程图</div>-->
+      <!--<div class="list-group-item">流程模板</div>-->
+    </div>
+  </div>
+  <div class="mainDivWarpper">
+    <input type='hidden' id='active_id' value='0'>
+    <ul class="nav nav-tabs" id="tabBtns" role="tablist">
+      <li class="active">
+        <a  role="tab" data-toggle="pill" href="#mainDiv_1" class="tabBtn" targetid="mainDiv_1">
+          主流程
+        </a>
+      </li>
+
+      <!--这仅仅是个占位符，每次创建新标签，插入到这个之前-->
+      <li id="li_placeholder"></li>
+
+      <li>
+        <a id="addChildFlow" class="addChildFlow">+</a>
+      </li>
+    </ul>
+    <div class="ulDiv tab-content">
+      <div class="mainDiv tab-pane fade in active" id="mainDiv_1" ondragover="allowDrop(event)" ondrop="drop(event)">
+          <input type="hidden" class="flowtype" value="main">
+      </div>
+      <span id="div_placeholder"></span>
+    </div>
+  </div>
+</div>
+
+<div id="canvasMenu" style="display:none;">
+  <ul>
+    <li id="cmSave"><i class="icon-ok"></i>&nbsp;<span class="_label">保存设计</span></li>
+    <!--<li id="cmAdd"><i class="icon-plus"></i>&nbsp;<span class="_label">添加步骤</span></li>-->
+    <!--<li id="cmRefresh"><i class="icon-refresh"></i>&nbsp;<span class="_label">刷新 F5</span></li>-->
+    <!--<li id="cmPaste"><i class="icon-share"></i>&nbsp;<span class="_label">粘贴</span></li>-->
+    <!--<li id="cmHelp"><i class="icon-search"></i>&nbsp;<span class="_label">帮助</span></li>-->
+  </ul>
+</div>
+<div id="processMenu" style="display:none;">
+  <ul>
+    <!--<li id="pm_begin"><i class="icon-play"></i>&nbsp;<span class="_label">设为第一步</span></li>-->
+    <li id="addNodeID"><i class="icon-cog"></i>&nbsp;<span class="_label">设置节点ID</span></li>
+    <li id="addNodeName"><i class="icon-cog"></i>&nbsp;<span class="_label">设置节点名称</span></li>
+    <li id="addPersons" onclick="addPerson()"><i class="icon-check"></i>&nbsp;<span class="_label">添加人员</span></li>
+    <li id="addNodePages"><i class="icon-plus"></i>&nbsp;<span class="_label">添加子页面</span></li>
+    <li id="addAutoCheckCondition"><i class="icon-th"></i>&nbsp;<span class="_label">设置自动审批条件</span></li>
+    <li id="addEndNodeCondition"><i class="icon-share-alt"></i>&nbsp;<span class="_label">设置结束赋值条件</span></li>
+    <!--<li id="pmSetting"><i class=" icon-wrench"></i>&nbsp;<span class="_label">样式</span></li>-->
+    <li id="pmDelete" onclick="delNode()"><i class="icon-trash"></i>&nbsp;<span class="_label">删除</span></li>
+  </ul>
+</div>
+
+<!--设置人员的弹出框-->
+<div id="person-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          选择人员
+        </h4>
+      </div>
+      <div class="modal-body" id="person-modal-body">
+        <div class="row">
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="person-close" class="btn btn-default">关闭</button>
+        <button type="button" id="person-ensure" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--设置节点ID的弹出框-->
+<div id="nodeID-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          设置节点ID:
+        </h4>
+      </div>
+      <div class="modal-body">
+        <input class="form-control" type="text">
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="nodeID-close" class="btn btn-default">关闭</button>
+        <button type="button" id="nodeID-ensure" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--设置节点名称的弹出框-->
+<div id="nodeName-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h4 class="modal-title">
+          设置节点名称：
+        </h4>
+      </div>
+      <div class="modal-body">
+        <input type="text" class="form-control">
+      </div>
+      <div class="modal-footer">
+          <button type="button" id="nodeName-close" class="btn btn-default">关闭</button>
+          <button type="button" id="nodeName-ensure" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+<!--提醒消息的的弹出框-->
+<div id="notifymessage-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <div class="modal-title text-center h4">
+        </div>
+      </div>
+      <div class="modal-body text-center h5">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--点击链接线的弹出框-->
+<div id="connection-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+
+    </div>
+  </div>
+</div>
+
+<!--创建子流程请输入名称弹出框-->
+<div id="flowInfo-modal" class="modal">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">请输入子流程信息</div>
+      <div class="modal-body">
+        <input type="text" class="form-control flowname" placeholder="请输入子流程名称">
+        <textarea class="form-control flowdesc" placeholder="请输入子流程描述" style="margin-top: 10px"></textarea>
+      </div>
+      <div class="modal-footer">
+        <button type="button" id="flowInfo-close" class="btn btn-default">关闭</button>
+        <button type="button" id="flowInfo-ensure" class="btn btn-primary">确定</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="text/javascript" src="assets/jsPlug/jquery-1.11.1.min.js"></script>
+<script type="text/javascript" src="assets/jsPlug/pinyin.js"></script>
+<script type="text/javascript" src="assets/bootstrap/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="assets/jsPlug/jquery-ui-1.10.4.js"></script>
+<script type="text/javascript" src="assets/jsPlug/jquery.contextmenu.r2.js"></script>
+<script type="text/javascript" src="assets/jsPlug/jquery.jsPlumb-1.4.0-all.js"></script>
+<script type="text/javascript" src="assets/flowDesignJs/myflowdesign.js"></script>
+<script type="text/javascript" src="configapi.js"></script>
+<script type="text/javascript">
+  $(function () {
+      // 所有的流程，创建一个新流程会向canvas中增加一个新的流程
+      // 第一个为主要的流程，不能删除，必须要有的，其余的为子流程，可自由创建
+      // 用子流程所在的容器：mainDiv + 时间戳表示当前的流程
+      //
+       canvas = {};
+       // 当前操作的是哪个流程,这是个全局变量
+      CurCanvas = "mainDiv_1";
+      canvasData = {};
+
+      var flowid = getUrlParam("flowid");
+      var flowname = getUrlParam("name");
+      var flowdesc = getUrlParam("desc");
+      drawData = {};
+      flowData = {};
+
+      //获取流程信息
+      $.ajax({
+          url:configapi.getflowapi,
+          type:"get",
+          cache:false,
+          async:false,
+          dataType:'json',
+          data:{
+              flowid:flowid
+          },
+          success:function (res) {
+              if(res.flow && res.flowview){
+                  //flow和flowview的长度是一样的
+
+                  for(var i = 0; i < res.flow.length;i++){
+                      if(!res.flow[i].mainflowid){
+                          // 如果没有mainflowid，则此流程是主流程，主流程只有1个
+                          // 主流程不需要对name，desc，flowid进行赋值，不需要创建tab和对应的div
+                          flowData = res.flow[i];
+                      }else{
+                          // html中是需要动态创建的tab
+                          var html = '';
+
+                          // htm中是需要动态创建的子流程的容器
+                          var htm = '';
+                          //创建tab
+                          var createdDivid = "mainDiv_" + res.flow[i].id;
+                          html += '<li>';
+                          html += '<a role="tab" data-toggle="pill" href="#'+createdDivid+'" class="tabBtn a_'+createdDivid+'" targetid="'+createdDivid+'">';
+                          html += '<i class="txt">'+res.flow[i].name+'</i>';
+                          html += '<span class="red">X</span>';
+                          html += '</a>';
+                          html += '</li>';
+
+                          //创建flow的容器
+                          htm += '<div class="mainDiv tab-pane fade active in" id="'+createdDivid+'" ondragover="allowDrop(event)" ondrop="drop(event)">' ;
+                          htm += '<input type="hidden" class="flowname" value="' + res.flow[i].name+ '">';
+                          htm += '<input type="hidden" class="flowdesc" value="' + res.flow[i].desc + '"> ';
+                          htm += '<input type="hidden" class="flowid" value="'+ res.flow[i].id +'"> ';
+                          htm += '<input type="hidden" class="flowtype" value="child">';//这里保存的是判断是主流程还是子流程的依据
+                          htm += '</div>';
+                        $("#li_placeholder").before(html);
+                        $("#div_placeholder").before(htm);
+                      }
+
+                      if(!res.flowview[i].mainflowid){
+                          createdDivid = "mainDiv_1";
+                      }
+                      canvas[createdDivid] = $("#"+createdDivid).flowDesign({"drawData":res.flowview[i].flowui,"Scope":createdDivid});
+                  }
+              }else{
+                  drawData = {};
+                  flowData = {};
+              }
+          },
+          error:function () {
+              console.log("获取流程信息出错了")
+          }
+      });
+
+
+      if(flowData.name){
+          $(".headerDiv").find("p.flowname").html('流程名称：'+flowData.name)
+      }
+
+      //添加子页面
+      $("#addNodePages").click(function () {
+        //隐藏右键列表
+        $("#jqContextMenu").hide().next("div").hide();
+        var Curid = $("#active_id").val();
+        var nodeid = $("#" + Curid).attr("nodeid");
+        var _flowid = $("#" + CurCanvas).find("input.flowid").val();
+        if(CurCanvas == "mainDiv_1"){
+            _flowid = flowid
+        }
+
+        if(!nodeid){
+            $("#notifymessage-modal").addClass("show")
+              .find(".modal-title").html("提示").end()
+              .find(".modal-body").html("请设置节点ID");
+
+            setTimeout(function () {
+              $("#notifymessage-modal").removeClass("show")
+            },1000);
+            return false;
+        }
+        window.parent.location.href=configapi.addnodepages + "?flowid=" + _flowid + "&nodeid=" + nodeid;
+      });
+
+      //添加自动审批条件
+      $("#addAutoCheckCondition").click(function () {
+          var fromautocheckMsg = {};
+          var autoCheckNodeId = $("#active_id").val();
+          var autoCheckMsgId = $("#"+autoCheckNodeId).attr("autoCheckMsgId");
+          if(!autoCheckMsgId){
+            autoCheckMsgId = "empty";
+          }
+          fromautocheckMsg.isAutoCheckModalShow = true;
+          fromautocheckMsg.autoCheckMsgid = autoCheckMsgId;
+          parent.postMessage(
+            fromautocheckMsg,
+            "*"
+          )
+      });
+
+      window.addEventListener("message",function (ev) {
+        if(ev.data.autoCheckMsgid){
+            $("#"+$("#active_id").val()).attr("autocheckmsgid",ev.data.autoCheckMsgid)
+        }
+      });
+
+      // 设置结束节点的条件
+      $("#addEndNodeCondition").click(function () {
+          var endNodeid = $("#active_id").val();
+          var endNodeConditionid = $("#" + endNodeid).attr("endnodeconditionid");
+          if(!endNodeConditionid){
+              endNodeConditionid = "empty";
+          }
+          var _flowid = $("#" + CurCanvas).find("input.flowid").val();
+          if(CurCanvas == "mainDiv_1"){
+              _flowid = flowid
+          }
+          var fromEndNodeCondition = {};
+          fromEndNodeCondition.endNodeConditionFlowid = _flowid;
+          fromEndNodeCondition.endNodeConditionid = endNodeConditionid;
+          fromEndNodeCondition.isEndNodeConditionModalShow = true;
+          parent.postMessage(
+              fromEndNodeCondition,
+              '*'
+          )
+      });
+
+      window.addEventListener("message",function (ev) {
+          var curId = $("#active_id").val();
+          if(ev.data.endNodeConditionid){
+              $("#"+curId).attr("endnodeconditionid",ev.data.endNodeConditionid)
+          }
+      })
+
+      //点击创建子流程
+      // 这个变量用于找到新创建的流程的tab标签和容器
+      var createdDivid = '';
+      $("#addChildFlow").click(function () {
+        //创建切换标签，id用时间戳保证唯一性
+         createdDivid = "mainDiv_" +new Date().getTime();
+
+        var html = '<li>';
+        html += '<a role="tab" data-toggle="pill" href="#'+createdDivid+'" class="tabBtn a_'+createdDivid+'" targetid="'+createdDivid+'">';
+        html += '<i class="txt">子流程</i>';
+        html += '<span class="red">X</span>';
+        html += '</a>';
+        html += '</li>';
+        $("#li_placeholder").before(html);
+
+        //创建流程所在的区域
+          var htm = '<div class="mainDiv tab-pane fade in active" id="'+createdDivid+'" ondragover="allowDrop(event)" ondrop="drop(event)">' ;
+          htm += '<input type="hidden" class="flowname" value="">';
+          htm += '<input type="hidden" class="flowdesc" value="">';
+          htm += '<input type="hidden" class="flowid" value="">';
+          htm += '<input type="hidden" class="flowtype" value="child">';//这里保存的是判断是主流程还是子流程的依据
+          htm += '</div>';
+        $("#div_placeholder").before(htm);
+
+        //创建流程的对象
+        //这里只能写成{flowTotal: "0", nodeTotal: "0", flowList:[], nodeList:[]}, 不能写成{}，否则主流程的节点会显示在子流程中
+        canvas[createdDivid] = $("#"+createdDivid).flowDesign(
+            {"drawData":{flowTotal: "0", nodeTotal: "0", flowList:[], nodeList:[]},"Scope":createdDivid}
+        );
+
+        //弹出对话框输入子流程名称
+        $("#flowInfo-modal").addClass('show').find(".flowname").val("").end().find(".flowdesc").val("");
+      });
+
+        // 点击确定按钮
+      $("#flowInfo-ensure").click(function () {
+        var name = $("#flowInfo-modal").find("input").val();
+        var desc = $("#flowInfo-modal").find("textarea").val();
+
+        if(!name || !desc){
+          return false;
+        }
+
+        $(".a_"+createdDivid).find('.txt').html(name);
+        $("#"+createdDivid).find('.flowname').val(name);
+        $("#"+createdDivid).find(".flowdesc").val(desc);
+
+        $("#flowInfo-modal").removeClass("show");
+      });
+
+      // 点击取消按钮
+      $("#flowInfo-close").click(function () {
+        $("#flowInfo-modal").removeClass("show");
+      });
+
+      //点击切换流程
+      $("#tabBtns").on("click",".tabBtn",function (ev) {
+          if(ev.target.tagName != "SPAN" || ev.target.tagName != "span"){
+            //选择对应的canvas属性,canvas[CurCanvas]
+            CurCanvas = $(this).attr('targetid');
+          }
+      });
+
+      // 点击切换流程上的删除按钮
+      // 1. 删除对应li
+      // 2. 删除canvas中对应对象
+      // 3. 删除对应的容器
+      $("#tabBtns").on("click",".tabBtn span",function (ev) {
+        if(ev.target.tagName == "SPAN" || ev.target.tagName == "span"){
+          //删除子流程的li
+          $(this).closest('li').prev().addClass("active");
+          $("#"+$(this).closest('a').attr("targetid")).prev().addClass("active in");
+          $(this).closest('li').remove();
+          var targetid = $(this).parent().attr('targetid');
+          // 删除对应的流程容器
+          $("#"+targetid).remove();
+
+          // 对应的canvas对象清空
+          canvas[targetid] = {};
+        }
+      });
+
+      //保存设计
+      $("#cmSave").click(function () {
+        $("#jqContextMenu").hide().next("div").hide();
+        var drawdata = canvas[CurCanvas].getDesignInfo(CurCanvas);
+        drawdata = JSON.parse(drawdata);
+        var nodesData = drawdata.nodesData;//保存节点数据
+        var flowview = drawdata.flowview;//保存UI
+        var flowsData = drawdata.flowsData;//保存链接数据
+        var judgeData = drawdata.judgeData;
+        //这里是主流程保存
+        //1. 不需要保存name
+        //2. 不需要保存desc
+        //3. 不需要保存mainFlowid
+
+        if(judgeData.flowtype == "main"){
+          $.ajax({
+            url:configapi.updateflowapi,
+            type:"post",
+            dataType:"json",
+            cache:false,
+            data:{
+              flowid:flowid,
+              nodes:nodesData,
+              flows:flowsData,
+              flowview:flowview
+            },
+            success:function (res) {
+              if(res.id){
+                  $("#notifymessage-modal").addClass('show')
+                    .find(".modal-title").html("成功").end()
+                    .find(".modal-body").html('流程保存成功');
+
+                  setTimeout(function () {
+                    $("#notifymessage-modal").removeClass('show')
+                  },1000)
+              }
+            },
+            error:function () {
+              console.log('保存flowdata和flowview出错了')
+            }
+          })
+        }else if(judgeData.flowtype == "child"){
+            //mainflowid  主流程的id
+            //flowid：子流程的id
+            $.ajax({
+                url:configapi.createorupdateflowapi,
+                type:'post',
+                dataType:'json',
+                cache:false,
+                data:{
+                    flowid:judgeData.flowid,
+                    mainflowid:flowid,
+                    name:judgeData.flowname,
+                    desc:judgeData.flowdesc,
+                    flowview:flowview,
+                    nodes:nodesData,
+                    flows:flowsData
+                },
+                success:function (res) {
+                    if(res.id){
+                        $("#notifymessage-modal").addClass('show')
+                          .find(".modal-title").html("成功").end()
+                          .find(".modal-body").html('流程保存成功');
+
+                        console.log(CurCanvas)
+                        $("#"+CurCanvas).find("input.flowid").val(res.id)
+                        setTimeout(function () {
+                          $("#notifymessage-modal").removeClass('show')
+                        },1000)
+                    }
+                },
+                error:function () {
+                    console.log('保存flowdata和flowview出错了')
+                }
+            })
+        }
+
+      });
+
+      //添加人员
+      $.ajax({
+          url:configapi.listusersapi,
+          type:"get",
+          cache:false,
+          async:false,
+          dataType:"json",
+          success:function (res) {
+              if(res.users){
+                  var html = '';
+                  $.each(res.users,function (idx, val) {
+                    html += '<div class="col-md-6">';
+                    html += '<label>';
+                    html += '<input type="radio" name="person" value="'+val.id+'">&nbsp;&nbsp;';
+                    html += '<span>'+val.loginname+'</span>';
+                    html += '</label>';
+                    html += '</div>'
+                  });
+                  $("#person-modal-body").find("div.row").append(html)
+              }
+          },
+          error:function () {
+            console.log('获取人员信息出错了')
+          }
+      });
+
+      //设置节点ID
+      $("#addNodeID").click(function () {
+        $("#nodeID-modal").addClass("show").find("input").val("");
+      });
+      $("#nodeID-close").click(function () {
+        $("#nodeID-modal").removeClass("show").find("input").val("");
+      });
+      $("#nodeID-ensure").click(function () {
+          var nodename = $("#nodeID-modal").find("input").val();
+          var curId = $("#active_id").val();
+          var allNodes = $(".mainDiv").find(".node-step");
+
+          //自定义的nodeid，不是真正的id
+          var hadNodesId = [];
+          for(var i = 0;i < allNodes.length; i++){
+            hadNodesId.push(allNodes.eq(i).attr("nodeid"))
+          }
+
+          var newid = pinyin.getFullChars(nodename).toLowerCase();
+
+          if($.inArray(newid,hadNodesId) > -1){
+              $("#nodeID-modal").removeClass("show");
+              $("#notifymessage-modal").addClass('show')
+                .find(".modal-title").html("错误").end()
+                .find(".modal-body").html("节点ID重复，请修改");
+
+              setTimeout(function () {
+                $("#notifymessage-modal").removeClass('show');
+                $("#nodeID-modal").addClass('show');
+              },1000)
+          }else{
+            $("#"+curId).find("p.nodeID").html('节点ID：<span>'+newid+'</span>');
+            $("#nodeID-modal").removeClass("show").find("input").val("");
+            $("#"+curId).attr("nodeid",newid);
+
+          }
+      });
+
+      // 设置节点名称
+    $("#addNodeName").click(function () {
+      $("#nodeName-modal").addClass("show").find("input").val("");
+    });
+
+    $("#nodeName-close").click(function () {
+      $("#nodeName-modal").removeClass("show").find("input").val("");
+    });
+
+    $("#nodeName-ensure").click(function () {
+      var curId = $("#active_id").val();
+      var nodename = $("#nodeName-modal").find("input").val();
+      $("#"+curId).find("p.nodeName").html('节点名称：<span>'+nodename+'</span>');
+      $("#nodeName-modal").removeClass("show").find("input").val("");
+    });
+
+
+    $(".flow-line").bind("click",function (ev) {
+      var el = $(ev.target);
+      if(el.get(0).tagName!="DIV" && el.get(0).tagName!="div"){
+        el = $(ev.target).parent("div");
+      }
+      el.addClass("cell-active").siblings(".flow-line").removeClass("cell-active")
+    })
+
+  });
+  //获取当前url参数
+  function getUrlParam(name) {
+    var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)"); //构造一个含有目标参数的正则表达式对象
+    var r = window.location.search.substr(1).match(reg);  //匹配目标参数
+    if (r != null) return decodeURI(r[2]); return null; //返回参数值
+  }
+
+  //添加人员
+  function addPerson() {
+    var toSelectPerson = {};
+    toSelectPerson.isSelectPersonModalShow = true;
+    var curId = $("#active_id").val();
+    var isAdmin = $("#" + curId).find(".nodeperson").attr("isadmin");
+    var persons = $("#" + curId).find(".nodeperson").attr("usrs");
+    var groups = $("#" + curId).find(".nodeperson").attr("groups");
+    var apartments = $("#" + curId).find(".nodeperson").attr("apartments");
+    var personsArr = [];
+    var groupsArr = [];
+    var apartmentsArr = [];
+    if(persons){
+      personsArr = persons.split(",");
+    }
+    if(groups){
+      groupsArr = groups.split(",");
+    }
+    if(apartments){
+      apartmentsArr = apartments.split(",");
+    }
+
+    // 这里需要三个变量值，故写成了String类型
+    toSelectPerson.isReshow = "false";
+    if(persons != "" || groups != "" || apartments != "" ){
+      toSelectPerson.isReshow = "true";
+    }
+    toSelectPerson.persons = personsArr;
+    toSelectPerson.groups = groupsArr;
+    toSelectPerson.apartments = apartmentsArr;
+    toSelectPerson.isAdmin = isAdmin;
+    parent.postMessage(
+        toSelectPerson,
+        "*"
+    );
+  }
+
+  window.addEventListener("message",function (ev) {
+      var curId = $("#active_id").val();
+      if(ev.data.apartments){
+          $("#"+curId).find(".nodeperson")
+            .attr("apartments",ev.data.apartments)
+            .html('人员:<span>已选择</span>');
+      }
+      if(ev.data.groups){
+          $("#"+curId).find(".nodeperson")
+            .attr("groups",ev.data.groups)
+            .html('人员:<span>已选择</span>');
+      }
+      if(ev.data.persons){
+        $("#"+curId).find(".nodeperson")
+          .attr("usrs",ev.data.persons)
+          .html('人员:<span>已选择</span>');
+      }
+      if(ev.data.isAdmin == true || ev.data.isAdmin == false){
+        $("#"+curId).find(".nodeperson")
+          .attr("isadmin",ev.data.isAdmin)
+      }
+  });
+
+  //  删除Node
+  function delNode() {
+    var activeId = $("#active_id").val();
+    //隐藏右键列表
+    $("#jqContextMenu").hide().next("div").hide();
+    if(activeId != ""){
+      canvas[CurCanvas].delNode(activeId)
+    }
+  }
+
+  //设置允许拖放区域
+  function allowDrop(ev){
+    ev.preventDefault();
+  }
+
+  //拖动元素
+  function drag(ev) {
+    var ele = $(ev.target);
+    if(ele.get(0).tagName!="DIV" && ele.get(0).tagName!="div"){
+      ele = $(ev.target).parent("div");
+    }
+    ev.dataTransfer.setData("id",ele.attr("id"));
+    ev.dataTransfer.setData("type",ele.data("type"));
+    ev.dataTransfer.setData("img",ele.find("img").attr("src"));
+    ev.dataTransfer.setData("nodetype",ele.attr("data-nodetype"));
+  }
+
+  //放置元素
+  function drop(ev) {
+    //当前放置动作所在的div
+    var curMainDiv = ev.target.id;
+    var time = new Date().getTime();
+    ev.preventDefault();
+    if(ev.dataTransfer){
+      var type = ev.dataTransfer.getData('type');
+      if(type == "anchor"){
+        var oLeft = document.getElementById(curMainDiv).offsetLeft;
+        var oTop = document.getElementById(curMainDiv).offsetTop;
+        var oImg = ev.dataTransfer.getData("img");
+        var oNodeType = ev.dataTransfer.getData("nodetype");
+        var x = ev.clientX - oLeft;
+        var y = ev.clientY - oTop;
+        var row = {
+          id:'w'+time,
+          style:"left:"+x+"px;top:"+y+"px",
+          img:oImg,
+          nodetype:oNodeType
+        };
+        canvas[CurCanvas].addNode(row);
+      }
+    }
+  }
+
+
+</script>
+</body>
+</html>

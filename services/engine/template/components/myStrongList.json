@@ -1,0 +1,67 @@
+{
+	"newlayout": {},
+	"setting": {},
+	"importpages": "",
+	"action": [
+       {
+    	   "type": "replace",
+	    	"from": {
+    		    "start": "viewpage=\"",
+		   		"end": "\""
+	   	   },
+		   "to": {
+			   "start": "let pageviewid = \"",
+			   "end": "\""
+		   },
+		   "totype": "json"
+	   },
+	   {
+    	   "type": "replace",
+	    	"from": {
+    		    "start": "editpage=\"",
+		   		"end": "\""
+	   	   },
+		   "to": {
+			   "start": "let pageeditid = \"",
+			   "end": "\""
+		   },
+		   "totype": "json"
+	   },
+	   {
+    	   "type": "replace",
+	    	"from": {
+    		    "start": "newset=\"",
+		   		"end": "\\]\""
+	   	   },
+		   "to": {
+			   "start": "let setnew = ",
+			   "end": "];"
+		   },
+		   "totype": "json"
+	   },
+	   {
+    	   "type": "replace",
+	    	"from": {
+    		    "start": "modalshow=\"{",
+		   		"end": "}\""
+	   	   },
+		   "to": {
+			   "start": "let showmodal = {",
+			   "end": "}"
+		   },
+		   "totype": "json"
+	   },
+	   {
+    	   "type": "replace",
+	    	"from": {
+    		    "start": "searchsby=\"",
+		   		"end": "\\]\""
+	   	   },
+		   "to": {
+			   "start": "let search = ",
+			   "end": "];"
+		   },
+		   "totype": "json"
+	   }
+   ]
+}

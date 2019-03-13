@@ -1,0 +1,40 @@
+/**
+*1medialibrary：[读取login_user_info.json,读取basicinfo_config.json];
+*search和filter读取controlable_info.json;
+**/
+[
+	{
+		'medialibrary':'淘宝.女装.连衣裙',
+		'search':{
+			'宝贝',
+			'search-Content':'连衣裙',
+			'搜女装'
+		},
+		'filter':{
+			'销量',
+			'价格':{
+				min:100,
+				max:500
+			},
+			'发货地':'京津冀',
+			['包邮','正品保障','赠送退货运费险']
+		},
+		'number':3,
+		'needspider':{
+			'_comments':'商品的详情信息，商品评论30条，评价类型为好评',
+			'content':[
+					{
+					'type':'商品',
+					'needinfo': ['名称','数量','产地','描述','价格'],
+					},
+					{
+					'type':'评论'
+					'number':'20'
+					'needinfo': ['时间', '谁','哪里', '内容']
+					},
+					'type':'赞',
+					'needinfo':['吐槽型','赞型','一般型']
+				]
+		}
+	}
+]

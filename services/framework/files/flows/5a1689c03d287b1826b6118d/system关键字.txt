@@ -1,0 +1,18 @@
+
+人员相关：
+	system-myself: 表示用户自己，返回用户ID。
+	system-myboss: 表示我的直接领导，，返回用户领导ID。
+
+日期相关：
+	system-today：表示今天
+	system-thisweek：表示本周
+	system-thismonth：表示本月
+	system-thisyear：表示本年
+
+	日期计算
+		system-today + n：未来几天。
+		system-today  - n：过去几天。
+
+工作方式：
+	新增一个systemkeyaction。
+	在ck和sk进行操作前，用systemkeyaction进行处理，如果包含了上面的关键字，调用相应的方法将值转化成系统对应的值。

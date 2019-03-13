@@ -1,0 +1,54 @@
+消息组的存储
+{
+	id
+	identify :	"可以是flowid, 也可以是groupid。。。"
+	title
+	desc
+	icon
+}
+
+////////////////////////////////////////////////////
+function Send(){
+	。。。。。
+	。。。。。
+	QueryGroup(.....)						//获得消息需要发送的组。
+		.then(ComposeMssage())				//组织消息内容。
+		.then(SaveMessage(data))			//存
+		.then(SendNotification(data))			//极光。
+		.then(function(){
+			res.send();
+		})
+}
+
+fuction QueryGroup(){
+	if(data.type == Notification) {
+		找到消息组里，绑定了流程ID的消息组。		
+	}
+
+}
+
+function ComposeMssage(....) {
+	
+	ComposeBase()		//from, to, priority, type, title...
+		.ComposeIfNotification(data)
+		.ComposeIfSharing(data)
+		.ComposeIfChat(data)
+		.ComposeIfAnnounce(data)
+		.then(function(){
+			resolved(data)
+		})
+}
+
+function ComposeIfNotification(){
+	Readrelatedmessageformat(data)
+		.ReadSKInfo(data)
+		.Readrelatedflowdata(data)
+		.composenotifcation()
+		.then(function(){
+			resolved(data)
+		})
+
+}
+
+
+

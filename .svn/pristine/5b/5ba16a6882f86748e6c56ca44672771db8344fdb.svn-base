@@ -1,0 +1,11 @@
+{
+  "newlayout": {
+    "start":"<div id = \"layouttobeadd\">",
+    "end":"</div>"
+  },
+  "setting": "",
+  "importpages": "",
+  "action":[
+	
+  ]
+}

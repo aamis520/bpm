@@ -1,0 +1,21 @@
+
+<!--   
+	本配置主要定义的是“爬虫项目”集合的信息，对应的工作流程是
+	1. 爬虫系统启动时，会来读取本文件
+	2. 对于所有"startspy = true"的流程，表示开始爬取数据，为false的不爬取。
+	3. 具体某个流程中的配置，从对应的文件夹中来获取。
+	
+	每个流程需要对应独立的爬虫进程，互相之前不应该影响。
+  --> 
+
+<group>
+	<project startspy = "true">
+		<name>娱乐型爬取</name>
+		<configfolder>happyproject</configfolder>
+	</project>
+	<project startspy = "false">
+		<name>工作型爬取</name>
+		<configfolder>workproject</configfolder>
+	</project>
+	
+</group>

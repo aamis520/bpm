@@ -1,0 +1,26 @@
+<ion-view view-title="联系人">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-back-button class="button-clear">
+      <i class="icon ion-ios-arrow-left"></i>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content>
+<!--<div ng-repeat="item in contactsList">-->
+  <!--<p><span>{{item.displayName}}:</span>{{item.phoneNumbers[0].value}}</p>-->
+<!--</div>-->
+    <div class="list">
+      <a ui-sref="tab.personList({department:'研发部'})" class="item item_person">
+        <b class="person_icon">
+          <i class="fa">研发</i>
+        </b>
+        <b class="person_name">北京圣达康网络科技有限公司</b>
+      </a>
+      <a ui-sref="tab.personList({department:item.departmentName})" ng-repeat="item in department" class="item item_person">
+        <b class="person_icon">
+          <i class="fa">{{item.departmentName.substring(0,2)}}</i>
+        </b>
+        <b class="person_name">{{item.departmentName}}</b>
+      </a>
+    </div>
+  </ion-content>
+</ion-view>

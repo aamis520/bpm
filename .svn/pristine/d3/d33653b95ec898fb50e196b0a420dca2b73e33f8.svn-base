@@ -1,0 +1,27 @@
+<ion-view view-title="{{initDash.companyname}}">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-back-button class="button-clear">
+      <i class="icon ion-ios-arrow-left"></i>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content class="padding">
+    <img class="full-image" src="img/banner_one.png">
+    <div ng-click="goSecond(item.url,item.childs)" ng-repeat="item in initDash.applications.needtoshow" class="repet_icon">
+      <div class="repet_col">
+        <div class="font_icon">
+            <i ng-show="!item.icon" class="fa">{{item.name | limitTo:2}}</i>
+            <i ng-show="item.icon" class="{{item.icon}} fa font"></i>
+        </div>
+        <p>{{item.name}}</p>
+      </div>
+    </div>
+    <div ui-sref="tab.application" class="repet_icon">
+      <div class="repet_col">
+        <div class="font_icon">
+            <i class="ion-arrow-expand font"></i>
+        </div>
+        <p>更多</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

@@ -1,0 +1,130 @@
+/**index.wxss**/
+.userinfo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width:100%;
+  
+}
+/*----------------------main-------------------*/
+.num{
+  color: #74521d;
+  font-size: 130rpx;
+}
+.num_small{
+  width:70%;
+  padding: 27rpx 0;
+  text-align: center;
+  border-bottom:1px solid #00b30c;
+}
+.ymd{
+  color: #c1b5a8;
+}
+.sign-wrap{
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+}
+.motto_out{
+  position:relative;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 360rpx;
+  height: 360rpx;
+  /*margin: 30rpx 0;*/
+  border-radius: 100%;
+  text-align: center;
+  background: #bbf1bf;
+  background-image:-webkit-linear-gradient(180deg,#ffffff,#bbf1bf); 
+  background-image:linear-gradient(180deg,#ffffff,#bbf1bf);
+  border: 1px solid #fefbf6;
+  box-shadow: 0px 5px 10px 0px #bbf1bf;
+}
+.sign-btn{
+  position:absolute;
+  top:48rpx;
+  z-index: 11;
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 260rpx;
+  height: 260rpx;
+  border: 2px solid #fff;
+  border-radius: 100%;
+  text-align: center;
+  line-height: 260rpx;
+  color: #00b30c;
+  font-weight: 900;
+  background-image:-webkit-linear-gradient(0deg,#ffffff,#bbf1bf); 
+  background-image:linear-gradient(0deg,#ffffff,#bbf1bf);
+}
+.sign-btn::after{
+  border: none;
+}
+.about{
+  color:#00b30c;
+  position: fixed;
+  right:10%;
+  bottom: 5%;
+}
+.onTime{
+  margin: 3% 0 0 25%;
+  padding-left: 5%;
+  width:100%;
+  font-size: 30rpx;
+  border-left: 10rpx solid #00b30c;
+}
+.gpsRound{
+  font-size: 30rpx;
+  color:#bbb;
+}
+.gpsRound text text{
+  color:#f00;
+}
+.signType{
+  width:60%;
+  margin-top: 20rpx;
+  color: #999;
+  font-size: 34rpx;
+  height: 50rpx;
+  line-height: 50rpx;
+}
+.signStatus{
+  width: 60%;
+  margin: 20rpx 0;
+  color:#74521d;
+  font-size: 40rpx;
+  font-weight: 900;
+}
+.signStatus text{
+  padding: 0 5rpx;
+  margin-left: 20rpx;
+  font-size: 30rpx;
+  background: #74521d;
+  color: #fff;
+}
+.upDate{
+  font-size: 30rpx;
+  margin-top: 10rpx;
+  width: 60%;
+  color:#f00;
+}
+.orangeHr{
+  width: 70%;
+  border-top: 1rpx solid #00b30c;
+  margin: 30rpx 0;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+

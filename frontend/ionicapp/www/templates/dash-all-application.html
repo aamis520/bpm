@@ -1,0 +1,21 @@
+<ion-view view-title="全部应用">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-buttons>
+      <button ng-click="$ionicGoBack()" class="button button-clear"><i class="icon ion-ios-arrow-left"></i></button>
+      <button class="button button-clear"><i class="icon ion-ios-close-empty"></i></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content class="padding">
+    <div ng-repeat="item in initDash" class="repet_icon">
+      <div class="repet_col">
+        <div class="font_icon">
+          <span ng-class="{'font':item.icon}">
+            <i ng-show="!item.icon" class="fa">{{item.name.substr(0, 2)}}</i>
+            <i ng-show="item.icon" class="{{item.icon}} fa"></i>
+          </span>
+        </div>
+        <p>{{item.menu}}</p>
+      </div>
+    </div>
+  </ion-content>
+</ion-view>

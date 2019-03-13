@@ -1,0 +1,33 @@
+<ion-view view-title="">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-buttons>
+      <button ng-click="$ionicGoBack()" class="button button-clear"><i class="icon ion-ios-arrow-left"></i></button>
+    </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content class="bg_gary">
+    <div class="name_box">
+      <div class="name_icon">
+        <i class="fa">{{person.personName | limitTo: -2}}</i>
+      </div>
+      <p>{{person.personName}}</p>
+    </div>
+    <ul class="list">
+      <li class="item">
+        <p class="key">姓名</p>
+        <p class="value">{{person.personName}}</p>
+      </li>
+      <li class="item">
+        <p class="key">电话</p>
+        <p class="value"><a href="tel:{{person.telPhone}}">{{person.telPhone}}</a></p>
+      </li>
+      <li class="item">
+        <p class="key">邮箱</p>
+        <p class="value">{{person.email}}</p>
+      </li>
+      <li class="item">
+        <p class="key">座机</p>
+        <p class="value"><a href="tel:{{person.officePhone}}">{{person.officePhone}}</a></p>
+      </li>
+    </ul>
+  </ion-content>
+</ion-view>

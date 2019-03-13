@@ -1,0 +1,25 @@
+<ion-view view-title="我的">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-back-button class="button-clear">
+      <i class="icon ion-ios-arrow-left"></i>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content class="padding bg_gary">
+    <div class="main_msg font_icon">
+      <p class="p_name">
+        <a>{{login_data.username}}</a>
+        <b class="main_name">
+          <i class="fa">{{login_data.username}}</i>
+        </b>
+      </p>
+      <p>{{login_data.companyname}}</p>
+    </div>
+    <div class="list">
+      <a class="item item-icon-left item-icon-right" href="#">
+        <i class="icon ion-ios-gear-outline blue"></i>
+        设置
+        <i class="icon ion-ios-arrow-right gary"></i>
+      </a>
+  </div>
+  </ion-content>
+</ion-view>

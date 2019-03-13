@@ -1,0 +1,33 @@
+{
+  "newlayout": {
+    "start":"<div id = \"layouttobeadd\">",
+    "end":"</div>"
+  },
+  "setting": "",
+  "action": [
+     {
+    	 "type":"replace",
+	   	  "from":{
+	   		  "start":"cardTitle=\"",
+	   		  "end":"\""
+	   	  },
+	   	  "to":{
+	   		  "start":"let cardTitle = \"",
+	   		  "end":"\""
+	   	  },
+	   	  "totype":"json"
+     }
+   ],
+  "importpages": {
+	  "type":"replace",
+	  "from":{
+		  "start":"importcardpageid=\"",
+		  "end":"\""
+	  },
+	  "to":{
+		  "start":"",
+		  "end":""
+	  },
+	  "totype":"json"
+  }
+}

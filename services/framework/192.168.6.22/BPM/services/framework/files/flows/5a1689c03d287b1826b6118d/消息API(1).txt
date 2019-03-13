@@ -1,0 +1,145 @@
+
+我们的消息系统要能达到如下一些要求：
+
+	1. 能够从原始数据中自动提取一些数据，作为消息的内容（类似微信发分享，自动从网页中提取数据一样）。
+	2. 能够设置优先级。
+	3. 能够设置消息类型。
+	4. 能够设置收信人或收信组。
+	5. 能够设置收信模块。
+	6. 能够设置消息是否可以有动作，如果用户点击后，动作如何来做。
+	7. 能够发送系统通知。
+	8. 可以设置消息需要被确认收到功能。
+	9. 支持群组或个人对个人的讨论。（暂时不考虑附件等内容）
+
+有如下的用户场景需要考虑
+	1. 用户提交一个请假申请，在审批人 消息列表中，要有这个申请，而且做为重要优先级显示。审批人点击这个项，可以直接进入这个的申批表单。
+	2. 如果申请被拒绝，申请人端得到一个消息，消息中有申请被拒绝的原因，同时有消息的详情。申请人点击后，可以进行申请修改并重新提交。
+	3. 如果某个项目管理中，有人员被加入或删除，则发给所有人一个最低优先级的消息。
+	4. 在用户组里讨论时，所说的话发送给相关人。
+
+
+API
+
+		http://xxxx/message/send
+			{
+				"Type":"类型，可选为Notification（状态通知）, Sharing（信息分享）, Announce（组织广告）, Chat（聊天）",
+				"Priority":"5, 4, 3, 2, 1   5表示非常重要",
+				"FromID":"",
+				"ToIDs":[],
+				"GroupIDs":[],
+				"Needconfirm":"True/False"
+				"Message":{
+					    "title": "标题",
+					    "desc": "描述",
+					    "thumb": "缩略图",
+					    "context": "消息内容，可为Html格式"
+					    "url":""
+					}
+			}
+			
+
+		http://xxxx/message/query
+			{
+				"usrid":""
+				"timestamp":""
+				"type":""
+				"from":"从多少条开始，如果是-1，则取所有；如果timestamp为0，同时超过50条，则只取50条"
+				"length":"取多少个"
+			}
+
+		返回值
+			{
+				"timestamp":"时间戳"
+				"havemore":"还有更多数据"
+				"messages":[
+					{
+					"Type":"类型，可选为Notification, Sharing, Announce, Chat",
+					"Priority":"5, 4, 3, 2, 1   5表示非常重要",
+					"FromID":"",
+					"ToIDs":[],
+					"GroupIDs":[],
+					"Needconfirm":"True/False"
+					"Message":{
+						    "title": "标题",
+						    "desc": "描述",
+						    "thumb": "缩略图",
+						    "context": "消息内容，可为Html格式"
+						    "url":""
+						}
+					"isread":""
+					"isconfirmed":""
+					}
+
+				] .......
+			}
+
+			
+		http://xxxx/message/messageRead  只要看了，就记录一下。
+			{
+				"usrid":""
+				"messageid":""
+			}
+
+		http://xxxx/message/messageConfirm   必须是用户选择确认后，再记录。
+			{
+				"usrid":""
+				"messageid":""
+			}
+
+		http://xxxx/message/querygroup
+			{
+				"usrid":""
+				"groupid":""
+			}
+
+			返回值
+			{
+				"title":""
+				"desc":""
+				"icon":""
+			}
+
+
+
+流程如何存储
+
+    "flows" : [ 
+        {
+            "conditionID" : "....."
+            "messageID" : "新建的messageID"
+	    "start" : "try",
+            "end" : "shenpi",
+            "type" : "forward"
+        }
+
+
+流程中的message设置存储方式
+	{
+	     "id"
+	     "toids"
+	     "priority"
+	     "keyword1":"skid"
+	     "keyword1":"skid"
+	     "keyword1":"skid"
+	     "keyword1":"skid"
+	}
+
+
+message存储格式
+			{
+				"Type":"类型，可选为Notification, Sharing, Announce, Chat",
+				"Priority":"5, 4, 3, 2, 1   5表示非常重要",
+				"FromID":"",
+				"ToIDs":[],
+				"GroupIDs":[],
+				"Needconfirm":"True/False"
+				"Message":{
+					    "title": "标题",
+					    "desc": "描述",
+					    "thumb": "缩略图",
+					    "context": "消息内容，可为Html格式"
+					    "url":""
+					}
+				ReadIDs:[]
+				ConfirmIDS:[]
+			}

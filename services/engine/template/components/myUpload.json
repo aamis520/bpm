@@ -1,0 +1,31 @@
+{
+  "newlayout": {},
+  "setting": "",
+  "action": [
+     {
+    	 "type":"replace",
+	   	  "from":{
+	   		  "start":"uploadfilesettype=\"",
+	   		  "end":"\""
+	   	  },
+	   	  "to":{
+	   		  "start":"let foldertype = \"",
+	   		  "end":"\""
+	   	  },
+	   	  "totype":"json"
+     },
+     {
+    	 "type":"replace",
+	   	  "from":{
+	   		  "start":"uploadfilesetkey=\"",
+	   		  "end":"\""
+	   	  },
+	   	  "to":{
+	   		  "start":"let folderkey = \"",
+	   		  "end":"\""
+	   	  },
+	   	  "totype":"json"
+     }
+   ],
+  "importpages": {}
+}

@@ -1,0 +1,23 @@
+[
+	{
+		"medialibrary":"0-text.要闻板块   用点号来做 主-子 板块的分割。"
+		"filter":"过滤什么"
+		"search":"搜索什么"
+		"needspider":{
+			"_comments":"定义需要爬取什么内容",
+			"content":[
+					{
+					"type":"文章"
+					"needinfo": "who, where, when, what"
+					},
+					{
+					"type":"评论"
+					"needinfo": "what"
+					}
+					。。。。
+				]
+
+		}
+	},
+
+]

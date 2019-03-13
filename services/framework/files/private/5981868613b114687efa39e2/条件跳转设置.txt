@@ -1,0 +1,128 @@
+
+需求：
+	1. 用户登录后，打开某个功能，能看到需要它审批的内容。
+	2. 审批通过后，能流到下一个节点。（另外一个用户登录后，打开某个功能，能看到需要它审批的内容。）同时还能看到别人的审批意见。
+	3. 审批拒绝后，如果设置了返回节点，则返回到那个节点。（重新审批）
+	4. 审批拒绝后，如果没有设置返回节点，则返回到那个起点。（重新提交）
+	5. 用户能看到的状态：待我审批，已被我审批通过，已被我审批拒绝，我提交的，我提交通过的，需要重新提交的，已存档。
+
+在Flowcontroller的submitdata（提交数据）和submitappoove(审核数据)中，对所有提交成功的数据，都：
+
+如果新提交/重新提交数据
+	1.  取当前的flow和节点，取出从本节点出发的“前向”条件，将所有条件取出。
+	2. 按优先级排列condidntion. 
+	3. 按顺序计算当前的condidnation是否符合，如果符合，则退出。（如果全不符合，则使用最后一条）
+	4. 取出condidnation的节点flow和node id，设置到新提交的数据的“nextflow”中。
+
+		{
+		    "_id" : ObjectId("5941033398a8f4800b3b669e"),
+		    "xiangmu" : "项目A",
+		    "fuzeren" : "591a71fc8c9082580984cee8",
+		    "shouru" : "40000",
+		    "zhichu" : "10000",
+		    "shijian" : "1504224000000",
+		    "usrid" : "591a71fc8c9082580984cee8",
+		    "createdAt" : ISODate("2017-06-14T09:34:43.260Z"),
+		    "updatedAt" : ISODate("2017-06-14T09:34:43.260Z")
+		    "nextflow":{flowid, nodeid}
+			
+			"nextFlowid"：...,
+			"nextnodeid":...
+		}
+
+	shenpirecord:
+		[]
+
+如果是审批同意：
+	除了以上四点外，还有：
+	5. 保存当前审批节点和审批人。（未来，如果下一节点审核不通过时，如果没有别的设置的话，再次提交时的申批流程会是原路返回）
+	6. 将申批的数据存到“申批记录“表中，需要包括：”申批人“， ”申批意见“，”申批时间“。
+
+		{
+		    "_id" : ObjectId("5941033398a8f4800b3b669e"),
+		    "xiangmu" : "项目A",
+		    "fuzeren" : "591a71fc8c9082580984cee8",
+		    "shouru" : "40000",
+		    "zhichu" : "10000",
+		    "shijian" : "1504224000000",
+		    "usrid" : "591a71fc8c9082580984cee8",
+		    "createdAt" : ISODate("2017-06-14T09:34:43.260Z"),
+		    "updatedAt" : ISODate("2017-06-14T09:34:43.260Z")
+		    "nextflowid":flowid
+		    "nextnode:nodeid
+		}
+
+	shenpirecorder:  ////所有的操作都需要有记录。。。。
+		[{
+			"_id"
+			"flowid":
+			"nodeid":
+			"itemid":
+
+			shenpiuserid:""
+			shenpicomments:""
+			shenpistatus:"approve, deny"
+
+			 "createdAt" : ISODate("2017-06-14T09:34:43.260Z"),
+			 "updatedAt" : ISODate("2017-06-14T09:34:43.260Z")
+
+		}]
+
+	问：这个流程中待我审批怎么做？
+		n5899123939.find({flowid})
+
+	问：我想查一条提交的审批记录，怎么查？
+		shenpirecorder.find({itemid}, sortby ‘updatedAt’)
+
+	问：我在这个流程中，拒绝的记录或同间的记录？
+		shenpirecorder.find({shenpiuserid， flowid}, sortby ‘updatedAt’)
+
+如果是审批拒绝：
+	1. 取当前节点的返回节点，将nextflow设置为这个节点，将状态变成被拒绝。
+	2. 如果当前节点的返回节点没有设置，则取初始节点，清除掉nextflow节点，将状态变成被拒绝
+	3. 将申批的数据存到“申批记录“表中，需要包括：”申批人“， ”申批意见“，”申批时间“。
+
+	
+	第一种情况，设置了返回结点：
+
+			{
+			    "_id" : ObjectId("5941033398a8f4800b3b669e"),
+			    "xiangmu" : "项目A",
+			    "fuzeren" : "591a71fc8c9082580984cee8",
+			    "shouru" : "40000",
+			    "zhichu" : "10000",
+			    "shijian" : "1504224000000",
+			    "usrid" : "591a71fc8c9082580984cee8",
+			    "createdAt" : ISODate("2017-06-14T09:34:43.260Z"),
+			    "updatedAt" : ISODate("2017-06-14T09:34:43.260Z")
+			    "status":待审批	//可以为"新创建，待审批，待修改，已完成"
+			    "nextflowid":flowid
+			    "nextnode:新的nodeid}
+			}
+
+	第二种情况，没有设置返回结点：
+
+			{
+			    "_id" : ObjectId("5941033398a8f4800b3b669e"),
+			    "xiangmu" : "项目A",
+			    "fuzeren" : "591a71fc8c9082580984cee8",
+			    "shouru" : "40000",
+			    "zhichu" : "10000",
+			    "shijian" : "1504224000000",
+			    "usrid" : "591a71fc8c9082580984cee8",
+			    "createdAt" : ISODate("2017-06-14T09:34:43.260Z"),
+			    "updatedAt" : ISODate("2017-06-14T09:34:43.260Z")
+			    "status":待修改	//可以为"新创建，待审批，待修改，已完成"
+			    "nextflowid":null
+			    "nextnode:null}
+			}
+
+
+需要注意的点：
+	1. 申批节点不止一个，同一个节点，也不只一次意见。
+	2. 审批要有记录。
+	3. 得知道下一个节点。
+
+
+
+

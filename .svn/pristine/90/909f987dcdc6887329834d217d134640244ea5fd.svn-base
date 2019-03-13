@@ -1,0 +1,45 @@
+<!-- 注：物品与文章是二选一的，在这里只是进行示例-->
+<!-- 如果有初始化操作的，需要在加载页面后执行函数。-->
+{
+	'物品':{
+		'名称':'#J_Title > h3',
+		'数量':'#J_PromoPriceNum',
+		'产地':'#J_PromoPriceNum',
+		'描述':'#J_PromoPriceNum',
+		'价格':'#J_PromoPriceNum',
+	},
+	'文章':{
+		'时间':'#J_Title > h3',
+		'谁':'#J_PromoPriceNum',
+		'产地':'#J_PromoPriceNum',
+		'哪里':'#J_PromoPriceNum',
+		'内容':'#J_PromoPriceNum',
+	},
+	'评论组':{
+		'正则匹配':{
+			'xpath':'[id^="review-"]',
+		}
+		'初始化动作':{
+			type:'button',
+			xpath:'#J_TabBar > li:nth-child(2) > a',
+		},
+		'下一页标记':{
+			'type':'button',
+			'xpath':'#reviews > div > div > div > div > div > div.tb-revbd > div > ul > li.pg-next',
+		},
+		'评论':{
+			'时间':'<img class=.*?><div>(.*?)<div>',
+			'谁':'<div class="J_KgRate_ReviewContent tb-tbcr-content ">(.*?)</div>',
+			'哪里':'<span class="tb-r-date">(.*?)</span>',
+			'内容':'<span class="tb-r-date">(.*?)</span>',
+		}
+	},
+	'赞':{
+		'吐槽型':'#J_PromoPriceNum',
+		'赞型':'#J_PromoPriceNum',
+		'一般型':'#J_PromoPriceNum',
+	}
+}
+
+
+

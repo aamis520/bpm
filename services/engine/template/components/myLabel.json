@@ -1,0 +1,57 @@
+{
+  "newlayout": {
+  },
+  "setting": {
+  },
+  "importpages": "",
+  "action":[
+    {
+      "type":"replace",
+      "from":{
+        "start":"queryCkId=\"",
+        "end":"\""
+      },
+      "to":{
+        "start":"let ckid = \"",
+        "end":"\""
+      },
+      "totype":"json"
+    },
+    {
+        "type":"replace",
+        "from":{
+          "start":"querySkId=\"",
+          "end":"\""
+        },
+        "to":{
+          "start":"let skid = \"",
+          "end":"\""
+        },
+        "totype":"json"
+     },
+     {
+         "type":"replace",
+         "from":{
+           "start":"labelcontent=\"",
+           "end":"\""
+         },
+         "to":{
+           "start":"let labelcontent = \"",
+           "end":"\""
+         },
+         "totype":"json"
+      },
+     {
+    	 "type":"replace",
+         "from":{
+           "start":"fontStyle=\"{",
+           "end":"}\""
+         },
+         "to":{
+           "start":"let fontStyle = {",
+           "end":"}"
+         },
+         "totype":"json"
+     }
+  ]
+}

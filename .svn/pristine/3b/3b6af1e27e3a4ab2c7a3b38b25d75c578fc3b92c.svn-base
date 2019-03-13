@@ -1,0 +1,69 @@
+{
+  "newlayout": {
+  },
+  "tabsubmitlayout":{
+	"form":{
+		"start":"<div id=\"formtobeaddstart\"></div>",
+		"end":"<div id=\"formtobeaddend\"></div>"
+	},
+	"tabs":{
+		"start":"<div id=\"tabstobeadd\"></div>",
+		"end":"</Tabs>"
+	},
+	"strs":{
+		"start":"<div id = \"layouttobeadd\">",
+		"end":"</div>"
+	}
+  },
+  "setting": "",
+  "importpages": {
+	  "type":"replace",
+	  "from":{
+		  "start":"importpageid=\"",
+		  "end":"\""
+	  },
+	  "to":{
+		  "start":"",
+		  "end":""
+	  },
+	  "totype":"json"
+  },
+  "action":[
+    {
+      "type":"replace",
+      "from":{
+        "start":"v-model.trim=\"formInline.",
+        "end":"\""
+      },
+      "to":{
+        "start":"var item = ",
+        "end":";"
+      },
+      "totype":"json"
+    },
+    {
+        "type":"replace",
+        "from":{
+          "start":"v-show=\"showformInline.",
+          "end":"\""
+        },
+        "to":{
+          "start":"var itemshow = ",
+          "end":";"
+        },
+        "totype":"json"
+     },
+     {
+         "type":"replace",
+         "from":{
+           "start":"v-show=\"warninglabels.",
+           "end":"\""
+         },
+         "to":{
+           "start":"var warningitem = ",
+           "end":";"
+         },
+         "totype":"json"
+     }
+  ]
+}

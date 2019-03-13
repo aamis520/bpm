@@ -1,0 +1,69 @@
+	function Objoperator(left, right, operation){
+		temp = left;
+		for (var key in left) {
+			leftarray.push(key)			
+		}
+		
+		for (var key in right){
+			rightarray.push(key)
+		}
+		if(leftarray.length ! = rigtharray.length) {
+			return temp;
+		}
+		
+		for (i in leftarray) {
+			if(leftarray[i] 是对像 && rigtharray[i] 也是对像){
+				left[leftarray[i]] = Objoperator(left[i], right[i], operation)
+			} else ( if(leftarray[i] 不是对像 && rigtharray[i] 也不是对像){){
+				计算。
+				........
+			} else {
+				return temp; 
+			}
+		}
+	}
+
+var forcalc = [ 
+	{
+		'201610': { data: 1 },
+		'201705': { data: 2 },
+		'201706': { data: 1 },
+		'201708': { data: 1 },
+		preOperate: '' },
+	{ 	'201704': { data: 1 }, 
+		'201706': { data: 1 },
+		preOperate: '-' },
+	{
+		'201705': { data: 2 },
+		'201706': { data: 1 },
+		'201708': { data: 1 },
+		preOperate: '+'}	
+]
+
+
+var  resu = []
+for(var i = 1 ; i < forcalc.length;i++){
+	Objoperator(_forcalc[0],_forcalc[i])
+}
+
+Objoperator(prevRow,nextRow){
+	ObjoperatorTemp = prevRow;
+	var prevKeyArray = []
+	var nextKeyArray = []
+	for(var prevKey in prevrow){
+		prevKeyArray.push(prevKey)
+	}
+	for(var nextKey in nextRow){
+		nextKeyArray.push(nextKey)
+	}
+	if(prevKeyArray.length != nextKeyArray.length){
+		return ObjoperatorTemp
+	}else{
+		for(key in prevKeyArray){
+			if(isObj(ObjoperatorTemp[key]) && isObj(nextKeyArray[key])){
+				ObjoperatorTemp = 
+			}
+		}
+	}
+}
+

@@ -1,0 +1,5 @@
+<view class="login">
+用户名：<input bindinput="listenUser" type="text" />
+密码：<input bindinput="listenPwd" value="{{data.password}}" type="password" />
+<button bindtap="login" class="btn_login">登录</button>
+</view>

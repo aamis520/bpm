@@ -1,0 +1,876 @@
+<style scoped>
+    .mgb10{
+        margin-bottom:10px;
+    }
+    .mgt10{
+        margin-top:10px;
+    }
+    .mgt2{
+        margin-top:2px;
+    }
+    .aligncenter{
+        text-align:center
+    }
+</style>
+<template>
+    <div>
+        <Modal
+            v-model="isEndNodeConditionShow"
+            title="请设置结束节点的赋值"
+            @on-ok="endNodeConditionOk"
+            @on-cancel="endNodeConditionCancel">
+                <!--Tabs中没有放置内容，是因为，在modal框 && tab页中，select显示异常-->
+                <!--这里的-10是因为tab的click事件只能传String，做值为-10，是避免和索引值重复-->
+                <Tabs value="relatedFlow-10" @on-click="saveCurIndex">
+                    <TabPane label="本流程" name="relatedFlow-10"></TabPane>
+                    <template v-for="(item,index) in endNodeConditionForm.relatedFlows">
+                        <!--索引值从0开始，这里label显示需从1开始，name有作为参数的作用，索引仍从0开始-->
+                        <TabPane :label="'相关流程'+(index + 1)" :name="'relatedFlow'+index"></TabPane>
+                    </template>
+                </Tabs>
+
+                <Form ref="endNodeConditionForm" v-model="endNodeConditionForm" :label-width="25">
+                    <!--这是本流程的  start-->
+                    <template v-if= "curIndex == -10">
+                        <Form-item class="mgb10">
+                            <Row>
+                                <Col span="8">
+                                    本流程
+                                </Col>
+                                <Col span="16">
+                                    <label class="mgr10">选择新流程: </label>
+                                    <Select v-model="endNodeConditionForm.thisFlow.toFlowID"
+                                            @on-change = "getSksByFlowId(endNodeConditionForm.thisFlow.toFlowID,'to')"
+                                            style="width:200px">
+                                        <Option v-for="(item,index) in flowList"
+                                                :value="item.value"
+                                                :key="index"
+                                        >
+                                          {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                            </Row>
+                        </Form-item>
+
+                        <hr class="mgb10 mgt10">
+                        <!--条件循环开始-->
+                        <Form-item
+                            v-for="(thisFlowCondition,index) in endNodeConditionForm.thisFlow.condition"
+                            :key="index"
+                        >
+                            <Row>
+                                <Col span="8">
+                                    <Select v-model="thisFlowCondition.fromSkName">
+                                        <Option v-for="(item,_index) in curFlowSks" :value="item.value" :key="_index">
+                                            {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                                <Col span="2" offset="1">
+                                    <Button disabled>
+                                        <Icon type="ios-arrow-thin-right" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                                <Col span="8" offset="1">
+                                    <Select v-model="thisFlowCondition.toSkName">
+                                        <Option v-for="(item,_index) in endNodeConditionForm.thisFlow.toSkList" :value="item.value" :key="_index">
+                                            {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                                <Col span="3" offset="1">
+                                    <Button type="error" @click="handleRemove(index)">
+                                        <Icon type="trash-a" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <!--条件循环结束-->
+                        <Form-item>
+                            <Row>
+                                <Col span="24">
+                                    <Button type="dashed" long @click="handleAdd" icon="plus-round">新增</Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                    </template>
+                    <!--这是本流程的  --end-->
+
+                    <!--这是相关流程的  -- start-->
+                    <!--这里使用v-show没任何效果，故使用v-if-->
+                    <template v-for="(eachRelatedFlows,index) in endNodeConditionForm.relatedFlows" v-if="curIndex == index">
+                        <!--这是相关流程中的本流程--start-->
+                        <Row class="mgb10">
+                            <Col span="24" class="aligncenter">
+                                <h6>本流程部分</h6>
+                            </Col>
+                        </Row>
+                        <Form-item class="mgb10">
+                            <Row>
+                                <Col span="8">
+                                    本流程
+                                </Col>
+                                <Col span="16">
+                                    <label class="mgr10">选择新流程: </label>
+                                    <Select v-model="eachRelatedFlows.curflow.toFlowID"
+                                            @on-change = "getSksByFlowId(eachRelatedFlows.curflow.toFlowID,'to','cur')"
+                                            style="width:200px">
+                                        <Option v-for="(item,flowListIndex) in flowList"
+                                                :value="item.value"
+                                                :key="flowListIndex"
+                                        >
+                                          {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                            </Row>
+                        </Form-item>
+
+                        <hr class="mgt10 mgb10">
+                        <!--这是相关流程中的本流程循环条件开始 --start-->
+                        <Form-item
+                          v-for="(eachRelatedFlowsCurCondition,idex) in eachRelatedFlows.curflow.condition"
+                          :key="idex"
+                        >
+                            <Row>
+                                <Col span="8">
+                                <Select v-model="eachRelatedFlowsCurCondition.fromSkName">
+                                    <Option v-for="(item,_inde) in curFlowSks" :value="item.value" :key="_inde">
+                                        {{ item.label }}
+                                    </Option>
+                                </Select>
+                                </Col>
+                                <Col span="2" offset="1">
+                                    <Button disabled>
+                                        <Icon type="ios-arrow-thin-right" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                                <Col span="8" offset="1">
+                                    <Select v-model="eachRelatedFlowsCurCondition.toSkName">
+                                        <Option v-for="(item,_inde) in eachRelatedFlows.curflow.toSkList" :value="item.value" :key="_inde">
+                                            {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                                <Col span="3" offset="1">
+                                    <Button type="error" @click="handleRemove(idex,'cur')">
+                                        <Icon type="trash-a" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <Form-item>
+                            <Row>
+                                <Col span="24">
+                                    <Button type="dashed" long @click="handleAdd('cur')" icon="plus-round">新增</Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <!--这是相关流程中的本流程循环条件结束 --end-->
+                        <!--这是相关流程中的本流程--end-->
+
+                        <hr class="mgt10">
+                        <hr class="mgt2 mgb10">
+
+                        <!--这是相关流程中的相关流程 start-->
+                        <Row class="mgb10">
+                            <Col span="24" class="aligncenter">
+                                <h6>相关流程部分</h6>
+                            </Col>
+                        </Row>
+                        <Form-item class="mgb10">
+                            <Row>
+                                <Col span="12">
+                                <label class="">选择起始流程: </label>
+                                <Select v-model="eachRelatedFlows.relatedflow.fromFlowID"
+                                        @on-change = "getSksByFlowId(eachRelatedFlows.relatedflow.fromFlowID,'from','related')"
+                                        style="width:220px">
+                                    <Option v-for="(item,_idx) in flowList"
+                                            :value="item.value"
+                                            :key="_idx"
+                                    >
+                                        {{ item.label }}
+                                    </Option>
+                                </Select>
+                                </Col>
+                                <Col span="12">
+                                    <label class="">选择目标流程: </label>
+                                    <Select v-model="eachRelatedFlows.relatedflow.toFlowID"
+                                            @on-change = "getSksByFlowId(eachRelatedFlows.relatedflow.toFlowID,'to','related')"
+                                            style="width:220px">
+                                        <Option v-for="(item,_idx) in flowList"
+                                                :value="item.value"
+                                                :key="_idx"
+                                        >
+                                            {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <hr class="mgb10 mgt10">
+                        <!--条件循环开始-->
+                        <Form-item
+                          v-for="(eachRelatedFlowsCondition,_index) in eachRelatedFlows.relatedflow.condition"
+                          :key="_index"
+                        >
+                            <Row>
+                                <Col span="8">
+                                    <Select v-model="eachRelatedFlowsCondition.fromSkName" placement="top">
+                                        <Option v-for="(item,_inde) in eachRelatedFlows.relatedflow.fromSkList" :value="item.value" :key="_inde">
+                                            {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                                <Col span="2" offset="1">
+                                    <Button disabled>
+                                        <Icon type="ios-arrow-thin-right" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                                <Col span="8" offset="1">
+                                    <Select v-model="eachRelatedFlowsCondition.toSkName">
+                                        <Option v-for="(item,_inde) in eachRelatedFlows.relatedflow.toSkList" :value="item.value" :key="_inde">
+                                           {{ item.label }}
+                                        </Option>
+                                    </Select>
+                                </Col>
+                                <Col span="3" offset="1">
+                                    <Button type="error" @click="handleRemove(_index,'related')">
+                                        <Icon type="trash-a" size="14"></Icon>
+                                    </Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <!--条件循环结束-->
+                        <Form-item>
+                            <Row>
+                                <Col span="24">
+                                    <Button type="dashed" long @click="handleAdd('related')" icon="plus-round">新增</Button>
+                                </Col>
+                            </Row>
+                        </Form-item>
+                        <!--这是相关流程中的相关流程 start-->
+                    </template>
+                    <!--这是相关流程的  --end-->
+
+                </Form>
+          </Modal>
+    </div>
+</template>
+<script>
+    export default{
+         props:[
+            'toEndNodeConditionMsg'
+        ],
+        computed:{
+            isEndNodeConditionShow(){
+                return this.toEndNodeConditionMsg.isEndNodeConditionModalShow
+            },
+            ThisFlowId(){
+                return this.toEndNodeConditionMsg.thisFlowid
+            },
+            conditionid(){
+                return this.toEndNodeConditionMsg.conditionid
+            }
+        },
+
+        watch:{
+            conditionid(){
+                if(this.conditionid == "empty"){
+                    this.getSksByFlowId(this.ThisFlowId,'from');
+                    this.endNodeConditionForm = {
+                        thisFlow:{
+                            toFlowID:'',
+                            toSkList:[{
+                                label:'空',
+                                value:''
+                            }],
+                            condition:[
+                                {
+                                    fromSkName:'',
+                                    toSkName:'',
+                                }
+                            ],
+                            toSkList:[{
+                                label:'请选择流程',
+                                value:''
+                            }],
+                        },
+                        relatedFlows:[
+                            {
+                                curflow:{
+                                    toFlowID:'',
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        },
+                                    ],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                },
+                                relatedflow:{
+                                    fromFlowID:'',
+                                    toFlowID:'',
+                                    fromSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        }
+                                    ]
+                                }
+                            },
+                            {
+                                curflow:{
+                                    toFlowID:'',
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        }
+                                    ],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }]
+                                },
+                                relatedflow:{
+                                    fromFlowID:'',
+                                    toFlowID:'',
+                                    fromSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        }
+                                    ]
+                                }
+
+                            },
+                            {
+                                curflow:{
+                                    toFlowID:'',
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        }
+                                    ],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }]
+                                },
+                                relatedflow:{
+                                    fromFlowID:'',
+                                    toFlowID:'',
+                                    fromSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    toSkList:[{
+                                        label:'空',
+                                        value:''
+                                    }],
+                                    condition:[
+                                        {
+                                            fromSkName:'',
+                                            toSkName:''
+                                        }
+                                    ]
+                                }
+                            },
+                        ],
+                    }
+                }else{
+                    console.log('conditionid:'+this.conditionid)
+                    if(!this.conditionid){
+                        return
+                    }
+                    this.$http.get(this.globalconfig.listendnodeconditionapi,{
+                        params:{
+                            id:this.conditionid
+                        }
+                    },{emulateJSON:true})
+                    .then((response)=>{
+                        if(response.data.conditions){
+                            this.conditionReshow = response.data.conditions;
+                        }
+                    },(response)=>{
+                        this.$Message.error("未读取到结束条件:"+ this.conditionid)
+                    }).then(()=>{
+                        this.getSksByFlowId(this.ThisFlowId,'from');
+                        var _result = this.conditionReshow;
+                        // 这是回显本流程部分的
+                        this.endNodeConditionForm.thisFlow.toFlowID = _result.condition[0].toflowid;
+                        this.endNodeConditionForm.thisFlow.toSkList = this.getSksByFlowIdReshow(_result.condition[0].toflowid);
+                        var _thisFlowConditionArr = [];
+                        for(var i = 0 ; i < _result.condition[0].condition.length;i++){
+                            var _thisFlowConditionObj = {}
+                            _thisFlowConditionObj.fromSkName = _result.condition[0].condition[i].fromSkName;
+                            _thisFlowConditionObj.toSkName = _result.condition[0].condition[i].toSkName;
+                            _thisFlowConditionArr.push(_thisFlowConditionObj)
+                        };
+                        this.endNodeConditionForm.thisFlow.condition = _thisFlowConditionArr;
+
+                        // 这是回显相关流程部分的
+                        for(var j = 1 ;j < _result.condition.length;j++){
+                            if(_result.condition[j].curflow){
+                                this.endNodeConditionForm.relatedFlows[j-1].curflow.toFlowID = _result.condition[j].curflow.toflowid;
+                                var _curflowConditionArr = [];
+                                for(var k = 0 ; k < _result.condition[j].curflow.condition.length;k++){
+                                    var _curflowConditionObj = {};
+                                    _curflowConditionObj.fromSkName = _result.condition[j].curflow.condition[k].fromSkName;
+                                    _curflowConditionObj.toSkName = _result.condition[j].curflow.condition[k].toSkName;
+                                    _curflowConditionArr.push(_curflowConditionObj);
+                                }
+                                this.endNodeConditionForm.relatedFlows[j-1].curflow.condition = _curflowConditionArr;
+                                this.endNodeConditionForm.relatedFlows[j-1].curflow.toSkList = this.getSksByFlowIdReshow(_result.condition[j].curflow.toflowid);
+                            }
+
+                            if(_result.condition[j].relatedflow){
+                                this.endNodeConditionForm.relatedFlows[j-1].relatedflow.fromFlowID = _result.condition[j].relatedflow.fromflowid;
+                                this.endNodeConditionForm.relatedFlows[j-1].relatedflow.toFlowID = _result.condition[j].relatedflow.toflowid;
+                                var _relatedflowConditionArr = [];
+                                for(var m = 0; m < _result.condition[j].relatedflow.condition.length;m++){
+                                    var _relatedflowConditionObj = {};
+                                    _relatedflowConditionObj.fromSkName = _result.condition[j].relatedflow.condition[m].fromSkName;
+                                    _relatedflowConditionObj.toSkName = _result.condition[j].relatedflow.condition[m].toSkName;
+                                    _relatedflowConditionArr.push(_relatedflowConditionObj);
+                                }
+                                this.endNodeConditionForm.relatedFlows[j-1].relatedflow.condition = _relatedflowConditionArr;
+                                this.endNodeConditionForm.relatedFlows[j-1].relatedflow.fromSkList = this.getSksByFlowIdReshow(_result.condition[j].relatedflow.fromflowid)
+                                this.endNodeConditionForm.relatedFlows[j-1].relatedflow.toSkList = this.getSksByFlowIdReshow(_result.condition[j].relatedflow.toflowid)
+                            }
+                        }
+                    })
+                }
+            },
+        },
+
+        data(){
+            return{
+                // curIndex
+                curIndex:-10,
+
+                // 回显的结束条件的数据
+                conditionReshow:{},
+                // 所有的流程
+                flowList:[],
+                // 所有的sk
+                ajaxAllSks:[],
+
+                // 当前流程下的sk
+                curFlowSks:[{
+                    label:'本流程暂无sk',
+                    value:''
+                }],
+
+                endNodeConditionForm:{
+                    thisFlow:{
+                        toFlowID:'',
+                        toSkList:[{
+                            label:'空',
+                            value:''
+                        }],
+                        condition:[
+                            {
+                                fromSkName:'',
+                                toSkName:'',
+                            }
+                        ],
+                        toSkList:[{
+                            label:'请选择流程',
+                            value:''
+                        }],
+                    },
+                    relatedFlows:[
+                        {
+                            curflow:{
+                                toFlowID:'',
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    },
+                                ],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                            },
+                            relatedflow:{
+                                fromFlowID:'',
+                                toFlowID:'',
+                                fromSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    }
+                                ]
+                            }
+                        },
+                        {
+                            curflow:{
+                                toFlowID:'',
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    }
+                                ],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }]
+                            },
+                            relatedflow:{
+                                fromFlowID:'',
+                                toFlowID:'',
+                                fromSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    }
+                                ]
+                            }
+
+                        },
+                        {
+                            curflow:{
+                                toFlowID:'',
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    }
+                                ],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }]
+                            },
+                            relatedflow:{
+                                fromFlowID:'',
+                                toFlowID:'',
+                                fromSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                toSkList:[{
+                                    label:'空',
+                                    value:''
+                                }],
+                                condition:[
+                                    {
+                                        fromSkName:'',
+                                        toSkName:''
+                                    }
+                                ]
+                            }
+                        },
+                    ],
+                }
+            }
+        },
+        methods:{
+            endNodeConditionOk(){
+                // 这里是所有关流程的条件
+                var _condition = [];
+                // 这里取出的是本流程的条件
+                var _thisFlowObj = {};
+                _thisFlowObj.toflowid = this.endNodeConditionForm.thisFlow.toFlowID;
+                _thisFlowObj.condition = [];
+                var _thisFlowConditons = this.endNodeConditionForm.thisFlow.condition;
+                for(var i = 0 ; i < _thisFlowConditons.length;i++){
+                    if(_thisFlowConditons[i].fromSkName && _thisFlowConditons[i].toSkName){
+                        var _tempObj = {};
+                        _tempObj.fromSkName = _thisFlowConditons[i].fromSkName;
+                        _tempObj.toSkName = _thisFlowConditons[i].toSkName;
+                        _thisFlowObj.condition.push(_tempObj);
+                    }
+                }
+                if(_thisFlowObj.condition && _thisFlowObj.condition.length > 0){
+                    _condition.unshift(_thisFlowObj);
+                }
+
+                var _relatedFlow = this.endNodeConditionForm.relatedFlows;
+                for(var i = 0 ; i < _relatedFlow.length;i++){
+                    var _relatedFlowObj = {};
+                     _relatedFlowObj.curflow = {};
+                    //相关流程中的本流程部分
+                    if(_relatedFlow[i].curflow.toFlowID && _relatedFlow[i].curflow.condition.length > 0){
+                        _relatedFlowObj.curflow = {};
+                        _relatedFlowObj.curflow.toflowid = _relatedFlow[i].curflow.toFlowID;
+                        _relatedFlowObj.curflow.condition = [];
+                        for(var j = 0;j < _relatedFlow[i].curflow.condition.length;j++){
+                            if(_relatedFlow[i].curflow.condition[j].fromSkName && _relatedFlow[i].curflow.condition[j].toSkName){
+                                var _tempCurObj = {};
+                                _tempCurObj.fromSkName = _relatedFlow[i].curflow.condition[j].fromSkName;
+                                _tempCurObj.toSkName = _relatedFlow[i].curflow.condition[j].toSkName;
+                                _relatedFlowObj.curflow.condition.push(_tempCurObj);
+                            }
+                        }
+                    }
+                    // 相关流程中的相关流程部分
+                    _relatedFlowObj.relatedflow = {};
+                    if(_relatedFlow[i].relatedflow.fromFlowID && _relatedFlow[i].relatedflow.toFlowID && _relatedFlow[i].relatedflow.condition.length > 0){
+                        _relatedFlowObj.relatedflow.fromflowid = _relatedFlow[i].relatedflow.fromFlowID;
+                        _relatedFlowObj.relatedflow.toflowid = _relatedFlow[i].relatedflow.toFlowID;
+                        _relatedFlowObj.relatedflow.condition = [];
+                        for(var k = 0;k < _relatedFlow[i].relatedflow.condition.length;k++){
+                            if(_relatedFlow[i].relatedflow.condition[k].fromSkName && _relatedFlow[i].relatedflow.condition[k].toSkName){
+                                 var _tempRelatedObj = {};
+                                _tempRelatedObj.fromSkName = _relatedFlow[i].relatedflow.condition[k].fromSkName;
+                                _tempRelatedObj.toSkName = _relatedFlow[i].relatedflow.condition[k].toSkName;
+                                _relatedFlowObj.relatedflow.condition.push(_tempRelatedObj);
+                            }
+                        }
+                    }
+
+                    if( (_relatedFlowObj.relatedflow.condition && _relatedFlowObj.relatedflow.condition.length > 0) ||
+                        (_relatedFlowObj.curflow.condition && _relatedFlowObj.curflow.condition.length > 0) ){
+                        _condition.push(_relatedFlowObj);
+                    }
+                }
+
+                // 没有可用的条件，不保存
+                if(_condition.length == 0){
+                    this.$Message.error("别闹，填充可用的条件")
+                    var data = {};
+                    data.endNodeConditionid = '';
+                    data.isEndNodeConditionShow = false;
+                    this.$emit("fromEndNodeCondition",data);
+                    return
+                }
+                var _conditionid = this.conditionid;
+                if(this.conditionid !="empty"){
+                    _conditionid = this.conditionid;
+                }
+console.log('_condition')
+console.log(_condition)
+
+                this.$http.get(this.globalconfig.createorupdataendnodeconditionapi,{
+                    params:{
+                        id:_conditionid,
+                        flowid:this.ThisFlowId,
+                        condition:_condition
+                    }
+                },{emulateJSON:true})
+                .then((response)=>{
+                    if(response.data.id){
+                        var _id = response.data.id;
+                        var data = {};
+                        data.isEndNodeConditionShow = false;
+                        data.endNodeConditionid = _id;
+                        this.$emit("fromEndNodeCondition",data);
+                        this.$Message.info('提交成功');
+                    }
+                },(response)=>{
+                    this.$Message.error("结束节点条件更新或创建失败");
+                })
+            },
+
+            endNodeConditionCancel(){
+                var data = {};
+                data.endNodeConditionid = '';
+                data.isEndNodeConditionShow = false;
+                this.$emit("fromEndNodeCondition",data);
+            },
+
+            // 增加一行
+            handleAdd(where){
+                var _tempObj = {};
+                _tempObj.fromSkName = '';
+                _tempObj.toSkName = '';
+
+                if(this.curIndex == -10){
+                    this.endNodeConditionForm.thisFlow.condition.push(_tempObj)
+                }
+                if(this.curIndex >= 0){
+                    if(where == 'cur'){
+                        this.endNodeConditionForm.relatedFlows[this.curIndex].curflow.condition.push(_tempObj)
+                    }
+                    if(where == 'related'){
+                        this.endNodeConditionForm.relatedFlows[this.curIndex].relatedflow.condition.push(_tempObj)
+                    }
+                }
+            },
+
+            // 删除一行
+            handleRemove(index,where){
+                if(this.curIndex == -10){
+                    this.endNodeConditionForm.thisFlow.condition.splice(index,1)
+                }
+                if(this.curIndex >= 0){
+                    if(where == 'cur'){
+                        this.endNodeConditionForm.relatedFlows[this.curIndex].curflow.condition.splice(index,1)
+                    }
+                    if(where == 'related'){
+                        this.endNodeConditionForm.relatedFlows[this.curIndex].relatedflow.condition.splice(index,1)
+                    }
+                }
+            },
+
+            //保存当前的索引值，即当前操作的是本流程，还是相关流程的index，本流程的index为-1,
+            saveCurIndex(index){
+                var _index = Number(index.slice("relatedFlow".length));
+                this.curIndex = _index;
+            },
+
+            // 读出所有流程
+            handleListFlows(){
+                this.$http.get(this.globalconfig.listflow,{
+                    params:{
+
+                    }
+                },{emulateJSON:true})
+                .then((response)=>{
+                    if(response.data.flows){
+                        this.ajaxAllFlows = response.data.flows;
+                        var _tempArr = [];
+                        for(var i = 0 ; i < response.data.flows.length;i++){
+                            var _tempObj = {};
+                            _tempObj.label = response.data.flows[i].name;
+                            _tempObj.value = response.data.flows[i].id;
+                            _tempArr.push(_tempObj);
+                        }
+                        this.flowList = _tempArr;
+                    }
+                },(response)=>{
+                    this.$Message.error("listflows获取失败");
+                })
+            },
+
+            // 读出所有的sk
+            handleListSks(){
+                this.$http.get(this.globalconfig.listsksapi,{
+                    params:{
+
+                    }
+                },{emulateJSON:true})
+                .then((response)=> {
+                    if(response.data.sks){
+                        this.ajaxAllSks = response.data.sks;
+                    }
+                },(response)=>{
+                    this.$Message.error("读取sks失败");
+                })
+            },
+
+            // 根据流程id筛选出流程下sk，回显用
+            getSksByFlowIdReshow(flowid){
+                var _tempArr = [
+                    {
+                         label:'空',
+                         value:''
+                    }
+                ];
+                for(var i = 0 ; i < this.ajaxAllSks.length;i++){
+                    if(this.ajaxAllSks[i].flowid == flowid){
+                        var _tempObj = {};
+                        _tempObj.value = this.ajaxAllSks[i].key;
+                        _tempObj.label = this.ajaxAllSks[i].name;
+                        _tempArr.push(_tempObj);
+                    }
+                }
+                return _tempArr;
+            },
+
+            // 根据流程id读出新选择的流程下的sks
+            // where是赋值给fromsklist/tosklist
+            // which 是赋值给相关流程的本流程还是相关流程的相关流程
+            getSksByFlowId(flowid,where,which){
+                var _tempArr = [
+                    {
+                         label:'空',
+                         value:''
+                    }
+                ];
+
+                for(var i = 0 ; i < this.ajaxAllSks.length;i++){
+                    if(this.ajaxAllSks[i].flowid == flowid){
+                        var _tempObj = {};
+                        _tempObj.value = this.ajaxAllSks[i].key;
+                        _tempObj.label = this.ajaxAllSks[i].name;
+                        _tempArr.push(_tempObj);
+                    }
+                }
+
+                if(_tempArr.length == 1){
+                     _tempArr = [
+                         {
+                             label:'此流程下无sk',
+                             value:''
+                         }
+                     ];
+                }
+                if(this.curIndex == -10){
+                    if(where == "from"){
+                        this.curFlowSks = _tempArr;
+                    }
+                    if(where == "to"){
+                        this.endNodeConditionForm.thisFlow.toSkList = _tempArr;
+                    }
+                }
+                if(this.curIndex >= 0){
+                    if(where == "from"){
+                        if(which == 'cur'){
+                            this.endNodeConditionForm.relatedFlows[this.curIndex].curflow.fromSkList = _tempArr;
+                        }
+                        if(which == 'related'){
+                            this.endNodeConditionForm.relatedFlows[this.curIndex].relatedflow.fromSkList = _tempArr;
+                        }
+                    }
+                    if(where == "to"){
+                        if(which == 'cur'){
+                            this.endNodeConditionForm.relatedFlows[this.curIndex].curflow.toSkList = _tempArr;
+                        }
+                        if(which == 'related'){
+                            this.endNodeConditionForm.relatedFlows[this.curIndex].relatedflow.toSkList = _tempArr;
+                        }
+                    }
+                }
+            },
+        },
+
+        created(){
+            this.handleListFlows();
+            this.handleListSks();
+        }
+    }
+</script>

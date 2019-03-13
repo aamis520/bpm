@@ -1,0 +1,21 @@
+{
+  "newlayout": {
+    "start":"<div id = \"layouttobeadd\">",
+    "end":"</div>"
+  },
+  "setting": "",
+  "importpages": {
+	  "type":"replace",
+	  "from":{
+		  "start":"importpageid=\"",
+		  "end":"\""
+	  },
+	  "to":{
+		  "start":"",
+		  "end":""
+	  },
+	  "totype":"json"
+  },
+  "action":[
+  ]
+}

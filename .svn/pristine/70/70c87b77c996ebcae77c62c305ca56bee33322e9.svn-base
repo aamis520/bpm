@@ -1,0 +1,23 @@
+{
+	"newlayout": {
+		
+	},
+	"setting": {
+		
+	},
+	"importpages": "",
+	"action":[
+          {
+        	  "type":"replace", 
+        	  "from":{
+        		  "start":"customervalue =\"",
+        		  "end":"\""
+			  },
+        	  "to":{
+        		  "start":"skid: \"",
+        		  "end":"\""
+			  },
+        	  "totype":"json"
+    	  }
+	]
+}

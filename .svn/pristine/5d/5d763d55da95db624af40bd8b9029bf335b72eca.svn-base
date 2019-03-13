@@ -1,0 +1,16 @@
+image{
+  width: 400rpx;
+  height:400rpx;
+  margin: 0 auto;
+}
+text{
+  text-align: center;
+  width: 100%;
+  color: #00b30c;
+}
+.foot{
+  position: absolute;
+  bottom: 10rpx;
+  width: 100%;
+  text-align: center;
+}

@@ -1,0 +1,43 @@
+﻿<!doctype html>
+<html lang="en-au">
+    <head>
+		<meta charset="utf-8">
+    <link rel="stylesheet" href="../css/style.css" />
+    </head>
+    <body>
+
+		<div class="contain">
+			<div class="gantt"></div>
+    </body>
+	<script src="../js/jquery.min.js"></script>
+	<script src="../js/jquery.fn.gantt.js"></script>
+	<script src="moment.min.js"></script>
+    <script>
+
+		$(function() {
+
+			"use strict";
+
+			var today = moment();
+			var andTwoHours = moment().add("hours",2);
+
+			var today_friendly = "/Date(" + today.valueOf() + ")/";
+			var next_friendly = "/Date(" + andTwoHours.valueOf() + ")/";
+
+			$(".gantt").gantt({
+				source: [
+            {name: "测试",values: [{from: today_friendly,to: today_friendly},{from: next_friendly,to: next_friendly}]},
+            {name: "开发",values: [{from: today_friendly,to: next_friendly}]},
+            {name: "预审",values: [{from: today_friendly,to: next_friendly}]},
+        ],
+waitText:"请稍后。。。",
+scrollToToday:true,
+				scale: "hours",
+				minScale: "hours",
+				navigate: "buttons"
+			});
+
+		});
+
+    </script>
+</html>

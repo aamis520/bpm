@@ -1,0 +1,1666 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="BookmarkManager">
+    <bookmark url="file://$PROJECT_DIR$/frontend/engine/src/pages/framework/pageedit/submitform.vue" mnemonic="4" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" readonly="true" id="8567cd0c-ef89-4719-9149-8e2f2111a7c5" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/services/framework/package.json" afterPath="$PROJECT_DIR$/services/framework/package.json" />
+    </list>
+    <list id="f7f6428c-31f5-49e6-a510-b392aeda1633" name="UnDefault" comment="UnDefault">
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/jijujue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/tongji" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval/myList06804352.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval/myList55946479.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval/myList70600866.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval/shenpia.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/approval/shenpiliebiao.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/jijujue/myList52225440.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/jijujue/myStrongList52235266.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/jijujue/yijujue.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/liebiaoa.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myButton16753241.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myButton24524743.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myButton65376909.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myButton87364541.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myStrongList16754043.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myStrongList24522887.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myStrongList65379465.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/myStrongList87360565.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/submit/tijiao.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/tongji/myList30344381.vue" />
+      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/frontend/framework/src/pages/flows/customer/5a138f19d818b768265cd6df/tongji/tongji.vue" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frontend/engine/package.json" afterPath="$PROJECT_DIR$/frontend/engine/package.json" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/frontend/framework/package.json" afterPath="$PROJECT_DIR$/frontend/framework/package.json" />
+    </list>
+    <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
+    <file path="$PROJECT_DIR$/frontend/engine/package.json" ignored="false" />
+    <option name="TRACKING_ENABLED" value="true" />
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="CreatePatchCommitExecutor">
+    <option name="PATCH_PATH" value="" />
+  </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="default_target" />
+  <component name="FavoritesManager">
+    <favorites_list name="BPM">
+      <favorite_root url="file://$PROJECT_DIR$/frontend/engine/src/pages/framework/selectpersonModal.vue" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/frontend/engine/src/pages/framework/endNodeConditionModal.vue" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+      <favorite_root url="file://$PROJECT_DIR$/frontend/engine/src/pages/framework/messageCard.vue" type="psiFile" klass="com.intellij.ide.projectView.impl.nodes.PsiFileNode" />
+    </favorites_list>
+  </component>
+  <component name="FileEditorManager">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file leaf-file-name="FlowController.js" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/FlowController.js">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="113">
+              <caret line="986" column="20" lean-forward="true" selection-start-line="986" selection-start-column="20" selection-end-line="986" selection-end-column="20" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+    </leaf>
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="JavaScript File" />
+        <option value="HTML File" />
+      </list>
+    </option>
+  </component>
+  <component name="FindInProjectRecents">
+    <findStrings>
+      <find>editPerson</find>
+      <find>showdepartment</find>
+      <find>personId</find>
+      <find>登录名</find>
+      <find>met</find>
+      <find>updateperso</find>
+      <find>checkloginname</find>
+      <find>editperson</find>
+      <find>defaultPassword</find>
+      <find>userStatus</find>
+      <find>console</find>
+      <find>wa</find>
+      <find>listonepersoninfo</find>
+      <find>_dataid</find>
+      <find>newpath</find>
+      <find>methods</find>
+      <find>handleUpload</find>
+      <find>uploadsuccess</find>
+      <find>buliddatafornewflow</find>
+      <find>downloadfile</find>
+      <find>relFlowForm1</find>
+      <find>ajaxAllFlows</find>
+      <find>getSksByFlowId</find>
+      <find>tonextnodeid</find>
+      <find>相关流程1</find>
+      <find>本流程部分1</find>
+      <find>本流程部分2</find>
+      <find>relFlowForm2</find>
+      <find>endNodeConditionOk</find>
+      <find>relFlowForm1.toNodeList</find>
+    </findStrings>
+    <replaceStrings>
+      <replace>getpersonid</replace>
+      <replace>msgShow</replace>
+      <replace>msgForShow</replace>
+      <replace>_tempObjForBtn</replace>
+      <replace>RichEditor</replace>
+      <replace>-10</replace>
+      <replace>ThisFlowId</replace>
+      <replace>aligncenter</replace>
+      <replace>tempRelatedCurFlowConditionObj</replace>
+      <replace>tempRelatedCurFlowConditionArr</replace>
+      <replace>_tempRelatedCurFlowConditionArr</replace>
+      <replace>_endNodeFlowInfo</replace>
+      <replace>_tempCurDataObj</replace>
+      <replace>_tempRelatedCurDataObj</replace>
+      <replace>cannotCalcArr</replace>
+      <replace>_startYear</replace>
+      <replace>_startMonth</replace>
+      <replace>_startDay</replace>
+      <replace>k</replace>
+      <replace>xi</replace>
+      <replace>groupforcalculate</replace>
+      <replace>getskkey</replace>
+      <replace>_isneedgroupbyRange</replace>
+      <replace>_isNeedGroupByRange</replace>
+      <replace>getvalbyskkeynotneedgroupby</replace>
+      <replace>ctnKeyVal</replace>
+      <replace>curFlowPageList</replace>
+      <replace>nextNodeidByFlowArr</replace>
+      <replace>getSksAnd</replace>
+      <replace>getSksAndNodeByFlowId</replace>
+    </replaceStrings>
+  </component>
+  <component name="IdeDocumentHistory">
+    <option name="CHANGED_PATHS">
+      <list>
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvestep65040794.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory73997966.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/chakan.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory73997966 [3].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory11657620.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory73997966 [4].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory73997966 [5].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory11657620 [2].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory73997966 [7].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/moren.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/FlowController.js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/createMessageHandler.js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/FlowController [2].js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/NextNodeGenerateHandler.js" />
+        <option value="$PROJECT_DIR$/services/framework/api/controllers/NextNodeGenerateHandler.js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/FlowController [3].js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory66480822.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory97931692.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory26921563 [2].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory61407716.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory05350726.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory29687194.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory99605248.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory56180246.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory91213765.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory57845571.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory52781958.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory61493523.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory55906999.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory51228934.vue" />
+        <option value="$PROJECT_DIR$/frontend/framework/src/pages/framework/person.vue" />
+        <option value="$PROJECT_DIR$/frontend/framework/src/Config.vue" />
+        <option value="$PROJECT_DIR$/frontend/framework/src/pages/framework/personedit.vue" />
+        <option value="$PROJECT_DIR$/services/framework/api/controllers/PersonController.js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory49780144.vue" />
+        <option value="$PROJECT_DIR$/services/engine/template/components/Approvehistory.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/EndNodeHandler.js" />
+        <option value="$PROJECT_DIR$/services/framework/config/connections.js" />
+        <option value="$PROJECT_DIR$/services/engine/config/connections.js" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/endNodeConditionModal.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/endNodeConditionModal [2].vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/fileListWithSubmit90209293.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/fileListWithSubmit59290614.vue" />
+        <option value="$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myFiles27202428.vue" />
+        <option value="$PROJECT_DIR$/services/engine/template/components/fileListWithSubmit.vue" />
+        <option value="$PROJECT_DIR$/services/engine/template/components/myFiles.vue" />
+        <option value="$PROJECT_DIR$/services/framework/api/controllers/UploadfileController.js" />
+        <option value="$PROJECT_DIR$/frontend/engine/src/pages/framework/endNodeConditionModal.vue" />
+        <option value="$PROJECT_DIR$/services/framework/api/controllers/EndNodeHandler.js" />
+        <option value="$PROJECT_DIR$/services/framework/api/controllers/FlowController.js" />
+      </list>
+    </option>
+  </component>
+  <component name="JsBuildToolGruntFileManager" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsBuildToolPackageJson" detection-done="true" sorting="DEFINITION_ORDER" />
+  <component name="JsFlowSettings">
+    <service-enabled>false</service-enabled>
+    <exe-path />
+    <annotation-enable>false</annotation-enable>
+    <other-services-enabled>false</other-services-enabled>
+  </component>
+  <component name="JsGulpfileManager">
+    <detection-done>true</detection-done>
+    <sorting>DEFINITION_ORDER</sorting>
+  </component>
+  <component name="NodeModulesDirectoryManager">
+    <handled-path value="$PROJECT_DIR$/frontend/engine/node_modules" />
+    <handled-path value="$PROJECT_DIR$/frontend/framework/node_modules" />
+    <handled-path value="$PROJECT_DIR$/frontend/ionicapp/node_modules" />
+    <handled-path value="$PROJECT_DIR$/frontend/ionicapp/plugins/cordova-sqlite-storage/node_modules" />
+    <handled-path value="$PROJECT_DIR$/services/engine/node_modules" />
+    <handled-path value="$PROJECT_DIR$/services/framework/node_modules" />
+  </component>
+  <component name="PhpWorkspaceProjectConfiguration" backward_compatibility_performed="true" />
+  <component name="ProjectFrameBounds">
+    <option name="x" value="-6" />
+    <option name="y" value="1" />
+    <option name="width" value="1368" />
+    <option name="height" value="733" />
+  </component>
+  <component name="ProjectInspectionProfilesVisibleTreeState">
+    <entry key="Project Default">
+      <profile-state>
+        <expanded-state>
+          <State>
+            <id />
+          </State>
+        </expanded-state>
+        <selected-state>
+          <State>
+            <id>AngularJS</id>
+          </State>
+        </selected-state>
+      </profile-state>
+    </entry>
+  </component>
+  <component name="ProjectView">
+    <navigator currentView="ProjectPane" proportions="" version="1">
+      <flattenPackages />
+      <showMembers />
+      <showModules />
+      <showLibraryContents />
+      <hideEmptyPackages />
+      <abbreviatePackageNames />
+      <autoscrollToSource />
+      <autoscrollFromSource />
+      <sortByType />
+      <manualOrder />
+      <foldersAlwaysOnTop value="true" />
+    </navigator>
+    <panes>
+      <pane id="Scope" />
+      <pane id="ProjectPane">
+        <subPane>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="api" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="controllers" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="views" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="template" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="template" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="components" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="template" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="commonaction" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="services" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="config" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frontend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frontend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frontend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frontend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+          <PATH>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.ProjectViewProjectNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="BPM" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="frontend" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="engine" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="src" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="pages" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+            <PATH_ELEMENT>
+              <option name="myItemId" value="framework" />
+              <option name="myItemType" value="com.intellij.ide.projectView.impl.nodes.PsiDirectoryNode" />
+            </PATH_ELEMENT>
+          </PATH>
+        </subPane>
+      </pane>
+      <pane id="Scratches" />
+    </panes>
+  </component>
+  <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
+    <property name="nodejs_interpreter_path" value="C:/Program Files/nodejs/node" />
+    <property name="js.eslint.eslintPackage" value="" />
+    <property name="js-jscs-nodeInterpreter" value="C:\Program Files\nodejs\node.exe" />
+    <property name="HbShouldOpenHtmlAsHb" value="" />
+    <property name="DefaultHtmlFileTemplate" value="HTML File" />
+    <property name="editor.config.accepted" value="true" />
+    <property name="settings.editor.selected.configurable" value="vcs.Subversion" />
+    <property name="JavaScriptPreferStrict" value="false" />
+    <property name="JavaScriptWeakerCompletionTypeGuess" value="true" />
+    <property name="SearchEverywhereHistoryKey" value="func&#9;null&#9;null" />
+  </component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="E:\www\BPM\frontend\engine\src\pages\framework" />
+      <recent name="E:\www\BPM\services\engine\api\controllers" />
+      <recent name="E:\www\BPM\frontend\engine\static\flowDesign" />
+      <recent name="E:\www\BPM\frontend\engine\src\assets\myflowDesign" />
+      <recent name="E:\www\BPM\frontend\engine\src\assets" />
+    </key>
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="E:\www\BPM\frontend\framework\src\pages\flows\customer" />
+      <recent name="E:\www\BPM\services\framework\api\models" />
+      <recent name="E:\www\BPM\frontend\framework\src\pages" />
+      <recent name="E:\www\BPM\frontend\engine\static\flowDesign\assets\img" />
+      <recent name="E:\www\BPM\services\engine\api\models" />
+    </key>
+  </component>
+  <component name="RestoreUpdateTree" date="Moments ago" ActionInfo="_Update">
+    <UpdatedFiles>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Updated from server" />
+        <option name="myStatusName" value="Changed on server" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="CHANGED_ON_SERVER" />
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Updated" />
+          <option name="myStatusName" value="Changed" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="UPDATED" />
+          <PATH vcs="svn" revision="2978">E:\www\BPM\services\engine\template\submitform.vue</PATH>
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Created" />
+          <option name="myStatusName" value="Created" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="CREATED" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Deleted" />
+          <option name="myStatusName" value="Deleted" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="true" />
+          <option name="myId" value="REMOVED_FROM_REPOSITORY" />
+        </FILE-GROUP>
+        <FILE-GROUP>
+          <option name="myUpdateName" value="Restored" />
+          <option name="myStatusName" value="Will be restored" />
+          <option name="mySupportsDeletion" value="false" />
+          <option name="myCanBeAbsent" value="false" />
+          <option name="myId" value="RESTORED" />
+        </FILE-GROUP>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Modified" />
+        <option name="myStatusName" value="Modified" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MODIFIED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Skipped" />
+        <option name="myStatusName" value="Skipped" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SKIPPED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with conflicts" />
+        <option name="myStatusName" value="Will be merged with conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_CONFLICTS" />
+        <PATH vcs="svn" revision="2978">E:\www\BPM\services\framework\api\controllers\FlowController.js</PATH>
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with tree conflicts" />
+        <option name="myStatusName" value="Merged with tree conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_TREE_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged with property conflicts" />
+        <option name="myStatusName" value="Will be merged with property conflicts" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED_WITH_PROPERTY_CONFLICT" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Merged" />
+        <option name="myStatusName" value="Will be merged" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="MERGED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Not in repository" />
+        <option name="myStatusName" value="Not in repository" />
+        <option name="mySupportsDeletion" value="true" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="UNKNOWN" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally added" />
+        <option name="myStatusName" value="Locally added" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_ADDED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Locally removed" />
+        <option name="myStatusName" value="Locally removed" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="LOCALLY_REMOVED" />
+      </FILE-GROUP>
+      <FILE-GROUP>
+        <option name="myUpdateName" value="Switched" />
+        <option name="myStatusName" value="Switched" />
+        <option name="mySupportsDeletion" value="false" />
+        <option name="myCanBeAbsent" value="false" />
+        <option name="myId" value="SWITCHED" />
+      </FILE-GROUP>
+    </UpdatedFiles>
+  </component>
+  <component name="RunManager">
+    <configuration default="true" type="DartCommandLineRunConfigurationType" factoryName="Dart Command Line Application">
+      <method />
+    </configuration>
+    <configuration default="true" type="DartTestRunConfigurationType" factoryName="Dart Test">
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerKarma" factoryName="Karma">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavaScriptTestRunnerProtractor" factoryName="Protractor">
+      <config-file value="" />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="JavascriptDebugType" factoryName="JavaScript Debug">
+      <method />
+    </configuration>
+    <configuration default="true" type="NodeJSConfigurationType" factoryName="Node.js" path-to-node="project" working-dir="">
+      <method />
+    </configuration>
+    <configuration default="true" type="cucumber.js" factoryName="Cucumber.js">
+      <option name="cucumberJsArguments" value="" />
+      <option name="executablePath" />
+      <option name="filePath" />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.gulp" factoryName="Gulp.js">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <gulpfile />
+      <tasks />
+      <arguments />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="js.build_tools.npm" factoryName="npm">
+      <command value="run-script" />
+      <scripts />
+      <node-interpreter value="project" />
+      <envs />
+      <method />
+    </configuration>
+    <configuration default="true" type="mocha-javascript-test-runner" factoryName="Mocha">
+      <node-interpreter>project</node-interpreter>
+      <node-options />
+      <working-directory />
+      <pass-parent-env>true</pass-parent-env>
+      <envs />
+      <ui />
+      <extra-mocha-options />
+      <test-kind>DIRECTORY</test-kind>
+      <test-directory />
+      <recursive>false</recursive>
+      <method />
+    </configuration>
+  </component>
+  <component name="ShelveChangesManager" show_recycled="false">
+    <option name="remove_strategy" value="false" />
+  </component>
+  <component name="SvnConfiguration" cleanupOnStartRun="true">
+    <configuration>C:\Users\demo\AppData\Roaming\Subversion</configuration>
+    <supportedVersion>125</supportedVersion>
+  </component>
+  <component name="SvnFileUrlMappingImpl">
+    <option name="myMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="E:\www\BPM" />
+          <option name="myCopyRoot" value="E:\www\BPM" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+    <option name="myMoreRealMappingRoots">
+      <list>
+        <SvnCopyRootSimple>
+          <option name="myVcsRoot" value="E:\www\BPM" />
+          <option name="myCopyRoot" value="E:\www\BPM" />
+        </SvnCopyRootSimple>
+      </list>
+    </option>
+  </component>
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="8567cd0c-ef89-4719-9149-8e2f2111a7c5" name="Default" comment="" />
+      <changelist id="f7f6428c-31f5-49e6-a510-b392aeda1633" name="UnDefault" comment="" />
+      <created>1495435369350</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1495435369350</updated>
+      <workItem from="1495435372018" duration="11858000" />
+      <workItem from="1495538774344" duration="30000" />
+      <workItem from="1495539379499" duration="63622000" />
+      <workItem from="1495701726470" duration="579000" />
+      <workItem from="1495702351905" duration="12190000" />
+      <workItem from="1495762829054" duration="25674000" />
+      <workItem from="1496020880733" duration="36844000" />
+      <workItem from="1496195184410" duration="46415000" />
+      <workItem from="1496390072787" duration="15855000" />
+      <workItem from="1496623765085" duration="30317000" />
+      <workItem from="1496710886806" duration="60170000" />
+      <workItem from="1496887992854" duration="56103000" />
+      <workItem from="1497235560731" duration="18177000" />
+      <workItem from="1497260020398" duration="141715000" />
+      <workItem from="1497746419580" duration="69613000" />
+      <workItem from="1498041039068" duration="394000" />
+      <workItem from="1498094639879" duration="3347000" />
+      <workItem from="1498098178409" duration="42049000" />
+      <workItem from="1498534322482" duration="62345000" />
+      <workItem from="1498716375994" duration="16517000" />
+      <workItem from="1498785769868" duration="23193000" />
+      <workItem from="1499045134767" duration="98695000" />
+      <workItem from="1499394956713" duration="12794000" />
+      <workItem from="1499649536612" duration="64350000" />
+      <workItem from="1499826384826" duration="23357000" />
+      <workItem from="1499922651701" duration="64072000" />
+      <workItem from="1500370860879" duration="20803000" />
+      <workItem from="1500448050954" duration="32547000" />
+      <workItem from="1500600375727" duration="22005000" />
+      <workItem from="1500859549928" duration="40734000" />
+      <workItem from="1500971725956" duration="71409000" />
+      <workItem from="1501237175941" duration="54164000" />
+      <workItem from="1501637293024" duration="9791000" />
+      <workItem from="1501654945686" duration="5094000" />
+      <workItem from="1501661826233" duration="35627000" />
+      <workItem from="1501830837003" duration="305000" />
+      <workItem from="1501831489093" duration="9686000" />
+      <workItem from="1502068462998" duration="21254000" />
+      <workItem from="1502105550226" duration="31756000" />
+      <workItem from="1502241661934" duration="68160000" />
+      <workItem from="1502673905194" duration="80329000" />
+      <workItem from="1503278959162" duration="121010000" />
+      <workItem from="1503644642676" duration="110157000" />
+      <workItem from="1504228362700" duration="12812000" />
+      <workItem from="1504488236547" duration="3691000" />
+      <workItem from="1504494144974" duration="3567000" />
+      <workItem from="1504504329689" duration="23102000" />
+      <workItem from="1504576987737" duration="91596000" />
+      <workItem from="1504834183055" duration="26347000" />
+      <workItem from="1505093242277" duration="61152000" />
+      <workItem from="1505271203013" duration="48624000" />
+      <workItem from="1505616688286" duration="10341000" />
+      <workItem from="1505784835177" duration="80755000" />
+      <workItem from="1506043752214" duration="94329000" />
+      <workItem from="1506577205122" duration="27235000" />
+      <workItem from="1506663100660" duration="11919000" />
+      <workItem from="1507598207487" duration="28620000" />
+      <workItem from="1507684215440" duration="33332000" />
+      <workItem from="1507784857727" duration="44617000" />
+      <workItem from="1508200898541" duration="11688000" />
+      <workItem from="1508286555828" duration="43448000" />
+      <workItem from="1508719091323" duration="19838000" />
+      <workItem from="1508977724403" duration="39737000" />
+      <workItem from="1509082387260" duration="1491000" />
+      <workItem from="1509084326781" duration="4949000" />
+      <workItem from="1509090929289" duration="6220000" />
+      <workItem from="1509326054067" duration="2519000" />
+      <workItem from="1509329716687" duration="11000" />
+      <workItem from="1509501891558" duration="624000" />
+      <workItem from="1509502781040" duration="1306000" />
+      <workItem from="1509583651971" duration="4334000" />
+      <workItem from="1509930713762" duration="14845000" />
+      <workItem from="1509958911971" duration="6426000" />
+      <workItem from="1509966268939" duration="92534000" />
+      <workItem from="1510550553826" duration="870000" />
+      <workItem from="1510551474435" duration="12163000" />
+      <workItem from="1510623852311" duration="11084000" />
+      <workItem from="1510660158528" duration="2271000" />
+      <workItem from="1510709637629" duration="75953000" />
+      <workItem from="1511139499069" duration="18580000" />
+      <workItem from="1511173932330" duration="49618000" />
+      <workItem from="1511398985035" duration="51918000" />
+      <workItem from="1511746950452" duration="38489000" />
+      <workItem from="1511862595447" duration="75966000" />
+      <workItem from="1512186321199" duration="13765000" />
+      <workItem from="1512369581105" duration="49953000" />
+      <workItem from="1512561263962" duration="33616000" />
+      <workItem from="1512814440462" duration="3055000" />
+      <workItem from="1512954432379" duration="10596000" />
+      <workItem from="1512985480097" duration="1529000" />
+      <workItem from="1512989209802" duration="7757000" />
+      <workItem from="1513056590769" duration="25995000" />
+    </task>
+    <task id="LOCAL-00076">
+      <created>1505354816099</created>
+      <option name="number" value="00076" />
+      <option name="presentableId" value="LOCAL-00076" />
+      <option name="project" value="LOCAL" />
+      <updated>1505354816099</updated>
+    </task>
+    <task id="LOCAL-00077" summary="关键字部分，可计算的值，返回计算结果，不可计算的值，返回条数">
+      <created>1505387861213</created>
+      <option name="number" value="00077" />
+      <option name="presentableId" value="LOCAL-00077" />
+      <option name="project" value="LOCAL" />
+      <updated>1505387861213</updated>
+    </task>
+    <task id="LOCAL-00078" summary="关键字部分增加判断，及反向条件label显示问题和弹出框有空白的问题">
+      <created>1505441730351</created>
+      <option name="number" value="00078" />
+      <option name="presentableId" value="LOCAL-00078" />
+      <option name="project" value="LOCAL" />
+      <updated>1505441730352</updated>
+    </task>
+    <task id="LOCAL-00079" summary="把优先级改为1最高">
+      <created>1505620453649</created>
+      <option name="number" value="00079" />
+      <option name="presentableId" value="LOCAL-00079" />
+      <option name="project" value="LOCAL" />
+      <updated>1505620453650</updated>
+    </task>
+    <task id="LOCAL-00080" summary="结束节点创建数据到新的流程中">
+      <created>1505810517919</created>
+      <option name="number" value="00080" />
+      <option name="presentableId" value="LOCAL-00080" />
+      <option name="project" value="LOCAL" />
+      <updated>1505810517921</updated>
+    </task>
+    <task id="LOCAL-00081" summary="结束节点中去掉dataid，俩模板中判断状态finish--》finished">
+      <created>1505879758475</created>
+      <option name="number" value="00081" />
+      <option name="presentableId" value="LOCAL-00081" />
+      <option name="project" value="LOCAL" />
+      <updated>1505879758475</updated>
+    </task>
+    <task id="LOCAL-00082" summary="人员选择用的">
+      <created>1505887036866</created>
+      <option name="number" value="00082" />
+      <option name="presentableId" value="LOCAL-00082" />
+      <option name="project" value="LOCAL" />
+      <updated>1505887036867</updated>
+    </task>
+    <task id="LOCAL-00083" summary="消息列表">
+      <created>1506058042741</created>
+      <option name="number" value="00083" />
+      <option name="presentableId" value="LOCAL-00083" />
+      <option name="project" value="LOCAL" />
+      <updated>1506058042743</updated>
+    </task>
+    <task id="LOCAL-00084" summary="消息的显示条数改为10">
+      <created>1506587642976</created>
+      <option name="number" value="00084" />
+      <option name="presentableId" value="LOCAL-00084" />
+      <option name="project" value="LOCAL" />
+      <updated>1506587642977</updated>
+    </task>
+    <task id="LOCAL-00085" summary="修改下到达结束节点的条件">
+      <created>1506654408550</created>
+      <option name="number" value="00085" />
+      <option name="presentableId" value="LOCAL-00085" />
+      <option name="project" value="LOCAL" />
+      <updated>1506654408550</updated>
+    </task>
+    <task id="LOCAL-00086" summary="在新赋值的流程信息中增加flowid">
+      <created>1506655441391</created>
+      <option name="number" value="00086" />
+      <option name="presentableId" value="LOCAL-00086" />
+      <option name="project" value="LOCAL" />
+      <updated>1506655441391</updated>
+    </task>
+    <task id="LOCAL-00087" summary="修改部分ck，消息api，系统关键字api，vue文件中部分created函数中执行时候，ajax中数据尚未返回">
+      <created>1507862175906</created>
+      <option name="number" value="00087" />
+      <option name="presentableId" value="LOCAL-00087" />
+      <option name="project" value="LOCAL" />
+      <updated>1507862175907</updated>
+    </task>
+    <task id="LOCAL-00088" summary="ck部分">
+      <created>1508313152888</created>
+      <option name="number" value="00088" />
+      <option name="presentableId" value="LOCAL-00088" />
+      <option name="project" value="LOCAL" />
+      <updated>1508313152889</updated>
+    </task>
+    <task id="LOCAL-00089" summary="ck多行计算部分，有bug">
+      <created>1509624194315</created>
+      <option name="number" value="00089" />
+      <option name="presentableId" value="LOCAL-00089" />
+      <option name="project" value="LOCAL" />
+      <updated>1509624194317</updated>
+    </task>
+    <task id="LOCAL-00090" summary="修改BUG 261 提交的数据不成功">
+      <created>1509951346111</created>
+      <option name="number" value="00090" />
+      <option name="presentableId" value="LOCAL-00090" />
+      <option name="project" value="LOCAL" />
+      <updated>1509951346112</updated>
+    </task>
+    <task id="LOCAL-00091" summary="BUG  255   修改选择消息时候选不到页面">
+      <created>1509967092855</created>
+      <option name="number" value="00091" />
+      <option name="presentableId" value="LOCAL-00091" />
+      <option name="project" value="LOCAL" />
+      <updated>1509967092856</updated>
+    </task>
+    <task id="LOCAL-00092" summary="结束节点">
+      <created>1510552104845</created>
+      <option name="number" value="00092" />
+      <option name="presentableId" value="LOCAL-00092" />
+      <option name="project" value="LOCAL" />
+      <updated>1510552104846</updated>
+    </task>
+    <task id="LOCAL-00093" summary="添加人员选择ID联动项">
+      <created>1510624378415</created>
+      <option name="number" value="00093" />
+      <option name="presentableId" value="LOCAL-00093" />
+      <option name="project" value="LOCAL" />
+      <updated>1510624378416</updated>
+    </task>
+    <task id="LOCAL-00094" summary="监督人员提交监督意见之后，不再改变数据的下个节点的指向">
+      <created>1510631414194</created>
+      <option name="number" value="00094" />
+      <option name="presentableId" value="LOCAL-00094" />
+      <option name="project" value="LOCAL" />
+      <updated>1510631414194</updated>
+    </task>
+    <task id="LOCAL-00095" summary="BUG 255   在显示页面名称之后加上nodeid">
+      <created>1510710504736</created>
+      <option name="number" value="00095" />
+      <option name="presentableId" value="LOCAL-00095" />
+      <option name="project" value="LOCAL" />
+      <updated>1510710504737</updated>
+    </task>
+    <task id="LOCAL-00096" summary="各个BUG">
+      <created>1510986371272</created>
+      <option name="number" value="00096" />
+      <option name="presentableId" value="LOCAL-00096" />
+      <option name="project" value="LOCAL" />
+      <updated>1510986371272</updated>
+    </task>
+    <task id="LOCAL-00097" summary="sails 的配置： 20480kb">
+      <created>1510990342297</created>
+      <option name="number" value="00097" />
+      <option name="presentableId" value="LOCAL-00097" />
+      <option name="project" value="LOCAL" />
+      <updated>1510990342297</updated>
+    </task>
+    <task id="LOCAL-00098" summary="修改提交的状态为approve&#10;！！！sails的配置信息改为可接受5000个JSON长度（parameterLimit:5000}）">
+      <created>1511143011096</created>
+      <option name="number" value="00098" />
+      <option name="presentableId" value="LOCAL-00098" />
+      <option name="project" value="LOCAL" />
+      <updated>1511143011096</updated>
+    </task>
+    <task id="LOCAL-00099" summary="消息的状态改变增加finished">
+      <created>1511167898810</created>
+      <option name="number" value="00099" />
+      <option name="presentableId" value="LOCAL-00099" />
+      <option name="project" value="LOCAL" />
+      <updated>1511167898810</updated>
+    </task>
+    <task id="LOCAL-00100" summary="提交表单中增加从cookie中取nodeid和flowid及流程审批图改正">
+      <created>1511249986082</created>
+      <option name="number" value="00100" />
+      <option name="presentableId" value="LOCAL-00100" />
+      <option name="project" value="LOCAL" />
+      <updated>1511249986082</updated>
+    </task>
+    <task id="LOCAL-00101" summary="在结束节点上找相关流程数据加上父子联系判断">
+      <created>1511329717039</created>
+      <option name="number" value="00101" />
+      <option name="presentableId" value="LOCAL-00101" />
+      <option name="project" value="LOCAL" />
+      <updated>1511329717039</updated>
+    </task>
+    <task id="LOCAL-00102" summary="调整消息的状态为['审批中'，‘被拒绝’,'已完成'],找node的cookie的过期时间由1天改为1000天">
+      <created>1511341069257</created>
+      <option name="number" value="00102" />
+      <option name="presentableId" value="LOCAL-00102" />
+      <option name="project" value="LOCAL" />
+      <updated>1511341069257</updated>
+    </task>
+    <task id="LOCAL-00103" summary="进入结束节点的条件加上判断">
+      <created>1511486662961</created>
+      <option name="number" value="00103" />
+      <option name="presentableId" value="LOCAL-00103" />
+      <option name="project" value="LOCAL" />
+      <updated>1511486662962</updated>
+    </task>
+    <task id="LOCAL-00104" summary="mainJS中加请求拦截层，修改卡片模板及CK">
+      <created>1511760643427</created>
+      <option name="number" value="00104" />
+      <option name="presentableId" value="LOCAL-00104" />
+      <option name="project" value="LOCAL" />
+      <updated>1511760643427</updated>
+    </task>
+    <task id="LOCAL-00105" summary="将消息铃铛的路由配置到index中">
+      <created>1511760777669</created>
+      <option name="number" value="00105" />
+      <option name="presentableId" value="LOCAL-00105" />
+      <option name="project" value="LOCAL" />
+      <updated>1511760777669</updated>
+    </task>
+    <task id="LOCAL-00106" summary="给拒绝和同意的消息分开设置页面">
+      <created>1511939996714</created>
+      <option name="number" value="00106" />
+      <option name="presentableId" value="LOCAL-00106" />
+      <option name="project" value="LOCAL" />
+      <updated>1511939996715</updated>
+    </task>
+    <task id="LOCAL-00107" summary="文件上传部分">
+      <created>1512027799206</created>
+      <option name="number" value="00107" />
+      <option name="presentableId" value="LOCAL-00107" />
+      <option name="project" value="LOCAL" />
+      <updated>1512027799206</updated>
+    </task>
+    <task id="LOCAL-00108" summary="&quot;附件中删除按钮时有时无，怀疑和render函数有关，先固定为删除按钮常在">
+      <created>1512038100608</created>
+      <option name="number" value="00108" />
+      <option name="presentableId" value="LOCAL-00108" />
+      <option name="project" value="LOCAL" />
+      <updated>1512038100608</updated>
+    </task>
+    <task id="LOCAL-00109" summary="消息卡片">
+      <created>1512091910078</created>
+      <option name="number" value="00109" />
+      <option name="presentableId" value="LOCAL-00109" />
+      <option name="project" value="LOCAL" />
+      <updated>1512091910078</updated>
+    </task>
+    <task id="LOCAL-00110" summary="去掉查看更多">
+      <created>1512092129836</created>
+      <option name="number" value="00110" />
+      <option name="presentableId" value="LOCAL-00110" />
+      <option name="project" value="LOCAL" />
+      <updated>1512092129836</updated>
+    </task>
+    <task id="LOCAL-00111" summary="增加节点描述">
+      <created>1512358203354</created>
+      <option name="number" value="00111" />
+      <option name="presentableId" value="LOCAL-00111" />
+      <option name="project" value="LOCAL" />
+      <updated>1512358203355</updated>
+    </task>
+    <task id="LOCAL-00112">
+      <created>1512369870018</created>
+      <option name="number" value="00112" />
+      <option name="presentableId" value="LOCAL-00112" />
+      <option name="project" value="LOCAL" />
+      <updated>1512369870019</updated>
+    </task>
+    <task id="LOCAL-00113" summary="子流程的节点赋值的人员（不在主流程中赋值）可看到相应的导航菜单">
+      <created>1512386903807</created>
+      <option name="number" value="00113" />
+      <option name="presentableId" value="LOCAL-00113" />
+      <option name="project" value="LOCAL" />
+      <updated>1512386903807</updated>
+    </task>
+    <task id="LOCAL-00114" summary="子流程的节点赋值的人员（不在主流程中赋值）可看到相应的导航菜单">
+      <created>1512439901124</created>
+      <option name="number" value="00114" />
+      <option name="presentableId" value="LOCAL-00114" />
+      <option name="project" value="LOCAL" />
+      <updated>1512439901124</updated>
+    </task>
+    <task id="LOCAL-00115" summary="子流程的节点赋值的人员（不在主流程中赋值）可看到相应的导航菜单">
+      <created>1512446083324</created>
+      <option name="number" value="00115" />
+      <option name="presentableId" value="LOCAL-00115" />
+      <option name="project" value="LOCAL" />
+      <updated>1512446083324</updated>
+    </task>
+    <task id="LOCAL-00116" summary="审批日志">
+      <created>1512528088334</created>
+      <option name="number" value="00116" />
+      <option name="presentableId" value="LOCAL-00116" />
+      <option name="project" value="LOCAL" />
+      <updated>1512528088334</updated>
+    </task>
+    <task id="LOCAL-00117" summary="结束节点设置modal">
+      <created>1512529498275</created>
+      <option name="number" value="00117" />
+      <option name="presentableId" value="LOCAL-00117" />
+      <option name="project" value="LOCAL" />
+      <updated>1512529498275</updated>
+    </task>
+    <task id="LOCAL-00118" summary="点击消息会创建新的消息和流程图在拒绝之后，显示不对">
+      <created>1512617883089</created>
+      <option name="number" value="00118" />
+      <option name="presentableId" value="LOCAL-00118" />
+      <option name="project" value="LOCAL" />
+      <updated>1512617883090</updated>
+    </task>
+    <task id="LOCAL-00119" summary="人员">
+      <created>1512718184237</created>
+      <option name="number" value="00119" />
+      <option name="presentableId" value="LOCAL-00119" />
+      <option name="project" value="LOCAL" />
+      <updated>1512718184237</updated>
+    </task>
+    <task id="LOCAL-00120" summary="子流程的节点赋值的人员（不在主流程中赋值）可看到相应的导航菜单">
+      <created>1512719947380</created>
+      <option name="number" value="00120" />
+      <option name="presentableId" value="LOCAL-00120" />
+      <option name="project" value="LOCAL" />
+      <updated>1512719947380</updated>
+    </task>
+    <task id="LOCAL-00121">
+      <created>1512875729555</created>
+      <option name="number" value="00121" />
+      <option name="presentableId" value="LOCAL-00121" />
+      <option name="project" value="LOCAL" />
+      <updated>1512875729556</updated>
+    </task>
+    <task id="LOCAL-00122" summary="下载附件">
+      <created>1513067846435</created>
+      <option name="number" value="00122" />
+      <option name="presentableId" value="LOCAL-00122" />
+      <option name="project" value="LOCAL" />
+      <updated>1513067846436</updated>
+    </task>
+    <task id="LOCAL-00123" summary="结束节点加上nodeid和nextnodeid">
+      <created>1513146673227</created>
+      <option name="number" value="00123" />
+      <option name="presentableId" value="LOCAL-00123" />
+      <option name="project" value="LOCAL" />
+      <updated>1513146673227</updated>
+    </task>
+    <task id="LOCAL-00124" summary="流程图多一步处理“continue”">
+      <created>1513149887286</created>
+      <option name="number" value="00124" />
+      <option name="presentableId" value="LOCAL-00124" />
+      <option name="project" value="LOCAL" />
+      <updated>1513149887286</updated>
+    </task>
+    <option name="localTasksCounter" value="125" />
+    <servers />
+  </component>
+  <component name="TimeTrackingManager">
+    <option name="totallyTimeSpent" value="3070317000" />
+  </component>
+  <component name="TodoView" selected-index="1">
+    <todo-panel id="selected-file">
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+    <todo-panel id="all">
+      <are-packages-shown value="true" />
+      <is-autoscroll-to-source value="true" />
+    </todo-panel>
+  </component>
+  <component name="ToolWindowManager">
+    <frame x="-6" y="1" width="1368" height="733" extended-state="0" />
+    <editor active="false" />
+    <layout>
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.25714287" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19639935" sideWeight="0.49702382" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7234042" sideWeight="0.110119045" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Version Control" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.385" sideWeight="0.88988096" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.49590835" sideWeight="0.56994045" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.48190045" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+    </layout>
+    <layout-to-restore>
+      <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.19639935" sideWeight="0.49702382" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4053156" sideWeight="0.56994045" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.7234042" sideWeight="0.110119045" order="11" side_tool="true" content_ui="tabs" />
+      <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.0" sideWeight="0.88988096" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3289689" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="TypeScript" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24479167" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.0" sideWeight="0.48190045" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Database" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
+      <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+    </layout-to-restore>
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="processedProjectFiles" value="true" />
+  </component>
+  <component name="VcsContentAnnotationSettings">
+    <option name="myLimit" value="2678400000" />
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="BUG 255   在显示页面名称之后加上nodeid" />
+    <MESSAGE value="各个BUG" />
+    <MESSAGE value="sails 的配置： 20480kb" />
+    <MESSAGE value="修改提交的状态为approve&#10;！！！sails的配置信息改为可接受5000个JSON长度（parameterLimit:5000}）" />
+    <MESSAGE value="消息的状态改变增加finished" />
+    <MESSAGE value="提交表单中增加从cookie中取nodeid和flowid及流程审批图改正" />
+    <MESSAGE value="在结束节点上找相关流程数据加上父子联系判断" />
+    <MESSAGE value="调整消息的状态为['审批中'，‘被拒绝’,'已完成'],找node的cookie的过期时间由1天改为1000天" />
+    <MESSAGE value="进入结束节点的条件加上判断" />
+    <MESSAGE value="mainJS中加请求拦截层，修改卡片模板及CK" />
+    <MESSAGE value="将消息铃铛的路由配置到index中" />
+    <MESSAGE value="给拒绝和同意的消息分开设置页面" />
+    <MESSAGE value="文件上传部分" />
+    <MESSAGE value="&quot;附件中删除按钮时有时无，怀疑和render函数有关，先固定为删除按钮常在" />
+    <MESSAGE value="消息卡片" />
+    <MESSAGE value="去掉查看更多" />
+    <MESSAGE value="增加节点描述" />
+    <MESSAGE value="审批日志" />
+    <MESSAGE value="结束节点设置modal" />
+    <MESSAGE value="点击消息会创建新的消息和流程图在拒绝之后，显示不对" />
+    <MESSAGE value="人员" />
+    <MESSAGE value="子流程的节点赋值的人员（不在主流程中赋值）可看到相应的导航菜单" />
+    <MESSAGE value="下载附件" />
+    <MESSAGE value="结束节点加上nodeid和nextnodeid" />
+    <MESSAGE value="流程图多一步处理“continue”" />
+    <option name="LAST_COMMIT_MESSAGE" value="流程图多一步处理“continue”" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <option name="time" value="8" />
+    </breakpoint-manager>
+    <watches-manager />
+  </component>
+  <component name="editorHistoryManager">
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory98212890.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory51228934.vue" />
+    <entry file="file://$PROJECT_DIR$/frontend/framework/src/pages/framework/person.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="399" column="14" lean-forward="false" selection-start-line="399" selection-start-column="14" selection-end-line="399" selection-end-column="14" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/framework/src/pages/framework/nopage.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/framework/src/pages/framework/department.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="172">
+          <caret line="248" column="7" lean-forward="false" selection-start-line="248" selection-start-column="4" selection-end-line="248" selection-end-column="7" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/engine/template/components/Approvehistory.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="100">
+          <caret line="49" column="10" lean-forward="false" selection-start-line="49" selection-start-column="10" selection-end-line="49" selection-end-column="10" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/Approvehistory49780144.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/EndNodeHandler.js" />
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/PersonController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="78" column="20" lean-forward="false" selection-start-line="78" selection-start-column="20" selection-end-line="78" selection-end-column="20" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/framework/src/Config.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="66" column="74" lean-forward="false" selection-start-line="66" selection-start-column="74" selection-end-line="66" selection-end-column="74" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/framework/src/pages/framework/personedit.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="27" column="30" lean-forward="false" selection-start-line="27" selection-start-column="30" selection-end-line="27" selection-end-column="30" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/endNodeConditionModal.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/endNodeConditionModal [2].vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/tijiaobiaodan.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard40111309.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/tijiaofujian.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/fileListWithSubmit90209293.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/morenyemian [3].vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/morenyemian.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard24263892.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myStrongList42654350.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/liebiao.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard34171494.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard34179014.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myButton24393562.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/morenyemian [2].vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/tijiaobiaodanjibenxinxi.vue" />
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard13556711.vue" />
+    <entry file="file://$USER_HOME$/Desktop/use/font.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/querybyck.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/querybysks.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/JobpositionController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/createMessageHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/tijiaobiaodanfujianshangchuan.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="210">
+          <caret line="14" column="112" lean-forward="false" selection-start-line="14" selection-start-column="86" selection-end-line="14" selection-end-column="112" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/fileListWithSubmit59290614.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="150">
+          <caret line="10" column="39" lean-forward="true" selection-start-line="10" selection-start-column="39" selection-end-line="10" selection-end-column="39" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard17569772.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/chakan.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="225">
+          <caret line="15" column="81" lean-forward="false" selection-start-line="15" selection-start-column="81" selection-end-line="15" selection-end-column="81" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myCard17560018.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/chakanfujian.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/myFiles27202428.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="825">
+          <caret line="55" column="0" lean-forward="true" selection-start-line="55" selection-start-column="0" selection-end-line="55" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/engine/template/components/myUpload.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-972">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/engine/template/components/myFiles.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="119">
+          <caret line="52" column="28" lean-forward="false" selection-start-line="52" selection-start-column="28" selection-end-line="52" selection-end-column="28" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$USER_HOME$/AppData/Roaming/NetSarang/Xftp/Temporary/fileListWithSubmit.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="125">
+          <caret line="122" column="20" lean-forward="false" selection-start-line="122" selection-start-column="8" selection-end-line="122" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/engine/template/components/fileListWithSubmit.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="828">
+          <caret line="123" column="54" lean-forward="true" selection-start-line="123" selection-start-column="54" selection-end-line="123" selection-end-column="54" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/UploadfileController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="90">
+          <caret line="6" column="0" lean-forward="false" selection-start-line="6" selection-start-column="0" selection-end-line="6" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/config/connections.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="64" column="18" lean-forward="false" selection-start-line="64" selection-start-column="18" selection-end-line="64" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/engine/config/connections.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-76">
+          <caret line="64" column="18" lean-forward="false" selection-start-line="64" selection-start-column="18" selection-end-line="64" selection-end-column="18" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/NextNodeGenerateHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1148">
+          <caret line="689" column="36" lean-forward="true" selection-start-line="689" selection-start-column="36" selection-end-line="689" selection-end-column="36" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/frontend/engine/src/pages/framework/endNodeConditionModal.vue">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="406">
+          <caret line="886" column="0" lean-forward="false" selection-start-line="886" selection-start-column="0" selection-end-line="886" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/EndNodeHandler.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1895">
+          <caret line="268" column="13" lean-forward="false" selection-start-line="268" selection-start-column="13" selection-end-line="268" selection-end-column="13" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/services/framework/api/controllers/FlowController.js">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="113">
+          <caret line="986" column="20" lean-forward="true" selection-start-line="986" selection-start-column="20" selection-end-line="986" selection-end-column="20" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+  </component>
+  <component name="masterDetails">
+    <states>
+      <state key="ScopeChooserConfigurable.UI">
+        <settings>
+          <splitter-proportions>
+            <option name="proportions">
+              <list>
+                <option value="0.2" />
+              </list>
+            </option>
+          </splitter-proportions>
+        </settings>
+      </state>
+    </states>
+  </component>
+</project>

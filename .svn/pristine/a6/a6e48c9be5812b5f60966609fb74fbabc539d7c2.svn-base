@@ -1,0 +1,242 @@
+<style>
+  .mgt10{
+      margin-top:10px;
+  }
+  .right{
+      float:right
+  }
+</style>
+<template>
+    <div>
+        <template>
+            <label>点击筛选消息：</label>
+            <ButtonGroup>
+                <Button type="primary" @click="filterMessage('lastest')">
+                    最新消息
+                </Button>
+                <Button type="primary" @click="filterMessage('submit')">
+                    待我审批
+                </Button>
+                <Button type="primary" @click="filterMessage('deny')">
+                    被拒绝
+                </Button>
+                <template v-for="(item,index) in flowArr">
+                    <Button type="primary" @click="filterMessage('flow',item.value)">
+                        {{item.label}}
+                    </Button>
+                </template>
+            </ButtonGroup>
+            <Table :columns="msgShowTitle" :data="msgShow" class="mgt10"></Table>
+            <Page :total="dataCount" :current="currentPage" :page-size="pageSize" show-total @on-change="changepage" class="mgt10 right"></Page>
+        </template>
+    </div>
+</template>
+
+<script>
+  export default {
+      data(){
+          return {
+              // 页面初始化请求下来的200条没任何处理的消息
+              ajaxMessages:[],
+              // 生成按钮的flow数组
+              flowArr:[],
+
+              currentPage:1,
+              dataCount:0,
+              pageSize:2,
+
+              // 筛选出来展示的数据,符合分页原则的
+              msgShow:[],
+
+              // 筛选出来的数据，待分页筛选
+              msgForShow:[],
+              msgShowTitle:[
+                  {
+                      title: '内容',
+                      key: 'content'
+                  },
+                  {
+                      title: '发送人',
+                      width:100,
+                      key: 'sender'
+                  },
+                  {
+                      title: '时间',
+                      width:150,
+                      key: 'time'
+                  },
+                  {
+                      title: '操作',
+                      key: 'action',
+                      width: 80,
+                      align: 'center',
+                      render: (h, params) => {
+                          return h('div', [
+                              h('Button', {
+                                  props: {
+                                      type: 'primary',
+                                      size: 'small'
+                                  },
+                                  style: {
+                                      marginRight: '5px'
+                                  },
+                                  on: {
+                                      click: () => {
+                                          this.showDetail(params.index)
+                                      }
+                                  }
+                              }, '查看'),
+                          ]);
+                      }
+                  }
+              ]
+          }
+      },
+      methods:{
+          // 翻页
+          changepage(index){
+              this.currentPage = index;
+
+              var _start = ( index - 1 ) * this.pageSize;
+              var _end = index * this.pageSize;
+              this.msgShow = this.msgForShow.slice(_start,_end);
+          },
+
+           // 筛选消息
+           filterMessage(type,flowid){
+                if(type == "lastest"){
+                    var _tempArrFormsgShow = [];
+                    for(var i = 0 ; i < this.ajaxMessages.length;i++){
+                          var _tempObjForLatestMsg = {}
+                          _tempObjForLatestMsg.content = this.ajaxMessages[i].title;
+                          _tempObjForLatestMsg.sender = this.ajaxMessages[i].sender;
+                          _tempObjForLatestMsg.time = this.ajaxMessages[i].time;
+                          _tempObjForLatestMsg.url = this.ajaxMessages[i].url;
+                          _tempArrFormsgShow.push(_tempObjForLatestMsg)
+                    }
+                    this.msgForShow = _tempArrFormsgShow;
+                }
+                if(type == "submit" || type == "deny"){
+                    var _tempArrFormsgShow = [];
+                    for(var i = 0 ; i < this.ajaxMessages.length;i++){
+                        if(this.ajaxMessages[i].status == type){
+                            var _tempObjForLatestMsg = {}
+                            _tempObjForLatestMsg.content = this.ajaxMessages[i].title;
+                            _tempObjForLatestMsg.sender = this.ajaxMessages[i].sender;
+                            _tempObjForLatestMsg.time = this.ajaxMessages[i].time;
+                            _tempObjForLatestMsg.url = this.ajaxMessages[i].url;
+                            _tempArrFormsgShow.push(_tempObjForLatestMsg)
+                        }
+                    }
+                    this.msgForShow = _tempArrFormsgShow;
+                }
+                if(type == "flow"){
+                    var _flowid = flowid;
+                    var _tempArrFormsgShow = [];
+                    for(var i = 0 ; i < this.ajaxMessages.length;i++){
+                        if(this.ajaxMessages[i].flowid == flowid){
+                            var _tempObjForLatestMsg = {}
+                            _tempObjForLatestMsg.content = this.ajaxMessages[i].title;
+                            _tempObjForLatestMsg.sender = this.ajaxMessages[i].sender;
+                            _tempObjForLatestMsg.time = this.ajaxMessages[i].time;
+                            _tempObjForLatestMsg.url = this.ajaxMessages[i].url;
+                            _tempArrFormsgShow.push(_tempObjForLatestMsg)
+                        }
+                    }
+                    this.msgForShow = _tempArrFormsgShow;
+                }
+
+                if(this.msgForShow.length <= this.pageSize){
+                    this.msgShow = this.msgForShow;
+                }else{
+                    this.msgShow = this.msgForShow.slice(0,this.pageSize)
+                }
+                 this.dataCount = this.msgForShow.length;
+                 this.currentPage = 1;
+           },
+
+          // 跳转到详情页
+          showDetail(index){
+               var _url = this.msgShow[index].url;
+               this.$router.push(_url)
+          },
+
+          handleQueryAllMessage(){
+               var _usrid = window.localStorage.getItem("usrid");
+               // 读取消息的最长条数
+               var _count = 200;
+               _usrid = "598186bb13b114687efa39e4"
+               this.$http.get(this.globalconfig.listmessageformessagelistapi,{
+                  params:{
+                      usrid:_usrid,
+                      count:_count
+                  }
+               },{emulateJSON:true})
+               .then((response)=>{
+                  if(response.data.messages){
+                      var _resdata = response.data.messages;
+                      this.ajaxMessages = _resdata;
+                      var _tempFlowArrForBtn = [];
+                      var _tempArrFormsgShow = [];
+                      for(var i = 0 ;i < _resdata.length;i++){
+                           // 这是生成按钮
+                          var _tempObjForBtn = {};
+                          _tempObjForBtn.label = _resdata[i].flowname;
+                          _tempObjForBtn.value = _resdata[i].flowid;
+                          _tempFlowArrForBtn.push(_tempObjForBtn);
+
+                          // 这是取最新消息的数据
+                          var _tempObjForLatestMsg = {}
+                          _tempObjForLatestMsg.content = _resdata[i].title;
+                          _tempObjForLatestMsg.sender = _resdata[i].sender;
+                          _tempObjForLatestMsg.time = _resdata[i].time;
+                          _tempObjForLatestMsg.url = _resdata[i].url + "&usrid=" + _usrid;
+                          _tempArrFormsgShow.push(_tempObjForLatestMsg)
+                      }
+                      this.flowArr = this.uniqueArr(_tempFlowArrForBtn,"value");
+                      this.msgForShow = _tempArrFormsgShow;
+                      // 做分页
+                      this.dataCount = this.msgForShow.length;
+                      if(this.dataCount <= this.pageSize){
+                          this.msgShow = this.msgForShow
+                      }else{
+                          this.msgShow = this.msgForShow.slice(0,this.pageSize)
+                      }
+                  }
+               },(response)=>{
+                    this.$Message.error("读取messages失败")
+               })
+          },
+
+          // 根据数组中的对象的某个key对数组去重
+          uniqueArr(arr,key) {
+              var newArr=[];
+              for(var i=0;i<arr.length;i++){
+                  if(_objIsInArray(arr[i],newArr,key) ==-1){
+                      newArr.push(arr[i]);
+                  }
+              }
+              return newArr
+
+              function _objIsInArray(obj,arr,key){
+                 var tmpStatus=false;
+                 for(var j=0;j<arr.length;j++){
+                     if(obj[key]==arr[j][key]){
+                        return j;
+                         break;
+                     }else{
+                         tmpStatus=false;
+                     }
+                 }
+                 if(!tmpStatus){
+                      return -1;
+                 }
+              }
+          },
+      },
+      created(){
+          this.handleQueryAllMessage()
+      }
+
+  }
+</script>

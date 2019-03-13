@@ -1,0 +1,1387 @@
+<style scoped>
+ .mgb10{
+        margin-bottom:10px;
+    }
+    .mgt10{
+        margin-top:10px;
+    }
+    .mgt2{
+        margin-top:2px;
+    }
+    .aligncenter{
+        text-align:center
+    }
+</style>
+<template>
+<div>
+  <Modal
+    v-model="isEndNodeConditionShow"
+    title="请设置结束节点的赋值  @!每个流程中只可选择一项作为唯一项!@"
+    @on-ok="endNodeConditionOk"
+    width=610
+    @on-cancel="endNodeConditionCancel"
+  >
+    <!--Tabs中没有放置内容，是因为，在modal框 && tab页中，select显示异常，所以手动实现tab的功能-->
+    <!--这里的-10是因为tab的click事件只能传String，做值为-10，是避免和索引值重复-->
+      <Tabs value="relatedFlow-10" @on-click="saveCurIndex">
+        <TabPane label="本流程" name="relatedFlow-10"></TabPane>
+        <TabPane label="相关流程1" name="relatedFlow1"></TabPane>
+        <TabPane label="相关流程2" name="relatedFlow2"></TabPane>
+        <TabPane label="相关流程3" name="relatedFlow3"></TabPane>
+      </Tabs>
+      <!--这是本流程S-->
+      <div v-show="curIdx == -10">
+        <Form ref="curFlowForm" v-model="curFlowForm" :label-width="25">
+          <Row class="mgb10">
+            <Col span="24" class="aligncenter">
+            <h6>本流程部分</h6>
+            </Col>
+          </Row>
+          <Form-item class="mgt10">
+            <Row>
+              <Col span="8">
+                  本流程部分
+              </Col>
+              <Col span="16">
+                <label class="mgr10">选择新流程：</label>
+                <Select
+                    v-model="curFlowForm.toFlowID"
+                    style="width:200px"
+                    @on-change = "getSksByFlowId(curFlowForm.toFlowID,'to')"
+                >
+                  <Option v-for="(item,idx) in flowList"
+                          :value="item.value"
+                          :key="item.value + idx+0"
+                  >
+                    {{item.label}}
+                  </Option>
+                </Select>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10">
+          <!--条件循环开始-->
+          <Form-item
+            v-for="(eachCurFlowForm,index) in curFlowForm.condition"
+            :key="index"
+          >
+            <Row>
+              <Col span="7">
+              <Select v-model="eachCurFlowForm.fromSkName">
+                <Option v-for="(item,_index) in curFlowSks" :value="item.value" :key="item.value+_index+0">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="2" offset="1">
+              <Button disabled>
+                <Icon type="ios-arrow-thin-right" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="7" offset="1">
+              <Select v-model="eachCurFlowForm.toSkName">
+                <Option v-for="(item,_index) in curFlowForm.toSkList" :value="item.value" :key="item.value+_index+0">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="1" offset="1">
+              <Button type="error" @click="handleRemove(index)">
+                <Icon type="trash-a" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="3" offset="1">
+              <Checkbox v-model="eachCurFlowForm.checked">唯一项</Checkbox>
+              </Col>
+
+            </Row>
+          </Form-item>
+          <!--条件循环结束-->
+          <hr class="mgb10">
+          <Form-item>
+            <Row>
+              <Col span="24">
+              <Button type="dashed" long @click="handleAdd" icon="plus-round">新增</Button>
+              </Col>
+            </Row>
+          </Form-item>
+        </Form>
+      </div>
+      <!--这是本流程E-->
+      <!--大号的modal放这里，会导致显示错乱，所以，用多个不同的form实现-->
+      <!--这是相关流程1S-->
+      <div v-show="curIdx == 1">
+        <Form ref="relFlowForm1" v-model="relFlowForm1" :label-width=25>
+          <Row class="mgb10">
+            <Col span="24" class="aligncenter">
+            <h6>本流程部分1</h6>
+            </Col>
+          </Row>
+          <Form-item class="mgb10">
+            <Row>
+              <Col span="8">
+              本流程部分
+              </Col>
+              <Col span="16">
+              <label class="mgr10">选择新流程: </label>
+              <Select v-model="relFlowForm1.curFlow.toFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm1.curFlow.toFlowID,'to','cur')"
+                      style="width:200px">
+                <Option v-for="(item,idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+idx+0"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10">
+          <Form-item
+            v-for="(eachRelFlowForm1CurCondition,idex) in relFlowForm1.curFlow.condition"
+            :key="idex"
+          >
+            <Row>
+              <Col span="7">
+              <Select v-model="eachRelFlowForm1CurCondition.fromSkName">
+                <Option v-for="(item,_inder) in curFlowSks" :value="item.value" :key="item.value+_inder+0">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="2" offset="1">
+              <Button disabled>
+                <Icon type="ios-arrow-thin-right" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="7" offset="1">
+              <Select v-model="eachRelFlowForm1CurCondition.toSkName">
+                <Option v-for="(item,_inder1r) in relFlowForm1.curFlow.toSkList" :value="item.value" :key="item.value+_inder1r+0">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="1" offset="1">
+              <Button type="error" @click="handleRemove(idex,'cur')">
+                <Icon type="trash-a" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="3" offset="1">
+              <Checkbox v-model="eachRelFlowForm1CurCondition.checked">唯一项</Checkbox>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10 mgt10">
+          <Form-item>
+            <Row>
+              <Col span="24">
+              <Button type="dashed" long @click="handleAdd('cur')" icon="plus-round">新增</Button>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgt10">
+          <hr class="mgt2 mgb10">
+
+          <Row class="mgb10">
+            <Col span="24" class="aligncenter">
+            <h6>相关流程部分1</h6>
+            </Col>
+          </Row>
+          <Form-item class="mgb10">
+            <Row>
+              <Col span="12">
+              <label class="">选择起始流程: </label>
+              <Select v-model="relFlowForm1.relatedFlow.fromFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm1.relatedFlow.fromFlowID,'from','rel')"
+                      style="width:220px">
+                <Option v-for="(item,_idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+_idx+1"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="12">
+              <label class="">选择目标流程: </label>
+              <Select v-model="relFlowForm1.relatedFlow.toFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm1.relatedFlow.toFlowID,'to','rel')"
+                      style="width:220px">
+                <Option v-for="(item,_idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+_idx+1"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgt10 mgb10">
+          <Form-item
+            v-for="(eachRelatedFlowsCondition,_index) in relFlowForm1.relatedFlow.condition"
+            :key="_index"
+          >
+            <Row>
+              <Col span="7">
+              <Select v-model="eachRelatedFlowsCondition.fromSkName" placement="top">
+                <Option v-for="(item,_inde) in relFlowForm1.relatedFlow.fromSkList" :value="item.value" :key="item.value+_inde+1">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="2" offset="1">
+              <Button disabled>
+                <Icon type="ios-arrow-thin-right" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="7" offset="1">
+              <Select v-model="eachRelatedFlowsCondition.toSkName" placement="top">
+                <Option v-for="(item,_inde) in relFlowForm1.relatedFlow.toSkList" :value="item.value" :key="item.value+_inde+1">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="1" offset="1">
+              <Button type="error" @click="handleRemove(_index,'rel')">
+                <Icon type="trash-a" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="3" offset="1">
+              <Checkbox v-model="eachRelatedFlowsCondition.checked">唯一项</Checkbox>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10 mgt10">
+          <Form-item>
+            <Row>
+              <Col span="24">
+              <Button type="dashed" long @click="handleAdd('rel')" icon="plus-round">新增</Button>
+              </Col>
+            </Row>
+          </Form-item>
+        </Form>
+      </div>
+      <!--这是相关流程1E-->
+      <!--这是相关流程2S-->
+      <div v-show="curIdx == 2">
+        <Form ref="relFlowForm2" v-model="relFlowForm2" :label-width=25>
+          <Row class="mgb10">
+            <Col span="24" class="aligncenter">
+            <h6>本流程部分2</h6>
+            </Col>
+          </Row>
+          <Form-item class="mgb10">
+            <Row>
+              <Col span="8">
+              本流程部分
+              </Col>
+              <Col span="16">
+              <label class="mgr10">选择新流程: </label>
+              <Select v-model="relFlowForm2.curFlow.toFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm2.curFlow.toFlowID,'to','cur')"
+                      style="width:200px">
+                <Option v-for="(item,idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+idx+2"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgt10 mgb10">
+          <Form-item
+            v-for="(eachRelFlowForm2CurCondition,idex) in relFlowForm2.curFlow.condition"
+            :key="idex"
+          >
+            <Row>
+              <Col span="7">
+              <Select v-model="eachRelFlowForm2CurCondition.fromSkName">
+                <Option v-for="(item,_inde) in curFlowSks" :value="item.value" :key="item.value+_inde+2">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="2" offset="1">
+              <Button disabled>
+                <Icon type="ios-arrow-thin-right" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="7" offset="1">
+              <Select v-model="eachRelFlowForm2CurCondition.toSkName">
+                <Option v-for="(item,_inde) in relFlowForm2.curFlow.toSkList" :value="item.value" :key="item.value+_inde+2">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="1" offset="1">
+              <Button type="error" @click="handleRemove(idex,'cur')">
+                <Icon type="trash-a" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="3" offset="1">
+              <Checkbox v-model="eachRelFlowForm2CurCondition.checked">唯一项</Checkbox>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10 mgt10">
+          <Form-item>
+            <Row>
+              <Col span="24">
+              <Button type="dashed" long @click="handleAdd('cur')" icon="plus-round">新增</Button>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgt10">
+          <hr class="mgt2 mgb10">
+
+          <Row class="mgb10">
+            <Col span="24" class="aligncenter">
+            <h6>相关流程部分2</h6>
+            </Col>
+          </Row>
+          <Form-item class="mgb10">
+            <Row>
+              <Col span="12">
+              <label class="">选择起始流程: </label>
+              <Select v-model="relFlowForm2.relatedFlow.fromFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm2.relatedFlow.fromFlowID,'from','rel')"
+                      style="width:220px">
+                <Option v-for="(item,_idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+_idx+2"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="12">
+              <label class="">选择目标流程: </label>
+              <Select v-model="relFlowForm2.relatedFlow.toFlowID"
+                      @on-change = "getSksByFlowId(relFlowForm2.relatedFlow.toFlowID,'to','rel')"
+                      style="width:220px">
+                <Option v-for="(item,_idx) in flowList"
+                        :value="item.value"
+                        :key="item.value+_idx+2"
+                >
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgt10 mgb10">
+          <Form-item
+            v-for="(eachRelatedFlowsCondition,_index) in relFlowForm2.relatedFlow.condition"
+            :key="_index"
+          >
+            <Row>
+              <Col span="7">
+              <Select v-model="eachRelatedFlowsCondition.fromSkName" placement="top">
+                <Option v-for="(item,_inde) in relFlowForm2.relatedFlow.fromSkList" :value="item.value" :key="item.value+_inde+2">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="2" offset="1">
+              <Button disabled>
+                <Icon type="ios-arrow-thin-right" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="7" offset="1">
+              <Select v-model="eachRelatedFlowsCondition.toSkName" placement="top">
+                <Option v-for="(item,_inde) in relFlowForm2.relatedFlow.toSkList" :value="item.value" :key="item.value+_inde+2">
+                  {{ item.label }}
+                </Option>
+              </Select>
+              </Col>
+              <Col span="1" offset="1">
+              <Button type="error" @click="handleRemove(_index,'rel')">
+                <Icon type="trash-a" size="14"></Icon>
+              </Button>
+              </Col>
+              <Col span="3" offset="1">
+              <Checkbox v-model="eachRelatedFlowsCondition.checked">唯一项</Checkbox>
+              </Col>
+            </Row>
+          </Form-item>
+          <hr class="mgb10 mgt10">
+          <Form-item>
+            <Row>
+              <Col span="24">
+              <Button type="dashed" long @click="handleAdd('rel')" icon="plus-round">新增</Button>
+              </Col>
+            </Row>
+          </Form-item>
+        </Form>
+      </div>
+      <!--这是相关流程2E-->
+      <!--这是相关流程3S-->
+    <div v-show="curIdx == 3">
+      <Form ref="relFlowForm3" v-model="relFlowForm3" :label-width=25>
+        <Row class="mgb10">
+          <Col span="24" class="aligncenter">
+          <h6>本流程部分3</h6>
+          </Col>
+        </Row>
+        <Form-item class="mgb10">
+          <Row>
+            <Col span="8">
+            本流程部分
+            </Col>
+            <Col span="16">
+            <label class="mgr10">选择新流程: </label>
+            <Select v-model="relFlowForm3.curFlow.toFlowID"
+                    @on-change = "getSksByFlowId(relFlowForm3.curFlow.toFlowID,'to','cur')"
+                    style="width:200px">
+              <Option v-for="(item,idx) in flowList"
+                      :value="item.value"
+                      :key="item.value+idx+3"
+              >
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+          </Row>
+        </Form-item>
+        <hr class="mgt10 mgb10">
+        <Form-item
+          v-for="(eachRelFlowForm3CurCondition,idex) in relFlowForm3.curFlow.condition"
+          :key="idex"
+        >
+          <Row>
+            <Col span="7">
+            <Select v-model="eachRelFlowForm3CurCondition.fromSkName">
+              <Option v-for="(item,_inde) in curFlowSks" :value="item.value" :key="item.value+_inde+3">
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+            <Col span="2" offset="1">
+            <Button disabled>
+              <Icon type="ios-arrow-thin-right" size="14"></Icon>
+            </Button>
+            </Col>
+            <Col span="7" offset="1">
+            <Select v-model="eachRelFlowForm3CurCondition.toSkName">
+              <Option v-for="(item,_inde) in relFlowForm3.curFlow.toSkList" :value="item.value" :key="item.value+_inde+3">
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+            <Col span="1" offset="1">
+            <Button type="error" @click="handleRemove(idex,'cur')">
+              <Icon type="trash-a" size="14"></Icon>
+            </Button>
+            </Col>
+            <Col span="3" offset="1">
+            <Checkbox v-model="eachRelFlowForm3CurCondition.checked">唯一项</Checkbox>
+            </Col>
+          </Row>
+        </Form-item>
+        <hr class="mgb10 mgt10">
+        <Form-item>
+          <Row>
+            <Col span="24">
+            <Button type="dashed" long @click="handleAdd('cur')" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+        </Form-item>
+        <hr class="mgt10">
+        <hr class="mgt2 mgb10">
+
+        <Row class="mgb10">
+          <Col span="24" class="aligncenter">
+          <h6>相关流程部分3</h6>
+          </Col>
+        </Row>
+        <Form-item class="mgb10">
+          <Row>
+            <Col span="12">
+            <label class="">选择起始流程: </label>
+            <Select v-model="relFlowForm3.relatedFlow.fromFlowID"
+                    @on-change = "getSksByFlowId(relFlowForm3.relatedFlow.fromFlowID,'from','rel')"
+                    style="width:220px">
+              <Option v-for="(item,_idx) in flowList"
+                      :value="item.value"
+                      :key="item.value+_idx+3"
+              >
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+            <Col span="12">
+            <label class="">选择目标流程: </label>
+            <Select v-model="relFlowForm3.relatedFlow.toFlowID"
+                    @on-change = "getSksByFlowId(relFlowForm3.relatedFlow.toFlowID,'to','rel')"
+                    style="width:220px">
+              <Option v-for="(item,_idx) in flowList"
+                      :value="item.value"
+                      :key="item.value+_idx+3"
+              >
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+          </Row>
+        </Form-item>
+        <hr class="mgt10 mgb10">
+        <Form-item
+          v-for="(eachRelatedFlowsCondition,_index) in relFlowForm3.relatedFlow.condition"
+          :key="_index"
+        >
+          <Row>
+            <Col span="7">
+            <Select v-model="eachRelatedFlowsCondition.fromSkName" placement="top">
+              <Option v-for="(item,_inde) in relFlowForm3.relatedFlow.fromSkList" :value="item.value" :key="item.value+_inde+3">
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+            <Col span="2" offset="1">
+            <Button disabled>
+              <Icon type="ios-arrow-thin-right" size="14"></Icon>
+            </Button>
+            </Col>
+            <Col span="7" offset="1">
+            <Select v-model="eachRelatedFlowsCondition.toSkName" placement="top">
+              <Option v-for="(item,_inde) in relFlowForm3.relatedFlow.toSkList" :value="item.value" :key="item.value+_inde+3">
+                {{ item.label }}
+              </Option>
+            </Select>
+            </Col>
+            <Col span="1" offset="1">
+            <Button type="error" @click="handleRemove(_index,'rel')">
+              <Icon type="trash-a" size="14"></Icon>
+            </Button>
+            </Col>
+            <Col span="3" offset="1">
+            <Checkbox v-model="eachRelatedFlowsCondition.checked">唯一项</Checkbox>
+            </Col>
+          </Row>
+        </Form-item>
+        <hr class="mgb10 mgt10">
+        <Form-item>
+          <Row>
+            <Col span="24">
+            <Button type="dashed" long @click="handleAdd('rel')" icon="plus-round">新增</Button>
+            </Col>
+          </Row>
+        </Form-item>
+      </Form>
+    </div>
+      <!--这是相关流程3E-->
+  </Modal>
+</div>
+</template>
+<script>
+  export default{
+     props:[
+            'toEndNodeConditionMsg'
+     ],
+     computed:{
+        isEndNodeConditionShow(){
+            return this.toEndNodeConditionMsg.isEndNodeConditionModalShow
+        },
+        ThisFlowId(){
+            return this.toEndNodeConditionMsg.thisFlowid
+        },
+        conditionid(){
+            return this.toEndNodeConditionMsg.conditionid
+        }
+     },
+     watch:{
+        conditionid(){
+            if(this.conditionid == 'empty'){
+                this.curFlowSks = this.getSksByFLowidReshow(this.ThisFlowId)
+                this.curIdx = -10;
+                // 本流程的form的modal
+                this.curFlowForm = {
+                  toFlowID:'',
+                  toSkList:[{
+                      label:'空',
+                      value:''
+                  }],
+                  condition:[{
+                      fromSkName:'',
+                      toSkName:'',
+                      checked:false
+                  }]
+                };
+                // 相关流程1的form的modal
+                this.relFlowForm1 = {
+                  curFlow:{
+                    toFlowID:'',
+                    toSkList:[{
+                        label:'空',
+                        value:''
+                    }],
+                    condition:[
+                      {
+                          fromSkName:'',
+                          toSkName:'',
+                          checked:false,
+                      }
+                    ],
+                  },
+                  relatedFlow:{
+                    fromFlowID:'',
+                    toFlowID:'',
+                    fromSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    toSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    condition:[{
+                      fromSkName:'',
+                      toSkName:'',
+                      checked:false,
+                    }]
+                  }
+                };
+                // 相关流程2的form的modal
+                this.relFlowForm2 = {
+                  curFlow:{
+                    toFlowID:'',
+                    toSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    condition:[
+                      {
+                        fromSkName:'',
+                        toSkName:'',
+                        checked:false,
+                      }
+                    ],
+                  },
+                  relatedFlow:{
+                    fromFlowID:'',
+                    toFlowID:'',
+                    fromSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    toSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    condition:[{
+                      fromSkName:'',
+                      toSkName:'',
+                      checked:false,
+                    }]
+                  }
+                };
+                // 相关流程3的form的modal
+                this.relFlowForm3={
+                  curFlow:{
+                    toFlowID:'',
+                    toSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    condition:[
+                      {
+                        fromSkName:'',
+                        toSkName:'',
+                        checked:false,
+                      }
+                    ],
+                  },
+                  relatedFlow:{
+                    fromFlowID:'',
+                    toFlowID:'',
+                    fromSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    toSkList:[{
+                      label:'空',
+                      value:''
+                    }],
+                    condition:[{
+                      fromSkName:'',
+                      toSkName:'',
+                      checked:false,
+                    }]
+                  }
+                }
+            }else{
+                 if(!this.conditionid){return};
+                 this.$http.get(this.globalconfig.listendnodeconditionapi,{
+                    params:{
+                        id:this.conditionid
+                    }
+                 },{emulateJSON:true})
+                 .then((response)=>{
+                    if(response.data.conditions){
+                        var _condition = response.data.conditions;
+                        this.curFlowSks = this.getSksByFLowidReshow(_condition.curflowid)
+                        // 回显本流程部分，如果有本流程部分，则一定是第一项
+                        if(_condition.condition[0] && _condition.condition[0].toflowid){
+                            this.curFlowForm.toFlowID = _condition.condition[0].toflowid;
+                            this.curFlowForm.toSkList = this.getSksByFLowidReshow(_condition.condition[0].toflowid);
+                            var _tempCurArr = []
+                            for(var i = 0;i < _condition.condition[0].condition.length;i++){
+                                var _tempObj = {};
+                                _tempObj.fromSkName = _condition.condition[0].condition[i].fromSkName;
+                                _tempObj.toSkName = _condition.condition[0].condition[i].toSkName;
+                                if(_condition.condition[0].condition[i].checked == "true"){
+                                    _tempObj.checked = true
+                                }
+                                _tempCurArr.push(_tempObj)
+                            }
+                            this.curFlowForm.condition = _tempCurArr;
+                        }
+                        // 如果有第一项为本流程部分，则相关流程新第二项开始，没有的话，相关流程从第一项开始
+                        var _ajaxRelCondition = [];
+                        if(_condition.condition[0] && _condition.condition[0].toflowid){
+                            _ajaxRelCondition = _condition.condition.slice(1)
+                        }else{
+                            _ajaxRelCondition = _condition.condition;
+                        }
+
+                        // 回显相关流程1部分，
+                        if(_ajaxRelCondition[0]){
+                            if(_ajaxRelCondition[0].curflow){
+                                this.relFlowForm1.curFlow.toFlowID = _ajaxRelCondition[0].curflow.toflowid;
+                                this.relFlowForm1.curFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[0].curflow.toflowid)
+                                var _tempArr = [];
+                                for(var j = 0;j < _ajaxRelCondition[0].curflow.condition.length;j++){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[0].curflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[0].curflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[0].curflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm1.curFlow.condition = _tempArr
+                            }
+                            if(_ajaxRelCondition[0].relatedflow){
+                                this.relFlowForm1.relatedFlow.fromFlowID = _ajaxRelCondition[0].relatedflow.toflowid;
+                                this.relFlowForm1.relatedFlow.toFlowID = _ajaxRelCondition[0].relatedflow.toflowid;
+                                this.relFlowForm1.relatedFlow.fromSkList = this.getSksByFLowidReshow(_ajaxRelCondition[0].relatedflow.toflowid);
+                                this.relFlowForm1.relatedFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[0].relatedflow.toflowid);
+                                var _tempArr = [];
+                                for(var j = 0 ;j < _ajaxRelCondition[0].relatedflow.condition.length;j++ ){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[0].relatedflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[0].relatedflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[0].relatedflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm1.relatedFlow.condition = _tempArr
+                            }
+                        }
+
+                         // 回显相关流程2部分，
+                        if(_ajaxRelCondition[1]){
+                            if(_ajaxRelCondition[1].curflow){
+                                this.relFlowForm2.curFlow.toFlowID = _ajaxRelCondition[1].curflow.toflowid;
+                                this.relFlowForm2.curFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[1].curflow.toflowid)
+                                var _tempArr = [];
+                                for(var j = 0;j < _ajaxRelCondition[1].curflow.condition.length;j++){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[1].curflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[1].curflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[1].curflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm2.curFlow.condition = _tempArr
+                            }
+                            if(_ajaxRelCondition[1].relatedflow){
+                                this.relFlowForm2.relatedFlow.fromFlowID = _ajaxRelCondition[1].relatedflow.toflowid;
+                                this.relFlowForm2.relatedFlow.toFlowID = _ajaxRelCondition[1].relatedflow.toflowid;
+                                this.relFlowForm2.relatedFlow.fromSkList = this.getSksByFLowidReshow(_ajaxRelCondition[1].relatedflow.toflowid);
+                                this.relFlowForm2.relatedFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[1].relatedflow.toflowid);
+                                var _tempArr = [];
+                                for(var j = 0 ;j < _ajaxRelCondition[1].relatedflow.condition.length;j++ ){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[1].relatedflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[1].relatedflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[1].relatedflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm2.relatedFlow.condition = _tempArr
+                            }
+                        }
+
+                         // 回显相关流程3部分，
+                        if(_ajaxRelCondition[2]){
+                            if(_ajaxRelCondition[2].curflow){
+                                this.relFlowForm3.curFlow.toFlowID = _ajaxRelCondition[2].curflow.toflowid;
+                                this.relFlowForm3.curFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[2].curflow.toflowid)
+                                var _tempArr = [];
+                                for(var j = 0;j < _ajaxRelCondition[2].curflow.condition.length;j++){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[2].curflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[2].curflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[2].curflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm3.curFlow.condition = _tempArr
+                            }
+                            if(_ajaxRelCondition[2].relatedflow){
+                                this.relFlowForm3.relatedFlow.fromFlowID = _ajaxRelCondition[2].relatedflow.toflowid;
+                                this.relFlowForm3.relatedFlow.toFlowID = _ajaxRelCondition[2].relatedflow.toflowid;
+                                this.relFlowForm3.relatedFlow.fromSkList = this.getSksByFLowidReshow(_ajaxRelCondition[2].relatedflow.toflowid);
+                                this.relFlowForm3.relatedFlow.toSkList = this.getSksByFLowidReshow(_ajaxRelCondition[2].relatedflow.toflowid);
+                                var _tempArr = [];
+                                for(var j = 0 ;j < _ajaxRelCondition[2].relatedflow.condition.length;j++ ){
+                                    var _tempObj = {}
+                                    _tempObj.fromSkName = _ajaxRelCondition[2].relatedflow.condition[j].fromSkName;
+                                    _tempObj.toSkName = _ajaxRelCondition[2].relatedflow.condition[j].toSkName;
+                                    if(_ajaxRelCondition[2].relatedflow.condition[j].checked == 'true'){
+                                        _tempObj.checked = true
+                                    }
+                                    _tempArr.push(_tempObj)
+                                }
+                                this.relFlowForm3.relatedFlow.condition = _tempArr
+                            }
+                        }
+                    }
+                 },(response)=>{
+                    this.$Message.error("未读取到结束条件:"+ this.conditionid)
+                 })
+            }
+        }
+     },
+     data(){
+        return {
+            curIdx:-10,
+            // 所有的flow
+            ajaxAllFlows:[],
+            // 流程list
+            flowList:[{
+                label:'空',
+                value:''
+            }],
+            // 所有的Sk
+            ajaxAllSks:[],
+
+            // 当前流程的sk
+            curFlowSks:[{
+                label:'本流程暂无sk',
+                value:''
+            }],
+            // 本流程的form的modal
+            curFlowForm:{
+                toFlowID:'',
+                toSkList:[{
+                    label:'空',
+                    value:''
+                }],
+                condition:[{
+                    fromSkName:'',
+                    toSkName:'',
+                    checked:false
+                }]
+            },
+            // 相关流程1的form的modal
+            relFlowForm1:{
+              curFlow:{
+                toFlowID:'',
+                toSkList:[{
+                    label:'空',
+                    value:''
+                }],
+                condition:[
+                    {
+                        fromSkName:'',
+                        toSkName:'',
+                        checked:false,
+                    }
+                ],
+              },
+              relatedFlow:{
+                fromFlowID:'',
+                toFlowID:'',
+                fromSkList:[{
+                  label:'空',
+                  value:''
+                }],
+                toSkList:[{
+                  label:'空',
+                  value:''
+                }],
+                condition:[{
+                  fromSkName:'',
+                  toSkName:'',
+                  checked:false,
+                }]
+              }
+            },
+            // 相关流程2的form的modal
+            relFlowForm2:{
+            curFlow:{
+                toFlowID:'',
+                toSkList:[{
+                    label:'空',
+                    value:''
+                }],
+                condition:[
+                    {
+                        fromSkName:'',
+                        toSkName:'',
+                        checked:false,
+                    }
+                ],
+              },
+              relatedFlow:{
+                fromFlowID:'',
+                toFlowID:'',
+                fromSkList:[{
+                  label:'空',
+                  value:''
+                }],
+                toSkList:[{
+                  label:'空',
+                  value:''
+                }],
+                condition:[{
+                  fromSkName:'',
+                  toSkName:'',
+                  checked:false,
+                }]
+              }},
+            // 相关流程3的form的modal
+            relFlowForm3:{
+            curFlow:{
+                toFlowID:'',
+                toSkList:[{
+                    label:'空',
+                    value:''
+                }],
+                condition:[
+                    {
+                        fromSkName:'',
+                        toSkName:'',
+                        checked:false,
+                    }
+                ],
+            },
+            relatedFlow:{
+              fromFlowID:'',
+              toFlowID:'',
+              fromSkList:[{
+                label:'空',
+                value:''
+              }],
+              toSkList:[{
+                label:'空',
+                value:''
+              }],
+              condition:[{
+                fromSkName:'',
+                toSkName:'',
+                checked:false,
+              }]
+            }},
+        }
+     },
+     methods:{
+        saveCurIndex(idx){
+          var _idx = Number(idx.slice("relatedFlow".length));
+          this.curIdx = _idx;
+        },
+
+        getSksByFLowidReshow(flowid){
+            var _arr = [{
+              label:'空',
+              value:''
+            }];
+            for(var i = 0 ; i < this.ajaxAllSks.length;i++){
+               if(flowid == this.ajaxAllSks[i].flowid){
+                  var _obj = {};
+                  _obj.value = this.ajaxAllSks[i].key;
+                  _obj.label = this.ajaxAllSks[i].name;
+                  _arr.push(_obj)
+               }
+            }
+
+            if(_arr.length == 1){
+                _arr = [{
+                   label:'此流程暂无sk',
+                   value:''
+                }]
+            }
+            return _arr
+        },
+
+        // 三个参数，flowid,cur/related，to/from
+        getSksByFlowId(flowid,where,which){
+           var _arr = [{
+              label:'空',
+              value:''
+           }];
+            for(var i = 0 ; i < this.ajaxAllSks.length;i++){
+               if(flowid == this.ajaxAllSks[i].flowid){
+                  var _obj = {};
+                  _obj.value = this.ajaxAllSks[i].key;
+                  _obj.label = this.ajaxAllSks[i].name;
+                  _arr.push(_obj)
+               }
+            }
+            if(_arr.length == 1){
+              _arr = [{
+                 label:'此流程暂无sk',
+                 value:''
+              }]
+            }
+
+            if(this.curIdx == -10){
+              if(where == 'from'){
+                this.curFlowSks = _arr
+              }else if(where == 'to'){
+                this.curFlowForm.toSkList = _arr
+              }
+            }else if(this.curIdx == 1){
+              if(which == 'cur'){
+                if(where == 'from'){
+                  this.relFlowForm1.curFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm1.curFlow.toSkList = _arr
+                }
+              }else if(which == 'rel'){
+                if(where == 'from'){
+                  this.relFlowForm1.relatedFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm1.relatedFlow.toSkList = _arr
+                }
+              }
+            }else if(this.curIdx == 2){
+              if(which == 'cur'){
+                if(where == 'from'){
+                  this.relFlowForm2.curFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm2.curFlow.toSkList = _arr
+                }
+              }else if(which == 'rel'){
+                if(where == 'from'){
+                  this.relFlowForm2.relatedFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm2.relatedFlow.toSkList = _arr
+                }
+              }
+            }else if(this.curIdx == 3){
+              if(which == 'cur'){
+                if(where == 'from'){
+                  this.relFlowForm3.curFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm3.curFlow.toSkList = _arr
+                }
+              }else if(which == 'rel'){
+                if(where == 'from'){
+                  this.relFlowForm3.relatedFlow.fromSkList = _arr
+                }else if(where == 'to'){
+                  this.relFlowForm3.relatedFlow.toSkList = _arr
+                }
+              }
+            }
+        },
+
+        handleAdd(where){
+          var _Obj = {
+            fromSkName : '',
+            toSkName : '',
+            checked : false
+          };
+          if(this.curIdx == -10){
+            this.curFlowForm.condition.push(_Obj)
+          }else if(this.curIdx == 1){
+            if(where == 'cur'){
+              this.relFlowForm1.curFlow.condition.push(_Obj)
+            }else if(where == 'rel'){
+              this.relFlowForm1.relatedFlow.condition.push(_Obj)
+            }
+          }else if(this.curIdx == 2){
+            if(where == 'cur'){
+              this.relFlowForm2.curFlow.condition.push(_Obj)
+            }else if(where == 'rel'){
+              this.relFlowForm2.relatedFlow.condition.push(_Obj)
+            }
+          }else if(this.curIdx == 3){
+            if(where == 'cur'){
+              this.relFlowForm3.curFlow.condition.push(_Obj)
+            }else if(where == 'rel'){
+              this.relFlowForm3.relatedFlow.condition.push(_Obj)
+            }
+          }
+        },
+
+        handleRemove(idx,where){
+          if(this.curIdx == -10){
+            this.curFlowForm.condition.splice(idx,1)
+          }else if(this.curIdx == 1){
+            if(where == 'cur'){
+              this.relFlowForm1.curFlow.condition.splice(idx,1)
+            }else if(where == "rel"){
+              this.relFlowForm1.relatedFlow.condition.splice(idx,1)
+            }
+          }else if(this.curIdx == 2){
+            if(where == 'cur'){
+              this.relFlowForm2.curFlow.condition.splice(idx,1)
+            }else if(where == "rel"){
+              this.relFlowForm2.relatedFlow.condition.splice(idx,1)
+            }
+          }else if(this.curIdx == 2){
+            if(where == 'cur'){
+              this.relFlowForm2.curFlow.condition.splice(idx,1)
+            }else if(where == "rel"){
+              this.relFlowForm2.relatedFlow.condition.splice(idx,1)
+            }
+          }else if(this.curIdx == 3){
+            if(where == 'cur'){
+              this.relFlowForm3.curFlow.condition.splice(idx,1)
+            }else if(where == "rel"){
+              this.relFlowForm3.relatedFlow.condition.splice(idx,1)
+            }
+          }
+        },
+
+        endNodeConditionOk(){
+            var _condition = []
+            // 本流程的条件
+            var _curFlowObj = {}
+            _curFlowObj['toflowid'] = this.curFlowForm.toFlowID;
+            _curFlowObj['condition'] = [];
+            for(var i = 0 ;i < this.curFlowForm.condition.length;i++){
+               if(this.curFlowForm.condition[i].fromSkName && this.curFlowForm.condition[i].toSkName){
+                  var _tempObj = {};
+                  _tempObj.fromSkName = this.curFlowForm.condition[i].fromSkName;
+                  _tempObj.toSkName = this.curFlowForm.condition[i].toSkName;
+                  if(this.curFlowForm.condition[i].checked){
+                    _tempObj.checked = "true"
+                  }
+                  _curFlowObj['condition'].push(_tempObj)
+               }
+            }
+            if(_curFlowObj['condition'] && _curFlowObj['condition'].length > 0){
+                _condition.unshift(_curFlowObj)
+            }
+            // 相关流程1的条件
+            var relFlow1Obj = {};
+            if(this.relFlowForm1.curFlow.toFlowID && this.relFlowForm1.curFlow.condition.length > 0){
+                relFlow1Obj.curflow = {}
+                relFlow1Obj.curflow.toflowid = this.relFlowForm1.curFlow.toFlowID;
+                relFlow1Obj.curflow.condition = []
+                for(var j = 0;j < this.relFlowForm1.curFlow.condition.length;j++){
+                    if(this.relFlowForm1.curFlow.condition[j].fromSkName && this.relFlowForm1.curFlow.condition[j].toSkName){
+                        var _tempObj = {}
+                        _tempObj.fromSkName = this.relFlowForm1.curFlow.condition[j].fromSkName;
+                        _tempObj.toSkName = this.relFlowForm1.curFlow.condition[j].toSkName;
+                        if(this.relFlowForm1.curFlow.condition[j].checked){
+                            _tempObj.checked = "true";
+                        }
+                        relFlow1Obj.curflow.condition.push(_tempObj)
+                    }
+                }
+            }
+            if(this.relFlowForm1.relatedFlow.fromFlowID && this.relFlowForm1.relatedFlow.toFlowID && this.relFlowForm1.relatedFlow.condition.length > 0){
+               relFlow1Obj.relatedflow = {}
+               relFlow1Obj.relatedflow.fromflowid = this.relFlowForm1.relatedFlow.fromFlowID;
+               relFlow1Obj.relatedflow.toflowid = this.relFlowForm1.relatedFlow.toFlowID;
+               relFlow1Obj.relatedflow.condition = []
+               for(var k = 0;k < this.relFlowForm1.relatedFlow.condition.length;k++){
+                  if(this.relFlowForm1.relatedFlow.condition[k].fromSkName && this.relFlowForm1.relatedFlow.condition[k].toSkName){
+                      var _tempObj = {}
+                      _tempObj.fromSkName = this.relFlowForm1.relatedFlow.condition[k].fromSkName
+                      _tempObj.toSkName = this.relFlowForm1.relatedFlow.condition[k].toSkName
+                      if(this.relFlowForm1.relatedFlow.condition[k].checked){
+                         _tempObj.checked = "true"
+                      }
+                      relFlow1Obj.relatedflow.condition.push(_tempObj)
+                  }
+               }
+            }
+            if( (relFlow1Obj.relatedflow && relFlow1Obj.relatedflow.condition && relFlow1Obj.relatedflow.condition.length > 0)
+                || (relFlow1Obj.curflow && relFlow1Obj.curflow.condition && relFlow1Obj.curflow.condition.length > 0) ){
+                 _condition.push(relFlow1Obj)
+            }
+
+            // 相关流程2的条件
+            var relFlow2Obj = {};
+            if(this.relFlowForm2.curFlow.toFlowID && this.relFlowForm2.curFlow.condition.length > 0){
+                relFlow2Obj.curflow = {}
+                relFlow2Obj.curflow.toflowid = this.relFlowForm2.curFlow.toFlowID;
+                relFlow2Obj.curflow.condition = []
+                for(var j = 0;j < this.relFlowForm2.curFlow.condition.length;j++){
+                    if(this.relFlowForm2.curFlow.condition[j].fromSkName && this.relFlowForm2.curFlow.condition[j].toSkName){
+                        var _tempObj = {}
+                        _tempObj.fromSkName = this.relFlowForm2.curFlow.condition[j].fromSkName;
+                        _tempObj.toSkName = this.relFlowForm2.curFlow.condition[j].toSkName;
+                        if(this.relFlowForm2.curFlow.condition[j].checked){
+                            _tempObj.checked = "true";
+                        }
+                        relFlow2Obj.curflow.condition.push(_tempObj)
+                    }
+                }
+            }
+            if(this.relFlowForm2.relatedFlow.fromFlowID && this.relFlowForm2.relatedFlow.toFlowID && this.relFlowForm2.relatedFlow.condition.length > 0){
+               relFlow2Obj.relatedflow = {}
+               relFlow2Obj.relatedflow.fromflowid = this.relFlowForm2.relatedFlow.fromFlowID;
+               relFlow2Obj.relatedflow.toflowid = this.relFlowForm2.relatedFlow.toFlowID;
+               relFlow2Obj.relatedflow.condition = []
+               for(var k = 0;k < this.relFlowForm2.relatedFlow.condition.length;k++){
+                  if(this.relFlowForm2.relatedFlow.condition[k].fromSkName && this.relFlowForm2.relatedFlow.condition[k].toSkName){
+                      var _tempObj = {}
+                      _tempObj.fromSkName = this.relFlowForm2.relatedFlow.condition[k].fromSkName
+                      _tempObj.toSkName = this.relFlowForm2.relatedFlow.condition[k].toSkName
+                      if(this.relFlowForm2.relatedFlow.condition[k].checked){
+                         _tempObj.checked = "true"
+                      }
+                      relFlow2Obj.relatedflow.condition.push(_tempObj)
+                  }
+               }
+            }
+            if( (relFlow2Obj.relatedflow && relFlow2Obj.relatedflow.condition.condition && relFlow2Obj.relatedflow.condition.length > 0)
+                || (relFlow2Obj.curflow && relFlow2Obj.curflow.condition && relFlow2Obj.curflow.condition.length > 0) ){
+                 _condition.push(relFlow2Obj)
+            }
+
+            // 相关流程3的条件
+            var relFlow3Obj = {};
+            if(this.relFlowForm3.curFlow.toFlowID && this.relFlowForm3.curFlow.condition.length > 0){
+                relFlow3Obj.curflow = {}
+                relFlow3Obj.curflow.toflowid = this.relFlowForm3.curFlow.toFlowID;
+                relFlow3Obj.curflow.condition = []
+                for(var j = 0;j < this.relFlowForm3.curFlow.condition.length;j++){
+                    if(this.relFlowForm3.curFlow.condition[j].fromSkName && this.relFlowForm3.curFlow.condition[j].toSkName){
+                        var _tempObj = {}
+                        _tempObj.fromSkName = this.relFlowForm3.curFlow.condition[j].fromSkName;
+                        _tempObj.toSkName = this.relFlowForm3.curFlow.condition[j].toSkName;
+                        if(this.relFlowForm3.curFlow.condition[j].checked){
+                            _tempObj.checked = "true";
+                        }
+                        relFlow3Obj.curflow.condition.push(_tempObj)
+                    }
+                }
+            }
+            if(this.relFlowForm3.relatedFlow.fromFlowID && this.relFlowForm3.relatedFlow.toFlowID && this.relFlowForm3.relatedFlow.condition.length > 0){
+               relFlow3Obj.relatedflow = {}
+               relFlow3Obj.relatedflow.fromflowid = this.relFlowForm3.relatedFlow.fromFlowID;
+               relFlow3Obj.relatedflow.toflowid = this.relFlowForm3.relatedFlow.toFlowID;
+               relFlow3Obj.relatedflow.condition = []
+               for(var k = 0;k < this.relFlowForm3.relatedFlow.condition.length;k++){
+                  if(this.relFlowForm3.relatedFlow.condition[k].fromSkName && this.relFlowForm3.relatedFlow.condition[k].toSkName){
+                      var _tempObj = {}
+                      _tempObj.fromSkName = this.relFlowForm3.relatedFlow.condition[k].fromSkName
+                      _tempObj.toSkName = this.relFlowForm3.relatedFlow.condition[k].toSkName
+                      if(this.relFlowForm3.relatedFlow.condition[k].checked){
+                         _tempObj.checked = "true"
+                      }
+                      relFlow3Obj.relatedflow.condition.push(_tempObj)
+                  }
+               }
+            }
+            if( (relFlow3Obj.relatedflow && relFlow3Obj.relatedflow.condition.condition && relFlow3Obj.relatedflow.condition.length > 0)
+                || (relFlow3Obj.curflow && relFlow3Obj.curflow.condition && relFlow3Obj.curflow.condition.length > 0) ){
+                 _condition.push(relFlow3Obj)
+            }
+
+            // 没有可用的条件，不保存
+            if(_condition.length == 0){
+                this.$Message.error("别闹，填充可用的条件")
+                var data = {};
+                data.endNodeConditionid = '';
+                data.isEndNodeConditionShow = false;
+                this.$emit("fromEndNodeCondition",data);
+                return
+            }
+            var _conditionid = this.conditionid;
+            if(this.conditionid == 'empty'){
+                _conditionid = '';
+            }
+
+            this.$http.get(this.globalconfig.createorupdataendnodeconditionapi,{
+                params:{
+                    id:_conditionid,
+                    flowid:this.ThisFlowId,
+                    condition:_condition
+                }
+            },{emulateJSON:true})
+            .then((response)=>{
+                if(response.data.id){
+                    var _id = response.data.id;
+                    var data = {};
+                    data.isEndNodeConditionShow = false;
+                    data.endNodeConditionid = _id;
+                    this.$emit("fromEndNodeCondition",data);
+                    this.$Message.info('提交成功');
+                }
+            },(response)=>{
+                this.$Message.error("结束节点条件更新或创建失败");
+            })
+        },
+        endNodeConditionCancel(){
+            var data = {};
+            data.endNodeConditionid = '';
+            data.isEndNodeConditionShow = false;
+            this.$emit("fromEndNodeCondition",data);
+        },
+
+        // 读出所有的flow
+        handleListAllFlows(){
+            this.$http.get(this.globalconfig.listflow,{
+
+            },{emulateJSON:true})
+            .then((res)=>{
+                if(res.data.flows){
+                    this.ajaxAllFlows = res.data.flows;
+                    var _tempArr = [{
+                        label:'空',
+                        value:''
+                    }];
+                    for(var i = 0 ; i < res.data.flows.length;i++){
+                        var _tempObj = {};
+                        _tempObj.label = res.data.flows[i].name;
+                        _tempObj.value = res.data.flows[i].id;
+                        _tempArr.push(_tempObj);
+                    }
+                    this.flowList = _tempArr;
+                }
+            },(res)=>{
+                this.$Message.error("listflows获取失败");
+            })
+        },
+
+        // 读出所有的sk
+        handleListSks(){
+            this.$http.get(this.globalconfig.listsksapi,{
+                params:{
+
+                }
+            },{emulateJSON:true})
+            .then((response)=> {
+                if(response.data.sks){
+                    this.ajaxAllSks = response.data.sks;
+                }
+            },(response)=>{
+                this.$Message.error("读取sks失败");
+            })
+        },
+     },
+     created(){
+        this.handleListAllFlows();
+        this.handleListSks();
+     }
+
+  }
+
+</script>

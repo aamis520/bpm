@@ -1,0 +1,50 @@
+<!--index.wxml-->
+<view class="container">
+  <view bindtap="bindViewTap" class="userinfo">
+      <view class="num">
+            <text class="hm">{{nowTime.hm}}</text>
+      </view>
+      <view class="num_small"> 
+            <text class="ymd">{{nowTime.ymd}}</text> 
+      </view>
+ <!--上班打卡-->
+      <view class="onTime">
+      上班时间：<text>{{company.ontime}}</text>
+      </view>
+       <view bindtap="signOn" wx:if="{{!on.time}}" class="motto_out">
+          <view class="sign-btn">上班打卡</view>
+       </view>
+       <view wx:if="{{!on.time}}" class="gpsRound">
+        <text wx:if="{{range == '正常'}}">已进入打卡范围内</text>
+        <text wx:if="{{range == '外勤'}}">未进入打卡范围内</text>
+       </view>
+      <text wx:if="{{on.time}}" class="signType">打卡成功({{on.range}})</text>
+      <view wx:if="{{on.time}}" class="signStatus">
+      {{on.time}}
+      <text>{{on.type}}</text>
+      </view>
+      <text bindtap="signOn" wx:if="{{on.time}}" class="upDate">更新打卡</text>
+
+<!--下班打卡-->
+<view class="orangeHr"></view>
+      <view class="onTime">
+      下班时间：<text>{{company.offtime}}</text>
+      </view>
+       <view bindtap="signOff" wx:if="{{!off.time&&on.time}}" class="motto_out">
+          <view class="sign-btn">下班打卡</view>
+       </view>
+       <view wx:if="{{!off.time&&on.time}}" class="gpsRound">
+          <text wx:if="{{range == '正常'}}">已进入打卡范围内</text>
+          <text wx:if="{{range == '外勤'}}">未进入打卡范围内</text>
+       </view>
+      <text wx:if="{{off.time}}" class="signType">打卡成功({{off.range}})</text>
+      <view wx:if="{{off.time}}" class="signStatus">
+      {{off.time}}
+      <text>{{off.type}}</text>
+      </view>
+      <text bindtap="signOff" wx:if="{{off.time}}" class="upDate">更新打卡</text>
+
+      
+  </view>
+<view bindtap="about" class="about">关于</view>
+</view>

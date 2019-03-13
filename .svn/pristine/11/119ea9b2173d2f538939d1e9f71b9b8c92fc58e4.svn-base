@@ -1,0 +1,91 @@
+/**
+ * Created by demo on 2017/8/7.
+ */
+module.exports = {
+    // 创建流程中消息的条件
+    createorupdate:function (req,res) {
+        var toIDs = req.param("toIDs");
+        var groupIDs =  req.param("groupIDs");
+        var priority = req.param("priority");
+        var keyword1 = req.param("keyword1");
+        var keyword2 = req.param("keyword2");
+        var keyword3 = req.param("keyword3");
+        var keyword4 = req.param("keyword4");
+        var departments = req.param("departments");
+        var id = req.param("id");
+        var flowid = req.param("flowid");
+        var nodeid = req.param("nodeid");
+        var page = req.param("page");
+        Messageconditions.findOne({
+            id:id
+        }).exec(function (err,condition) {
+            if(err){
+                res.send(200,{error:"未找到对应Messagecondition"})
+            }else{
+                if(condition){
+                    // 找到了，走更新
+                    Messageconditions.update(
+                        {id:id},
+                        {
+                            toIDs:toIDs,
+                            groupIDs:groupIDs,
+                            departmentIDs:departments,
+                            priority:priority,
+                            keyword1:keyword1,
+                            keyword2:keyword2,
+                            keyword3:keyword3,
+                            keyword4:keyword4,
+                            flowid:flowid,
+                            nodeid:nodeid,
+                            page:page
+                        }
+                    ).exec(function (err,upcondition) {
+                        if(!upcondition){
+                            res.send(200,{error:"Messageconditions更新失败"})
+                        }else{
+                            res.send(200,{id:upcondition[0].id})
+                        }
+                    })
+
+                }else{
+                  // 未找到，走创建
+                    Messageconditions.create({
+                        toIDs:toIDs,
+                        groupIDs:groupIDs,
+                        departmentIDs:departments,
+                        priority:priority,
+                        keyword1:keyword1,
+                        keyword2:keyword2,
+                        keyword3:keyword3,
+                        keyword4:keyword4,
+                        flowid:flowid,
+                        nodeid:nodeid,
+                        page:page
+                    }).exec(function (err,crcondition) {
+                        if(!crcondition){
+                            res.send(200,{error:"Messageconditions创建失败"})
+                        }else{
+                            res.send(200,{id:crcondition.id})
+                        }
+                    })
+                }
+            }
+        })
+    },
+
+    // 列出某个流程中的所有的消息的条件
+    listmessagecondition:function (req,res) {
+        Messageconditions.find({
+
+        }).exec(function (err,conditions) {
+            if(!conditions){
+                res.send(200,{error:"未找到Messageconditions"})
+            }else {
+                res.send(200,{conditions:conditions})
+            }
+        })
+    }
+
+
+
+}

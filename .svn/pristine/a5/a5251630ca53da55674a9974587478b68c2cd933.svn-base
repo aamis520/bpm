@@ -1,0 +1,90 @@
+<script type="text/javascript">
+var showingpagedlgqueue = []
+export default
+{
+	showingpagedlgqueue,
+	dataid:'',
+	parentid:'',
+    loginapi:'http://localhost:1337/login/login',
+    wechatloginapi:'http://localhost:1337/login/wechatlogin',
+    //提交数据
+    submitdataapi:'http://localhost:1337/flow/submitdata',
+    //更新数据
+    updatedataapi:'http://localhost:1337/flow/updatedata',
+    //删除一条数据
+    deldataapi:'http://localhost:1337/flow/deldata',
+    //提交审批意见
+    submitapprove:'http://localhost:1337/flow/submitapprove',
+
+    // 列出当前节点下的数据历史记录
+    listcurnodehostories:'http://localhost:1337/approvalhistory/listcurnodehistories',
+    // 获取预测的流程
+    getexceptedflow:'http://localhost:1337/flow/getexceptedflow',
+
+    querybyskids:'http://localhost:1337/flow/querybyskids',
+
+    querybysk:'http://localhost:1337/flow/querybysk',
+    listsks:'http://localhost:1337/flow/listsks',
+    listbyitemid:'http://localhost:1337/flow/listbyitemid',
+    querybyck:'http://localhost:1337/flow/querybyck',
+
+     createuserprofileapi:'http://localhost:1337/userprofile/create',
+     getallapi:'http://localhost:1337/userprofile/getall',
+     updateapi:'http://localhost:1337/userprofile/update',
+
+    //获取页面信息
+    getpageapi:'http://localhost:1337/page/listOne',
+     //部门添加api
+     adddepartmentapi:'http://localhost:1337/department/adddepartment',
+     //部门展示api
+     listdepartmentapi:'http://localhost:1337/department/listdepartment',
+     //部门修改api
+     updatedepartmentapi:'http://localhost:1337/department/updatedepartment',
+     //部门删除api
+     deletedepartmentapi:'http://localhost:1337/department/deletedepartment',
+     //岗位创建api
+     addjobpositionapi:'http://localhost:1337/jobposition/addjobposition',
+     //岗位展示api
+     listjobpositionapi:'http://localhost:1337/jobposition/listjobposition',
+     //岗位修改api
+     updatejobpositionapi:'http://localhost:1337/jobposition/updatejobposition',
+     //岗位删除api
+     deletejobpositionapi:'http://localhost:1337/jobposition/deletejobposition',
+     //人员添加api
+     createpersonapi:'http://localhost:1337/person/create',
+     //人员搜索api
+     findpersonapi:'http://localhost:1337/person/findperson',
+     //人员展示api
+     listpersonapi:'http://localhost:1337/person/listperson',
+     //人员编辑api
+     updatepersonapi:'http://localhost:1337/person/updateperson',
+     //人员删除api
+     deletepersonapi:'http://localhost:1337/person/deleteperson',
+
+    //列出我自己和我的上级
+    querymyselfandmyboss:'http://localhost:1337/flow/querymyselfandmyboss',
+    //上传文件
+    uploadapi:'http://localhost:1337/uploadfile/upload',
+    getallfilesapi:'http://localhost:1337/uploadfile/getallfiles',
+    getfilesapi:'http://localhost:1337/uploadfile/getfiles',
+    //删除文件
+    delfileapi:'http://localhost:1337/uploadfile/delfile',
+    //列出某个流程下的所有数据
+    queryalldatabyflowid:'http://localhost:1337/flow/queryalldatabyflowid',
+
+    // 列出卡片中的消息
+    listmessageforcardapi:'http://localhost:1337/message/messagequeryforpc',
+
+    // 列出消息列表中的所有消息，在前端做分类查询处理
+    listmessageformessagelistapi:'http://localhost:1337/message/messagequerybycount',
+    listallapprovalbyids:"http://localhost:1337/approvalhistory/listallapprovalbyids",
+    listapprovalnodeandnextnode:"http://localhost:1337/approvalhistory/listapprovalnodeandnextnode",
+
+    //生成数据id
+    generatedataidapi:'http://localhost:1337/flow/generatedataid',
+    uploadlogoapi:"http://localhost:1337/uploadfile/uploadlogo",
+    uploadcompanynameapi:"http://localhost:1337/uploadfile/uploadcompanyname"
+
+}
+
+</script>

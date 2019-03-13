@@ -1,0 +1,22 @@
+<ion-view view-title="{{department}}">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-buttons>
+      <button ng-click="$ionicGoBack()" class="button button-clear"><i class="icon ion-ios-arrow-left"></i></button>
+      </ion-nav-buttons>
+  </ion-nav-bar>
+  <ion-content>
+    <div class="list">
+      <a ng-click="go_person_detail($index)" ng-repeat="item in personList" class="item item_msg">
+        <b class="msg_icon">
+          <i class="fa">{{item.personName | limitTo:-2}}</i>
+        </b>
+        <b class="msg_right">
+          <p class="msg_type">
+            <span class="type">{{item.personName}}</span>
+          </p>
+          <p class="msg_content">{{item.personDesc}}</p>
+        </b>
+      </a>
+    </div>
+  </ion-content>
+</ion-view>

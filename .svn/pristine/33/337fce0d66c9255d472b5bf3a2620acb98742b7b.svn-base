@@ -1,0 +1,33 @@
+/* Empty. Add your own CSS if you like */
+.repet_col{
+  width:25%;
+  height:1rem;
+  float: left;
+}
+.repet_col .font_icon{
+  width: 60%;
+  margin: 0 20%;
+  text-align: center;
+  height: .53rem;
+  line-height: .53rem;
+  font-size: .16rem;
+  background: #387ef5;
+  border-radius: 50%;
+  color: #fff;
+}
+.repet_col .font_icon .font {
+  font-size: .34rem;
+  height: .53rem;
+  line-height: .53rem;
+}
+.repet_col p{
+  text-align: center;
+}
+.loading {
+  text-align: center;
+  margin-top: 2rem !important;
+}
+.scroll,iframe,iframe body{
+  width: 100% !important;
+  height: 100% !important;
+}

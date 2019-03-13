@@ -1,0 +1,61 @@
+/**
+ * Created by demo on 2017/6/27.
+ */
+module.exports = {
+    //创建或者更新conditions
+    updateorcreateconditions:function (req,res) {
+        var desc = req.param('desc');
+        var flowid = req.param("flowid");
+        var operations = req.param('operations');
+        var conditonid = req.param('conditionid');
+        Flowconditions.findOne({
+            id:conditonid
+        }).exec(function (err,condition) {
+            if(err){
+                res.send(200,{error:'未找到condition'})
+            }else {
+                if (!condition) {
+                    Flowconditions.create({
+                        desc:desc,
+                        flowid:flowid,
+                        operations:operations
+                    }).exec(function (err,conditionsed) {
+                        if(!conditionsed){
+                            res.send(200,{error:'创建condition失败'})
+                        }else{
+                            res.send(200,{id:conditionsed.id})
+                        }
+                    })
+                } else {
+                    Flowconditions.update(
+                        {id:conditonid},
+                        {
+                            desc:desc,
+                            flowid:flowid,
+                            operations:operations
+                    }).exec(function (err,upconditions) {
+                            if(!upconditions){
+                                res.send(200,{error:'更新condition失败'})
+                            }else{
+                                res.send(200,{id:upconditions[0].id})
+                            }
+                    })
+                }
+            }
+        })
+    },
+
+    //列出一个流程下所有的条件
+    listconditions:function (req,res) {
+        Flowconditions.find({
+
+        }).exec(function (err,conditions) {
+            if(!conditions){
+                res.send(200,{error:'获取失败'})
+            }else{
+                res.send(200,{conditions:conditions})
+            }
+        })
+    }
+
+};

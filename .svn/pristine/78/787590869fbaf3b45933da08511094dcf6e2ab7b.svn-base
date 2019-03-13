@@ -1,0 +1,13 @@
+{
+	"API":"输出到哪个API"
+	"flowid":"输出到哪个流程中"
+	“userid”:"以哪个用户的ID输出"
+	"token":"与服务器交互时的token，现在没有使用，未来会使用"
+	"mapping":[
+		{
+			"_comments":“主要定义的输出的格式，key为媒体库中的格式，value为API中参数的信息，主要用于最终调用的API的参数的组合”
+			"key":"文章.who"
+			"value":""
+		}
+	]
+}

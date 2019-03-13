@@ -1,0 +1,87 @@
+
+人员相关：
+	system-myself: 表示用户自己，返回用户ID。
+	system-myboss: 表示我的直接领导，，返回用户领导ID。
+
+日期相关：
+	system-today：表示今天
+	system-thisweek：表示本周
+	system-thismonth：表示本月
+	system-thisyear：表示本年
+
+	日期计算
+		system-today + n：未来几天。
+		system-today  - n：过去几天。
+
+工作方式：
+	新增一个systemkeyaction。
+	在ck和sk进行操作前，用systemkeyaction进行处理，如果包含了上面的关键字，调用相应的方法将值转化成系统对应的值。
+
+
+举例：
+	一个复杂关键字：我的项目的支出情况。
+
+	设置who的地方：system-myself.
+
+		1. 先说存储：
+			A: 比如，特定人员的存储：
+					"persons" : {
+						    "flowid" : "",
+						    "skid" : "",
+						    "who" : "593e4ac4d66c259805ac9c27",
+						    "operation" : ""
+						}
+
+			如果是“我的”的情况，存储方式为：
+					"persons" : {
+						    "flowid" : "",
+						    "skid" : "",
+						    "who" : "system-myself",
+						    "operation" : ""
+						}
+
+			B: 再有一个例子：
+			
+				固定时间的的项目情况
+					"duration" : {
+					    "flowid" : "5940d09706f4279c2c8afc6c",
+					    "skid" : "5940d4cd9960671c3f1ae2c6",
+					    "start" : "1485878400000",
+					    "end" : "1498924800000",
+					    "interval" : ""
+					},
+
+				如果是“今年”，则为
+					"duration" : {
+					    "flowid" : "5940d09706f4279c2c8afc6c",
+					    "skid" : "5940d4cd9960671c3f1ae2c6",
+					    "start" : "system-thisyear",
+					    "end" : "system-thisyear",
+					    "interval" : ""
+					},
+
+				如果是“去年”，则为
+					"duration" : {
+					    "flowid" : "5940d09706f4279c2c8afc6c",
+					    "skid" : "5940d4cd9960671c3f1ae2c6",
+					    "systemkey":"system-thisyear-1",
+					    "start" : null,
+					    "end" : null,
+					    "interval" : ""
+					},
+
+
+		2. 设置复杂关键字的地方：
+			多增加的设置有：
+				我自己（“当前登录用户”）  存为：system-myself。。。
+				我的上级（“当前登录用户的上级”）。  存为：system-myboss
+
+			时间上会有：
+				今天，明天，昨天，前X天（x为设置项），后X天。。。
+				本周，上周，下周，前X周（x为设置项），后X周。。。
+				今月，下月，上月，前X月（x为设置项），后X月。。。
+				今年，明年，去年，前X年（x为设置项），后X年。。。
+
+
+		3. 计算：
+			主要思路是通过systemkeyaction，在计算前，把上面的设置的值，转化成固定值，或ID，或时间。

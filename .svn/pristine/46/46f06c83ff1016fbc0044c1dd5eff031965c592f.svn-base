@@ -1,0 +1,24 @@
+<ion-view view-title="登录">
+  <ion-nav-bar class="bar-stable">
+    <ion-nav-back-button class="button-clear">
+      <i class="icon ion-ios-arrow-left"></i>
+    </ion-nav-back-button>
+  </ion-nav-bar>
+  <ion-content class="login">
+    <div class="list list-inset">
+      <label class="item item1 item-input">
+        <span class="input-label">用户名：</span>
+        <input type="text" name="log" placeholder="请输入用户名" ng-model="user.username">
+      </label>
+      <label class="item item1 item-input">
+        <span class="input-label">密　码：</span>
+        <input type="password" name="pwd" placeholder="请输入密码" ng-model="user.password">
+      </label>
+    </div>
+    <div class="padding">
+      <button class="button button-block  button-balanced" ng-click="signIn()">
+        登录
+      </button>
+    </div>
+  </ion-content>
+</ion-view>

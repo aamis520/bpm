@@ -1,0 +1,32 @@
+
+整体分类
+
+	模版类
+		表单
+			提交表单				--- submitform
+			审批表单				--- approveform
+		列表
+			普通列表				--- normallist
+			带搜索和按钮列表		--- stronglist
+		页面
+			普通页面。				--- normalpage
+			带页签页面。			--- tabpage		（页签设置后只能在每页中选择其它页面来展示）
+			按钮标签页面。			--- buttontabpage	（页签设置后只能在每页中选择其它页面来展示）
+
+
+
+	控件类
+		上传附件控件（带列表）。	--- myUpload
+		显示当前附件				--- myFiles
+		card卡片控件。
+		图表
+			甘特图控件。			--- GanttGram
+			饼状图控件。			--- PieChart
+			柱状图控件。			--- HistoGram
+			简单列表。				--- myList
+		button						--- myButton
+			打开页面按钮。
+			系统事件。
+		输入控件。（标签带输入）
+		信息控件。（标签带label）		--- myLabel
+		横向布局

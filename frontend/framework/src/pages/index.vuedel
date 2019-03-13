@@ -1,0 +1,168 @@
+<style scoped>
+
+.layout {
+    border: 1px solid #d7dde4;
+    background: #f5f7f9;
+    position: relative;
+    border-radius: 4px;
+    overflow: hidden;
+}
+
+.layout-breadcrumb {
+    padding: 10px 15px 0;
+}
+
+.layout-content {
+    min-height: 600px;
+    margin: 15px;
+    overflow: hidden;
+    background: #fff;
+    border-radius: 4px;
+}
+
+.layout-content-main {
+    padding: 20px 10px;
+}
+
+.layout-copy {
+    text-align: center;
+    padding: 10px 0 20px;
+    color: #9ea7b4;
+}
+
+.layout-menu-left {
+    background: #464c5b;
+    /*min-width: 100px;*/
+}
+
+.layout-header {
+    height: 60px;
+    background: #fff;
+    box-shadow: 0 1px 1px rgba(0, 0, 0, .1);
+}
+
+.layout-logo-left {
+    width: 90%;
+    height: 30px;
+    background: #5b6270;
+    border-radius: 3px;
+    margin: 15px auto;
+    line-height: 30px;
+    color: white;
+    text-align: center;
+    vertical-align: middle;
+    overflow: hidden;
+}
+
+.layout-ceiling-main a {
+    color: #9ba7b5;
+}
+
+.layout-hide-text .layout-text {
+    display: none;
+}
+
+.ivu-col {
+    transition: width .2s ease-in-out;
+}
+
+</style>
+
+<template>
+
+<div class="layout" :class="{'layout-hide-text': spanLeft < 5}">
+    <Row type="flex">
+        <i-col :span="spanLeft" class="layout-menu-left">
+            <Menu theme="dark" width="auto" @on-select="routeTo" :open-names=[menulist[0].name]>
+                <div class="layout-logo-left">
+                    <h3>XX公司管理系统</h3></div>
+
+                <template v-for="menu in menulist">
+                    <Submenu  :name=menu.name>
+                        <template slot="title">
+                            <Icon type="ios-paper"></Icon>
+                            {{menu.name}}
+                        </template>
+
+                        <template v-for="child in menu.child">
+                            <Menu-item :name=generatemenuid(menu.id,child.node)>
+                                <Icon type="document" :size="iconSize"></Icon>
+                                <span class="layout-text">{{child.name}}</span>
+                            </Menu-item>
+                        </template>
+                    </Submenu>
+                </template>
+                
+                <!--后台的-->
+                <Menu-item name="person">
+                    <Icon type="document" :size="iconSize"></Icon>
+                    <span class="layout-text">人员管理</span>
+                </Menu-item>
+                <Menu-item name="department">
+                    <Icon type="document" :size="iconSize"></Icon>
+                    <span class="layout-text">部门管理</span>
+                </Menu-item>
+                <Menu-item name="position">
+                    <Icon type="document" :size="iconSize"></Icon>
+                    <span class="layout-text">职位管理</span>
+                </Menu-item>
+              
+            </Menu>
+        </i-col>
+        <i-col :span="spanRight">
+            <div class="layout-header">
+                <i-button type="text" @click.native="toggleClick">
+                    <Icon type="navicon" size="32"></Icon>
+                </i-button>
+            </div>
+            <div class="layout-content">
+                <div class="layout-content-main">
+                    <transition mode="out-in">
+                        <router-view></router-view>
+                    </transition>
+                </div>
+            </div>
+        </i-col>
+    </Row>
+</div>
+
+</template>
+
+<script>
+
+export default {
+    data() {
+            return {
+                spanLeft: 5,
+                spanRight: 19,
+                menulist:JSON.parse(localStorage.getItem("menus"))
+            }
+        },
+        computed: {
+            iconSize() {
+                return this.spanLeft === 5 ? 14 : 24;
+            },
+            setActive() {
+              return this.$route.path.replace('/','');
+            }
+        },
+        methods: {
+            generatemenuid(parent, child) {
+                return parent + '|' + child;
+            },
+            toggleClick() {
+                    if (this.spanLeft === 5) {
+                        this.spanLeft = 2;
+                        this.spanRight = 22;
+                    } else {
+                        this.spanLeft = 5;
+                        this.spanRight = 19;
+                    }
+                },
+                routeTo(e) {
+                    this.$router.push(e);
+                }
+        }
+}
+
+</script>

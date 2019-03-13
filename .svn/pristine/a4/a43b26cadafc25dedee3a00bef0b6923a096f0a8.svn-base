@@ -1,0 +1,30 @@
+{
+  "pages":[
+    "pages/index/index",
+    "pages/logs/logs",
+    "pages/about/about",
+    "pages/login/login"
+  ],
+  "window":{
+    "backgroundTextStyle":"light",
+    "navigationBarBackgroundColor": "#ffffff",
+    "navigationBarTitleText": "橙子打卡",
+    "navigationBarTextStyle":"black"
+  },
+   "tabBar": {
+    "color": "#b2b2b2",
+    "selectedColor": "#00b30c",
+    "backgroundColor": "#ffffff",
+    "list": [{
+      "pagePath": "pages/index/index",
+      "text": "极速打卡",
+      "iconPath": "image/icon_sign_2.png",
+      "selectedIconPath": "image/icon_sign_1.png"
+    },{
+      "pagePath": "pages/logs/logs",
+      "text": "打卡记录",
+      "iconPath": "image/icon_Clockin_2.png",
+      "selectedIconPath": "image/icon_Clockin_1.png"
+    }]
+  }
+}
